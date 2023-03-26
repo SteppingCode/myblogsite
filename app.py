@@ -1,7 +1,7 @@
 from flask import render_template, Flask, request, redirect, url_for, session, g, abort, flash
 from config import Config
 from database.sqldb import FDataBase
-
+import git
 
 import os, sqlite3
 
@@ -26,6 +26,15 @@ def get_db():
 def first_page():
     return redirect(url_for('start_page'))
 
+@app.route('/update_server', methods=['POST', 'GET'])
+def webhook():
+    if request.method == 'POST':
+        repo = git.Repo('/home/dodik337/myblogsite')
+        origin = repo.remotes.origin
+        origin.pull()
+        return 'Сайт обновился', 200
+    else:
+        return 'Возникла ошибка', 400
 
 
 #Main page
