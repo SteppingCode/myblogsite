@@ -75,21 +75,13 @@ def post():
             return render_template('post.html', title='Добавить статью', menu=database.getMenu())
     return redirect(url_for('start_page'))
 
-@app.route('/delpost', methods=['POST', 'GET'])
-def delpost():
-    db = get_db()
-    database = FDataBase(db)
-    return render_template('delposts.html', title="Удалить пост")
-
-
-
 #Quit
 @app.route('/quit', methods=['GET', 'POST'])
 def quit_login():
     db = get_db()
     database = FDataBase(db)
     if 'userlogged' in session:
-        return render_template('quit_page.html', title='Выход', menu=database.getMenu())
+        return render_template('quit_page.html', title='Выход', menu=database.getMenu()), session.clear()
     else:
         return redirect(url_for('start_page'))
 
@@ -100,6 +92,23 @@ def allposts():
     return render_template('allposts.html', title='Cписок постов', menu=database.getMenu(),
                            posts=database.getPostAnnoce())
 
+@app.route('/delpost/<int:id_post>')
+def delpost_page(id_post):
+    db = get_db()
+    database = FDataBase(db)
+    title = database.getPostAnnoce()
+    aticle = database.getPostAnnoce()
+    if 'userlogged' in session:
+        if session['userlogged'] == 'admin':
+            delpost = database.delPost(id_post)
+            if not title:
+                abort(404)
+            if delpost:
+                return redirect(url_for('admin_page'))
+            return render_template('admin.html', title='title', menu=database.getAdminMenu(), post=aticle, post_title=title)
+    else:
+        return redirect(url_for('start_page'))
+
 @app.route('/posts/<int:id_post>')
 def showPost(id_post):
     db = get_db()
@@ -108,6 +117,7 @@ def showPost(id_post):
     if not title:
         abort(404)
     return render_template('aticle.html', title='title', menu=database.getMenu(), post=aticle, post_title=title)
+
 
 if __name__ == "__main__":
     app.run(debug=True)

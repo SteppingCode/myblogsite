@@ -131,7 +131,7 @@ class FDataBase:
             if id == 0:
                 self.__cur.execute("DELETE FROM post")
             else:
-                self.__cur.execute("DELETE FROM post WHERE ? == id", (id))
+                self.__cur.execute(f"DELETE FROM post WHERE {id} == id")
             self.__db.commit()
         except sq.Error as e:
             print(str(e))
@@ -169,8 +169,10 @@ if __name__ == "__main__":
     #print(db.addMenu('Авторизация', 'login'))
     #print(db.addMenu('Admin', 'admin_page'))
     #print(db.addMenu('Выход', 'quit_login'))
+    #print(db.delAdminMenu(0))
     #print(db.addAdminMenu('Добавить пост', 'post'))
-    #print(db.addAdminMenu('Удалить пост', 'delpost'))
+    #print(db.addAdminMenu('Удалить пост', 'delpost_page'))
     #print(db.addPost('Брянск', 'Брянск это хороший город России!'))
+    #print(db.delPost(12))
 
 
