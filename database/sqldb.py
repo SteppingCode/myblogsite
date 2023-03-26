@@ -8,7 +8,7 @@ import os
 
 app = Flask(__name__)
 app.config.from_object(Config)
-app.config.update(dict(DATABASE=os.path.join(app.root_path,'../users.db')))
+app.config.update(dict(DATABASE=os.path.join(app.root_path,'../posts.db')))
 
 #Подключение базы данных
 
@@ -19,6 +19,7 @@ def create_db():
         db.cursor().executescript(f.read())
     db.commit()
     db.close()
+    return True
 
 def connect_db():
     conn = sq.connect(app.config['DATABASE'])
@@ -38,28 +39,16 @@ class FDataBase:
 
     def addData(self, username, password):
         try:
-            self.__cur.execute('INSERT INTO users VALUES(NULL, ?, ?)', (username, password))
+            self.__cur.execute("INSERT INTO user VALUES (NULL, ?, ?)", (username, password))
             self.__db.commit()
         except sq.Error as e:
-            print('Ошибка добавления в БД', str(e))
-            return False
-        return True
-
-    def delData(self, id):
-        try:
-            if id == 0:
-                self.__cur.execute("DELETE FROM users")
-            else:
-                self.__cur.execute("DELETE FROM users WHERE id = {}".format(id))
-            self.__db.commit()
-        except sq.Error as e:
-            print('Fail', str(e))
+            print(str(e))
             return False
         return True
 
     def getData(self, username, password):
         try:
-            self.__cur.execute("SELECT username, password FROM users WHERE ? = username AND ? = password", (username, password))
+            self.__cur.execute("SELECT username, password FROM user WHERE ? = username AND ? = password", (username, password))
             res = self.__cur.fetchall()
             return res
         except sq.Error as e:
@@ -73,6 +62,7 @@ class FDataBase:
         except sq.Error as e:
             print(str(e))
             return False
+        return True
 
     def delMenu(self, id=0):
         try:
@@ -84,6 +74,7 @@ class FDataBase:
         except sq.Error as e:
             print(str(e))
             return False
+        return True
 
     def getMenu(self):
         try:
@@ -94,43 +85,76 @@ class FDataBase:
             print(str(e))
             return False
 
-    def addProfile(self, name, username, password, info):
+    def addAdminMenu(self, title, url):
         try:
-            tm = math.floor(time.time())
-            self.__cur.execute("INSERT INTO profile VALUES (NULL, ?, ?, ?, ?, ?)", (name, username, password, info, tm))
+            self.__cur.execute("INSERT INTO adminmenu VALUES (NULL, ?, ?)", (title, url))
             self.__db.commit()
         except sq.Error as e:
             print(str(e))
             return False
+        return True
 
-    def delProfile(self, id=0):
+    def delAdminMenu(self, id=0):
         try:
             if id == 0:
-                self.__cur.execute("DELETE FROM profile")
+                self.__cur.execute("DELETE FROM adminmenu")
             else:
-                self.__cur.execute("DELETE FROM profile WHERE id = ?", (id))
+                self.__cur.execute("DELETE FROM adminmenu WHERE ? == id", (id))
             self.__db.commit()
         except sq.Error as e:
             print(str(e))
             return False
+        return True
 
-    def getProfile(self, name, username):
+    def getAdminMenu(self):
         try:
-            self.__cur.execute("SELECT name, info FROM profile WHERE ? == name AND ? == username", (name, username))
+            self.__cur.execute("SELECT * FROM adminmenu")
             res = self.__cur.fetchall()
+            if res: return res
+        except sq.Error as e:
+            print(str(e))
+            return False
+        return True
+
+    def addPost(self, title, url):
+        try:
+            tm = math.floor(time.time())
+            self.__cur.execute("INSERT INTO post VALUES (NULL, ?, ?, ?)", (title, url, tm))
+            self.__db.commit()
+        except sq.Error as e:
+            print(str(e))
+            return False
+        return True
+
+    def delPost(self, id=0):
+        try:
+            if id == 0:
+                self.__cur.execute("DELETE FROM post")
+            else:
+                self.__cur.execute("DELETE FROM post WHERE ? == id", (id))
+            self.__db.commit()
+        except sq.Error as e:
+            print(str(e))
+            return False
+        return True
+
+    def getPostAnnoce(self):
+        try:
+            self.__cur.execute(f"SELECT id, title, text FROM post ORDER BY time DESC")
+            res = self.__cur.fetchall()
+            if res: return res
+        except sq.Error as e:
+            print("Ошибка получения статей из БД" + str(e))
+        return []
+
+    def getPost(self, postid):
+        try:
+            self.__cur.execute(f"SELECT  title, text FROM post WHERE id = {postid} LIMIT 1")
+            res = self.__cur.fetchone()
             if res: return res
         except sq.Error as e:
             print("Ошибка получения статьи из БД" + str(e))
-            return False
-
-    def getName(self, username, password):
-        try:
-            self.__cur.execute("SELECT name, username, password FROM profile WHERE ? == username AND ? == password", (username, password))
-            res = self.__cur.fetchall()
-            if res: return res
-        except sq.Error as e:
-            print(str(e))
-            return False
+        return (False, False)
 
 
 if __name__ == "__main__":
@@ -139,21 +163,14 @@ if __name__ == "__main__":
     db = FDataBase(db)
     #create_db()
     #print(db.delData(0))
-    #print(db.addData('bob','123'))
-    #print(db.addData('jonny', '1'))
-    #print(db.addData('jon', '321'))
-    #print(db.addData('jek', '825a'))
     #print(db.addData('admin', '111'))
     #print(db.delMenu(0))
     #print(db.addMenu('Главная', 'start_page'))
-    #print(db.addMenu('Регистрация', 'register'))
     #print(db.addMenu('Авторизация', 'login'))
-    #print(db.addMenu('Профиль', 'profile'))
+    #print(db.addMenu('Admin', 'admin_page'))
     #print(db.addMenu('Выход', 'quit_login'))
-    #print(db.addProfile('Евгений', 'admin', '111', 'Я красивый, занимаюсь программирование и люблю математику'))
-    #print(db.addProfile('Вася', 'jonny', '1', 'Я умный, НЕ занимаюсь программирование и люблю математику'))
-    #print(db.addProfile('Петя', 'bob', '123', 'Я не админ этого сайта(('))
-    #print(db.addProfile('Дима', 'jek', '825a', 'Я просто существую'))
-    #print(db.addProfile('Вика', 'jon', '321', 'Я самая популярная в классе!'))
+    #print(db.addAdminMenu('Добавить пост', 'post'))
+    #print(db.addAdminMenu('Удалить пост', 'delpost'))
+    #print(db.addPost('Брянск', 'Брянск это хороший город России!'))
 
 

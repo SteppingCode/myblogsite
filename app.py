@@ -7,7 +7,7 @@ import os, sqlite3
 
 app = Flask(__name__)
 app.config.from_object(Config)
-app.config.update(dict(DATABASE=os.path.join(app.root_path,'../users.db')))
+app.config.update(dict(DATABASE=os.path.join(app.root_path,'../posts.db')))
 
 
 
@@ -26,77 +26,14 @@ def get_db():
 def first_page():
     return redirect(url_for('start_page'))
 
-@app.errorhandler(404)
-def page_not_found(error):
-    return render_template('error.html', title='Страница не найдена')
 
-@app.route('/profile', methods=['POST', 'GET'])
-def profile():
-    db = get_db()
-    database = FDataBase(db)
-    if 'userlogged' in session:
-            if 'admin' in session['userlogged']:
-                return render_template('admin.html', title='Admin', menu=database.getMenu())
-            else:
-                return render_template('profile.html', title="Профиль", menu=database.getMenu(), profile=database.getProfile(request.form['name'], request.form['username']))
-    try:
-        if len(request.form['name']) > 3 and len(request.form['info']) > 6:
-            if request.form['password'] == request.form['password2']:
-                res = database.addProfile(request.form['name'], request.form['username'],\
-                                              request.form['password'], request.form['info'])
-                database.addData(request.form['username'], request.form['password'])
-                if not res:
-                    session['userlogged'] = request.form['username']
-                    flash('Профиль добававлен успешно', category='success')
-                    return redirect(url_for('profile', username=session['userlogged']))
-                else:
-                    flash('Ошибка добавления профиля', category='error')
-            else:
-                return render_template('addprofile.html', title='Добавить профиль', menu=database.getMenu())
-    except:
-        return redirect(url_for('start_page', title='Добавить профиль', menu=database.getMenu(), username=session['userlogged']))
-    return render_template('addprofile.html', title='Добавить профиль', menu=database.getMenu())
-
-"""
-@app.route('/profile')
-def profile():
-    db = get_db()
-    database = FDataBase(db)
-    if 'userlogged' in session:
-        try:
-            if 'admin' in session['userlogged']:
-                return render_template('admin.html', title='Admin', menu=database.getMenu())
-            else:
-                return render_template('profile.html', title="Профиль", menu=database.getMenu(), profile=database.getProfile(prof_reg['name'], session['userlogged']))
-        except NameError as e:
-            print(str(e))
-            abort(404)
-    else:
-        return redirect(url_for('start_page'))
-"""
 
 #Main page
 @app.route('/index', methods=['GET', 'POST'])
 def start_page():
     db = get_db()
     database = FDataBase(db)
-    return render_template('index.html', menu=database.getMenu())
-
-#Register
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    db = get_db()
-    database = FDataBase(db)
-    if 'userlogged' in session:
-        return redirect(url_for('start_page', username=session['userlogged']))
-    if request.method == 'POST':
-        if request.form['password'] == request.form['password2']:
-            if database.addData(request.form["username"], request.form["password"]):
-                session['userlogged'] = request.form['username']
-                return redirect(url_for('start_page', username=session['userlogged']))
-            else:
-                return render_template('register.html', title='Регистрация')
-    return render_template('register.html', title='Регистрация')
+    return render_template('allposts.html', menu=database.getMenu(), posts=database.getPostAnnoce())
 
 #Login
 @app.route('/login', methods=['POST', 'GET'])
@@ -110,6 +47,43 @@ def login():
         return redirect(url_for('start_page', username=session['userlogged']))
     return render_template('login.html', title="Авторизация")
 
+#Admin Page
+@app.route('/admin', methods=['POST', 'GET'])
+def admin_page():
+    db = get_db()
+    database = FDataBase(db)
+    if 'userlogged' in session:
+        if session['userlogged'] == 'admin':
+            return render_template('admin.html', title='Admin Page', menu=database.getAdminMenu(), posts=database.getPostAnnoce())
+    return redirect(url_for('start_page'))
+
+@app.route('/post', methods=['POST', 'GET'])
+def post():
+    db = get_db()
+    database = FDataBase(db)
+    if 'userlogged' in session:
+        if session['userlogged'] == 'admin':
+            if request.method == 'POST':
+                if len(request.form['name']) > 3 and len(request.form['post']) > 10:
+                    res = database.addPost(request.form['name'], request.form['post'])
+                    if not res:
+                        flash('Ошибка добавления статьи', category='error')
+                    else:
+                        flash('Статья добавлена успешно', category='success')
+                else:
+                    flash('Ошибка добавления статьи', category='error')
+            return render_template('post.html', title='Добавить статью', menu=database.getMenu())
+    return redirect(url_for('start_page'))
+
+@app.route('/delpost', methods=['POST', 'GET'])
+def delpost():
+    db = get_db()
+    database = FDataBase(db)
+    return render_template('delposts.html', title="Удалить пост")
+
+
+
+#Quit
 @app.route('/quit', methods=['GET', 'POST'])
 def quit_login():
     db = get_db()
@@ -119,6 +93,21 @@ def quit_login():
     else:
         return redirect(url_for('start_page'))
 
+@app.route('/allposts')
+def allposts():
+    db = get_db()
+    database = FDataBase(db)
+    return render_template('allposts.html', title='Cписок постов', menu=database.getMenu(),
+                           posts=database.getPostAnnoce())
+
+@app.route('/posts/<int:id_post>')
+def showPost(id_post):
+    db = get_db()
+    database = FDataBase(db)
+    title, aticle = database.getPost(id_post)
+    if not title:
+        abort(404)
+    return render_template('aticle.html', title='title', menu=database.getMenu(), post=aticle, post_title=title)
 
 if __name__ == "__main__":
     app.run(debug=True)
