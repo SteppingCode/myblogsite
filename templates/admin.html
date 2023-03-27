@@ -8,9 +8,10 @@
 <ul class="list-posts">
   {% for p in posts %}
   <li>
-    <p class="title"><a href="{{ url_for('showPost', id_post=p.id) }}" > {{ p.title }}</a></p>
+    <p class="title"><a href="{{ url_for('showPost', id_post=p.id) }}" > {{ p.title }}</a> <strong>{{ p.time }}</strong></p>
     <p class="annonce"> {{ p.text[:50]}}</p>
-    <p><a href="{{ url_for('delpost_page', id_post=p.id) }}" >Удалить?</a></p>
+    <p><a href="{{url_for('post_edit', id_post=p.id)}}">Редактировать</a></p>
+    <p><a href="{{ url_for('delpost_page', id_post=p.id) }}" >Удалить</a></p>
   </li>
   {% endfor %}
   </ul>

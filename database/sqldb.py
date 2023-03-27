@@ -1,8 +1,8 @@
 import math
 import sqlite3 as sq
 import time
-
-from flask import Flask, g, request
+import datetime
+from flask import Flask, g
 from config import Config
 import os
 
@@ -116,10 +116,10 @@ class FDataBase:
             return False
         return True
 
-    def addPost(self, title, url):
+    def addPost(self, title, text, photo):
         try:
-            tm = math.floor(time.time())
-            self.__cur.execute("INSERT INTO post VALUES (NULL, ?, ?, ?)", (title, url, tm))
+            tm = time.ctime()
+            self.__cur.execute("INSERT INTO post VALUES (NULL, ?, ?, ?, ?)", (title, text, photo, tm))
             self.__db.commit()
         except sq.Error as e:
             print(str(e))
@@ -140,7 +140,7 @@ class FDataBase:
 
     def getPostAnnoce(self):
         try:
-            self.__cur.execute(f"SELECT id, title, text FROM post ORDER BY time DESC")
+            self.__cur.execute(f"SELECT id, title, text, photo, time FROM post ORDER BY time DESC")
             res = self.__cur.fetchall()
             if res: return res
         except sq.Error as e:
@@ -149,13 +149,21 @@ class FDataBase:
 
     def getPost(self, postid):
         try:
-            self.__cur.execute(f"SELECT  title, text FROM post WHERE id = {postid} LIMIT 1")
+            self.__cur.execute(f"SELECT title, text, photo FROM post WHERE id = {postid} LIMIT 1")
             res = self.__cur.fetchone()
             if res: return res
         except sq.Error as e:
             print("Ошибка получения статьи из БД" + str(e))
         return (False, False)
 
+    def PostUpdate(self, title, text, photo, postid):
+        try:
+            self.__cur.execute(f"UPDATE post SET title == ?, text == ?, photo == ? WHERE id == ?", (title, text, photo, postid))
+            self.__db.commit()
+        except sq.Error as e:
+            print(str(e))
+            return False
+        return True
 
 if __name__ == "__main__":
     from app import connect_db
@@ -167,12 +175,13 @@ if __name__ == "__main__":
     #print(db.delMenu(0))
     #print(db.addMenu('Главная', 'start_page'))
     #print(db.addMenu('Авторизация', 'login'))
-    #print(db.addMenu('Admin', 'admin_page'))
-    #print(db.addMenu('Выход', 'quit_login'))
     #print(db.delAdminMenu(0))
+    #print(db.addAdminMenu('Главная', 'start_page'))
     #print(db.addAdminMenu('Добавить пост', 'post'))
-    #print(db.addAdminMenu('Удалить пост', 'delpost_page'))
-    #print(db.addPost('Брянск', 'Брянск это хороший город России!'))
+    #print(db.addAdminMenu('Admin', 'admin_page'))
+    #print(db.addAdminMenu('Выход', 'quit_login'))
+    #print(db.addPost('Брянск', 'Брянск это хороший город России!', 'http://t0.gstatic.com/licensed-image?q=tbn:ANd9GcQFDyEYcz2fF8CeyHLlcvTwBQqcZAzvyJlA6dxm_S870ENJT2r208KBxz2-QWv7_Pom'))
     #print(db.delPost(12))
-
+    #print(db.getPostAnnoce())
+    #print(db.PostUpdate('', '', 11))
 

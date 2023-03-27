@@ -2,15 +2,23 @@
 
 {% block content %}
 {{ super() }}
-
+<style>
+    ul.list-posts li {
+        overflow: hidden;
+    }
+</style>
 <h2> Список постов </h2>
-<hr>
 
+<hr>
 <ul class="list-posts">
   {% for p in posts %}
   <li>
-    <p class="title" > <a href="{{ url_for('showPost', id_post=p.id) }}" > {{ p.title }}</a></p>
-    <p class="annonce"> {{ p.text[:50]}}</p>
+    <p class="title" style="font-size:30px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;"><a href="{{ url_for('showPost', id_post=p.id) }}" style="text-decoration: none;">{{ p.title }}</a></p>
+    {% if p.text[50] %}
+      <p class="annonce" style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif">{{ p.text[:50]}}...</p>
+    {% else %}
+      <p class="annonce" style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif">{{ p.text[:50]}}</p>
+    {% endif %}
   </li>
   {% endfor %}
   </ul>

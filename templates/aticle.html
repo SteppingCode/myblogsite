@@ -4,4 +4,7 @@
 {{ super() }}
     <h1>{{ post_title }}</h1>
     <p>{{ post }}</p>
+    {% if post_image %}
+        <img src="{{ post_image }}" width="auto" height="auto">
+    {% endif %}
 {% endblock %}

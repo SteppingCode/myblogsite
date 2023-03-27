@@ -1,9 +1,0 @@
-{% extends "base.html" %}
-
-{% block content %}
-{{super()}}
-<h1>Вы точно хотите выйти?</h1>
-<button><a href="{{ url_for('start_page') }}">Да</a></button>
-<button>Нет</button>
-{% endblock  %}
-

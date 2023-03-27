@@ -1,3 +1,5 @@
+import time
+
 from flask import render_template, Flask, request, redirect, url_for, session, g, abort, flash
 from config import Config
 from database.sqldb import FDataBase
@@ -42,7 +44,10 @@ def webhook():
 def start_page():
     db = get_db()
     database = FDataBase(db)
-    return render_template('allposts.html', menu=database.getMenu(), posts=database.getPostAnnoce())
+    if 'userlogged' in session:
+        if session['userlogged'] == 'admin':
+            return render_template('allposts.html', title="Главная", menu=database.getAdminMenu(), posts=database.getPostAnnoce())
+    return render_template('allposts.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce())
 
 #Login
 @app.route('/login', methods=['POST', 'GET'])
@@ -74,7 +79,7 @@ def post():
         if session['userlogged'] == 'admin':
             if request.method == 'POST':
                 if len(request.form['name']) > 3 and len(request.form['post']) > 10:
-                    res = database.addPost(request.form['name'], request.form['post'])
+                    res = database.addPost(request.form['name'], request.form['post'], request.form['photo'])
                     if not res:
                         flash('Ошибка добавления статьи', category='error')
                     else:
@@ -87,12 +92,8 @@ def post():
 #Quit
 @app.route('/quit', methods=['GET', 'POST'])
 def quit_login():
-    db = get_db()
-    database = FDataBase(db)
     if 'userlogged' in session:
-        return render_template('quit_page.html', title='Выход', menu=database.getMenu()), session.clear()
-    else:
-        return redirect(url_for('start_page'))
+        return redirect(url_for('start_page')), session.clear()
 
 @app.route('/allposts')
 def allposts():
@@ -100,6 +101,24 @@ def allposts():
     database = FDataBase(db)
     return render_template('allposts.html', title='Cписок постов', menu=database.getMenu(),
                            posts=database.getPostAnnoce())
+
+@app.route('/editpost/<int:id_post>', methods=['POST', 'GET'])
+def post_edit(id_post):
+    db = get_db()
+    database = FDataBase(db)
+    if 'userlogged' in session:
+        if session['userlogged'] == 'admin':
+            if request.method == 'POST':
+                if len(request.form['title']) > 3 and len(request.form['text']) > 10:
+                    res = database.PostUpdate(request.form['title'], request.form['text'], request.form['photo'], id_post)
+                    if not res:
+                        flash('Ошибка редактирования статьи', category='error')
+                    else:
+                        flash('Статья успешно редактирована', category='success')
+                else:
+                    flash('Ошибка редактирования статьи', category='error')
+            return render_template('post_edit.html', title='Редактировать статью', menu=database.getMenu(), post=database.getPost(id_post))
+    return redirect(url_for('start_page'))
 
 @app.route('/delpost/<int:id_post>')
 def delpost_page(id_post):
@@ -122,10 +141,13 @@ def delpost_page(id_post):
 def showPost(id_post):
     db = get_db()
     database = FDataBase(db)
-    title, aticle = database.getPost(id_post)
+    title, aticle, photo = database.getPost(id_post)
     if not title:
         abort(404)
-    return render_template('aticle.html', title='title', menu=database.getMenu(), post=aticle, post_title=title)
+    if 'userlogged' in session:
+        if session['userlogged'] == 'admin':
+            return render_template('aticle.html', title='title', menu=database.getAdminMenu(), post=aticle, post_title=title, post_image=photo)
+    return render_template('aticle.html', title='title', menu=database.getMenu(), post=aticle, post_title=title, post_image=photo)
 
 
 if __name__ == "__main__":

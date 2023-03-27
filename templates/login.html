@@ -1,12 +1,57 @@
 {% extends 'base.html' %}
 {% block content %}
-<form action="{{url_for('login')}}" method="post" class='form-contact'>
-    <h1>Вход</h1>
-    <p><label> Имя: </label> <input type="text" name="username" value="" required></p>
-    <p><label> Пароль: </label> <input type="password" name="password" value="" required></p>
-    <p><input type="submit"></p>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
-
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            width: 300px;
+            padding: 15px;
+            border: 1px solid skyblue;
+            border-radius: 5px;
+        }
+        input {
+            margin: 5px 0px;
+            height: 35px;
+            padding: 7px;
+        }
+        input:invalid {
+            animation: shake 300ms;
+            color: rgb(255,  35, 35);
+        }
+        @keyframes shake {
+            25% { transform: translateX(4px); }
+            50% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
+        button {
+            height: 35px;
+            margin: 5px 0px;
+            background-color: skyblue;
+            border: none;
+            border-radius: 5px;
+            color: #333;
+        }
+        button:hover {
+            background-color: #333;
+            color: skyblue;
+        }
+    </style>
+<form action="{{url_for('login')}}" method="post" class="container">
+    <input type="text" name="username" placeholder="Логин" pattern="[A-Za-z ]*" required>
+    <input type="password" name="password" placeholder="Пароль" required>
+    <button>Войти</button>
 </form>
 
 

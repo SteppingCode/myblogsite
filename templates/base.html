@@ -5,8 +5,38 @@
     <link type="text/css" href="{{url_for('static', filename='css/styles.css')}}" rel="stylesheet"/>
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
     {% if title %}
-        <title>Главная</title>
+        <title>{{title}}</title>
     {% endif %}
+    <style>
+        ul.menu li {
+            float: left;
+            margin: 10px 40px 0px 50px;
+            position: relative;
+            cursor: pointer;
+        }
+        ul.menu li .last{
+        float: right;
+        }
+        ul.menu a:hover {
+        color:lightblue;
+        }
+        ul.menu a::after {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            height: 2px;
+            width: 100%;
+            left: 0;
+            background-color: skyblue;
+            transition: 0.3s;
+            transition-timing-function: ease-in-out;
+            transform: scaleX(0);
+        }
+        ul.menu a:hover::after {
+            transform: scaleX(-1);
+        }
+
+    </style>
 </head>
 <body>
 
