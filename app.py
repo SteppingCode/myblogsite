@@ -93,7 +93,8 @@ def post():
 @app.route('/quit', methods=['GET', 'POST'])
 def quit_login():
     if 'userlogged' in session:
-        return redirect(url_for('start_page')), session.clear()
+        if session['userlogged'] == 'admin':
+            return redirect(url_for('start_page')), session.clear()
 
 @app.route('/allposts')
 def allposts():
@@ -137,17 +138,15 @@ def delpost_page(id_post):
     else:
         return redirect(url_for('start_page'))
 
-@app.route('/posts/<int:id_post>')
+@app.route('/posts/<int:id_post>', methods=['POST', 'GET'])
 def showPost(id_post):
     db = get_db()
     database = FDataBase(db)
     title, aticle, photo = database.getPost(id_post)
-    if not title:
-        abort(404)
     if 'userlogged' in session:
         if session['userlogged'] == 'admin':
-            return render_template('aticle.html', title='title', menu=database.getAdminMenu(), post=aticle, post_title=title, post_image=photo)
-    return render_template('aticle.html', title='title', menu=database.getMenu(), post=aticle, post_title=title, post_image=photo)
+            return render_template('aticle.html', title=title, menu=database.getAdminMenu(), post=aticle, post_title=title, post_image=photo)
+    return render_template('aticle.html', title=title, menu=database.getMenu(), post=aticle, post_title=title, post_image=photo)
 
 
 if __name__ == "__main__":

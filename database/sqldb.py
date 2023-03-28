@@ -84,6 +84,7 @@ class FDataBase:
         except sq.Error as e:
             print(str(e))
             return False
+        return True
 
     def addAdminMenu(self, title, url):
         try:
