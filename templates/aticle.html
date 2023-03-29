@@ -2,9 +2,36 @@
 
 {% block content %}
 {{ super() }}
+<style>
+    h1 {
+        margin: 25px;
+    }
+    .post-text {
+        margin: 50px;
+    }
+</style>
+{% for cat, msg in get_flashed_messages(True) %}
+<div class="flash {{cat}}"> {{msg}}</div>
+{% endfor %}
     <h1>{{ post_title }}</h1>
-    <p>{{ post }}</p>
+    <p class="post-text">{{ post }}</p>
     {% if post_image %}
         <img src="{{ post_image }}" width="auto" height="auto">
+    {% endif %}
+    <form method="post">
+        <p><input name="username" placeholder="Ник" required></p>
+        <p><textarea placeholder="Текст комментария" name="text" required></textarea></p>
+        <p><button type="submit">Отправить</button></p>
+    </form>
+    {% if comments %}
+        {% for com in comments %}
+            <p>{{com.username}}</p>
+            <p>{{com.text}}</p>
+        {% if session %}
+            <p><a href="{{ url_for('delcom_page', id_post=com.postid, id_com=com.id) }}">Удалить</a></p>
+        {% endif %}
+        {% endfor %}
+    {% else %}
+        <h4>Тут пока ничего нет...</h4>
     {% endif %}
 {% endblock %}

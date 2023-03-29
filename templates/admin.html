@@ -2,6 +2,24 @@
 
 {% block content %}
 {{ super() }}
+<style>
+  .list-posts {
+    width: 50%
+    display: flexbox;
+    position: absolute;
+    align-items: flex-start;
+  }
+  .todo-list {
+    width: 50%;
+    display: flexbox;
+    position: absolute;
+    margin-left: 50%;
+  }
+  #hz:hover {
+    color: red;
+  }
+</style>
+
 <h2> Список постов </h2>
 <hr>
 
@@ -14,5 +32,19 @@
     <p><a href="{{ url_for('delpost_page', id_post=p.id) }}" >Удалить</a></p>
   </li>
   {% endfor %}
-  </ul>
+</ul>
+<ol class="todo-list">
+  <h2>TODO</h2>
+  {% if todo %}
+    {% for do in todo %}
+      <li>
+        <p><a href="{{url_for('deltodo', id_todo=do.id)}}" style="text-decoration: none;"><span id="hz">{{do.text}}</span></a></p>
+      </li>
+    {% endfor %}
+  {% endif %}
+  <form method="post">
+    <p><input name="text" type="text" placeholder="Текст"></p>
+    <button type="submit">Добавить</button>
+  </form>
+</ol>
 {% endblock %}

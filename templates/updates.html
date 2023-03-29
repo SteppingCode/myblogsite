@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+{{ super() }}
+<style>
+    h2 {
+        margin-left: 40%;
+        color: #E5D6A5;
+	    font-family: Arial;
+	    font-size: 22px;
+	    font-weight: bold;
+	    text-shadow:
+		-0   -1px 1px #000000,
+		 0   -1px 1px #000000,
+		-0    1px 1px #000000,
+		 0    1px 1px #000000,
+		-1px -0   1px #000000,
+		 1px -0   1px #000000,
+		-1px  0   1px #000000,
+		 1px  0   1px #000000,
+		-1px -1px 1px #000000,
+		 1px -1px 1px #000000,
+		-1px  1px 1px #000000,
+		 1px  1px 1px #000000,
+		-1px -1px 1px #000000,
+		 1px -1px 1px #000000,
+		-1px  1px 1px #000000,
+		 1px  1px 1px #000000;
+}
+    }
+    ul.list-updates {
+        list-style-type: none;
+    }
+    ul.list-updates li {
+        overflow: hidden;
+        font-weight: bold;
+    }
+    .title:hover {
+      color:skyblue;
+    }
+    img {
+      max-width: 40%;
+      max-height: 40%;
+    }
+</style>
+<h2> Список обновлений </h2>
+
+<hr>
+<ul class="list-updates">
+  {% if updates %}
+      {% for upd in updates %}
+        <li>
+          <p class="title" style="font-size:30px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">{{ upd.title }}</p> <strong>{{ upd.time }}</strong>
+          <p style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif">{{upd.text}}</p>
+          {% if upd.photo %}
+            <img src="{{ upd.photo }}" width="auto" height="auto">
+          {% endif %}
+          {% if session %}
+            <p><a href="{{ url_for('editupdate_page', id_update=upd.id) }}" style="color: #9FCC56; border: 1px skyblue solid; border-radius: 2px; padding: 5px; font-size:20px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; text-decoration: none;">Редактировать</a></p>
+            <p><a href="{{ url_for('delupdate_page', id_update=upd.id) }}" style="color: red; border: 1px skyblue solid; border-radius: 2px; padding: 5px; font-size:20px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; text-decoration: none;">Удалить</a></p>
+          {% endif %}
+        </li>
+      {% endfor %}
+  {% endif %}
+  {% if session %}
+    <form method="post">
+      <p><input type="text" name="title" placeholder="Название обновления" required></p>
+      <p><textarea name="text" rows="5" cols="40" placeholder="Текст" required></textarea></p>
+      <p><input type="text" name="photo" placeholder="Ссылка на фото"></p>
+      <button type="submit">Добавить</button>
+    </form>
+  {% endif %}
+  </ul>
+{% endblock %}
