@@ -5,7 +5,7 @@ import git, os, sqlite3
 
 app = Flask(__name__)
 app.config.from_object(Config)
-app.config.update(dict(DATABASE=os.path.join(app.root_path,'posts.db'))) #Создается база данных
+app.config.update(dict(DATABASE=os.path.join(app.root_path,'../posts.db'))) #Создается база данных
 
 #Соединение с базой данных
 def connect_db():
