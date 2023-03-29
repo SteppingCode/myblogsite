@@ -3,13 +3,42 @@
 {% block content %}
 {{ super() }}
 <style>
+    h2 {
+        margin-left: 40%;
+        color: #E5D6A5;
+	    font-family: Arial;
+	    font-size: 22px;
+	    font-weight: bold;
+	    text-shadow:
+		-0   -1px 1px #000000,
+		 0   -1px 1px #000000,
+		-0    1px 1px #000000,
+		 0    1px 1px #000000,
+		-1px -0   1px #000000,
+		 1px -0   1px #000000,
+		-1px  0   1px #000000,
+		 1px  0   1px #000000,
+		-1px -1px 1px #000000,
+		 1px -1px 1px #000000,
+		-1px  1px 1px #000000,
+		 1px  1px 1px #000000,
+		-1px -1px 1px #000000,
+		 1px -1px 1px #000000,
+		-1px  1px 1px #000000,
+		 1px  1px 1px #000000;
+}
+    }
+    ul.list-posts {
+        list-style-type: none;
+    }
     ul.list-posts li {
         overflow: hidden;
+        font-weight: bold;
     }
 </style>
 <h2> Список постов </h2>
-
 <hr>
+
 <ul class="list-posts">
   {% for p in posts %}
   <li>

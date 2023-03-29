@@ -1,40 +1,39 @@
-import time
 from flask import render_template, Flask, request, redirect, url_for, session, g, abort, flash
 from config import Config
 from database.sqldb import FDataBase
-import git
-
-import os, sqlite3
+import git, os, sqlite3
 
 app = Flask(__name__)
 app.config.from_object(Config)
-app.config.update(dict(DATABASE=os.path.join(app.root_path,'../posts.db')))
+app.config.update(dict(DATABASE=os.path.join(app.root_path,'posts.db'))) #Создается база данных
 
+#Соединение с базой данных
 def connect_db():
     conn = sqlite3.connect(app.config['DATABASE'])
     conn.row_factory = sqlite3.Row
     return conn
 
-
+#Получение данных из базы данных
 def get_db():
     if not hasattr(g, 'link_db'):
         g.link_db = connect_db()
         return g.link_db
 
+#Redirect to start_page
 @app.route('/', methods=['GET', 'POST'])
 def first_page():
     return redirect(url_for('start_page'))
 
+#Git update (doesnt work)
 @app.route('/update_server', methods=['POST', 'GET'])
 def webhook():
     if request.method == 'POST':
-        repo = git.Repo('/home/dodik337/myblogsite')
+        repo = git.Repo('/home/myblogweb/myblogsite')
         origin = repo.remotes.origin
         origin.pull()
         return 'Сайт обновился', 200
     else:
         return 'Возникла ошибка', 400
-
 
 #Main page
 @app.route('/index', methods=['GET', 'POST'])
@@ -75,6 +74,7 @@ def admin_page():
             return render_template('admin.html', title='Admin Page', menu=database.getAdminMenu(), posts=database.getPostAnnoce(), todo=database.getTODO())
     return redirect(url_for('start_page'))
 
+#Create post
 @app.route('/post', methods=['POST', 'GET'])
 def post():
     db = get_db()
@@ -90,23 +90,10 @@ def post():
                         flash('Статья добавлена успешно', category='success')
                 else:
                     flash('Ошибка добавления статьи', category='error')
-            return render_template('post.html', title='Добавить статью', menu=database.getMenu())
+            return render_template('post.html', title='Добавить статью', menu=database.getAdminMenu())
     return redirect(url_for('start_page'))
 
-#Quit
-@app.route('/quit', methods=['GET', 'POST'])
-def quit_login():
-    if 'userlogged' in session:
-        if session['userlogged'] == 'admin':
-            return redirect(url_for('start_page')), session.clear()
-
-@app.route('/allposts')
-def allposts():
-    db = get_db()
-    database = FDataBase(db)
-    return render_template('allposts.html', title='Cписок постов', menu=database.getMenu(),
-                           posts=database.getPostAnnoce())
-
+#Edit post
 @app.route('/editpost/<int:id_post>', methods=['POST', 'GET'])
 def post_edit(id_post):
     db = get_db()
@@ -122,9 +109,24 @@ def post_edit(id_post):
                         flash('Статья успешно редактирована', category='success')
                 else:
                     flash('Ошибка редактирования статьи', category='error')
-            return render_template('post_edit.html', title='Редактировать статью', menu=database.getMenu(), post=database.getPost(id_post))
+            return render_template('post_edit.html', title='Редактировать статью', menu=database.getAdminMenu(), post=database.getPost(id_post))
     return redirect(url_for('start_page'))
 
+#Quit
+@app.route('/quit', methods=['GET', 'POST'])
+def quit_login():
+    if 'userlogged' in session:
+        return redirect(url_for('start_page')), session.clear()
+
+#Show all posts
+@app.route('/allposts')
+def allposts():
+    db = get_db()
+    database = FDataBase(db)
+    return render_template('allposts.html', title='Cписок постов', menu=database.getMenu(),
+                           posts=database.getPostAnnoce())
+
+#Deleting post
 @app.route('/delpost/<int:id_post>')
 def delpost_page(id_post):
     db = get_db()
@@ -142,7 +144,7 @@ def delpost_page(id_post):
     else:
         return redirect(url_for('start_page'))
 
-
+#Post page
 @app.route('/posts/<int:id_post>', methods=['POST', 'GET'])
 def showPost(id_post):
     db = get_db()
@@ -174,6 +176,7 @@ def showPost(id_post):
         return render_template('aticle.html', title=title, menu=database.getMenu(), post=aticle, post_title=title, post_image=photo, comments=comments)
     return render_template('aticle.html', title=title, menu=database.getMenu(), post=aticle, post_title=title, post_image=photo)
 
+#Deleting comment
 @app.route('/delcom/<int:id_post>/<int:id_com>')
 def delcom_page(id_post, id_com):
     db = get_db()
@@ -182,7 +185,7 @@ def delcom_page(id_post, id_com):
         if session['userlogged'] == 'admin':
             delcom = database.delComment(id_post, id_com)
             if delcom:
-                return redirect(url_for('start_page'))
+                return redirect(url_for('showPost', id_post=id_post))
             return render_template('aticle.html', menu=database.getAdminMenu())
     else:
         return redirect(url_for('start_page'))
@@ -205,6 +208,25 @@ def update_page():
             return render_template('updates.html', title='Обновления', menu=database.getAdminMenu(), updates=database.getUpdatesAnnoce())
     return render_template('updates.html', title='Обновления', menu=database.getMenu(), updates=database.getUpdatesAnnoce())
 
+#Edit update
+@app.route('/editupdate/<int:id_update>', methods=['POST', 'GET'])
+def editupdate_page(id_update):
+    db = get_db()
+    database = FDataBase(db)
+    if 'userlogged' in session:
+        if session['userlogged'] == 'admin':
+            if request.method == 'POST':
+                if len(request.form['title']) > 3 and len(request.form['text']) > 10:
+                    res = database.UpdateUpdate(request.form['title'], request.form['text'], request.form['photo'], id_update)
+                    if not res:
+                        flash('Ошибка редактирования обновления', category='error')
+                    else:
+                        flash('Обновление успешно редактировано', category='success')
+                else:
+                    flash('Ошибка редактирования обновления', category='error')
+            return render_template('update_edit.html', title='Редактировать обновление', menu=database.getAdminMenu(), update=database.getUpdate(id_update))
+    return redirect(url_for('start_page'))
+
 #Deleting update
 @app.route('/delupdate/<int:id_update>')
 def delupdate_page(id_update):
@@ -218,26 +240,6 @@ def delupdate_page(id_update):
             return render_template('updates.html', menu=database.getAdminMenu())
     else:
         return redirect(url_for('update_page'))
-
-#Edit post
-@app.route('/editupdate/<int:id_update>', methods=['POST', 'GET'])
-def editupdate_page(id_update):
-    db = get_db()
-    database = FDataBase(db)
-    if 'userlogged' in session:
-        if session['userlogged'] == 'admin':
-            if request.method == 'POST':
-                if len(request.form['title']) > 3 and len(request.form['text']) > 10:
-                    res = database.UpdateUpdate(request.form['title'], request.form['text'], request.form['photo'], id_update)
-                    if not res:
-                        flash('Ошибка редактирования статьи', category='error')
-                    else:
-                        flash('Статья успешно редактирована', category='success')
-                else:
-                    flash('Ошибка редактирования статьи', category='error')
-            return render_template('update_edit.html', title='Редактировать обновление', menu=database.getAdminMenu(), update=database.getUpdate(id_update))
-    return redirect(url_for('start_page'))
-
 
 #Deleting to-do-list
 @app.route('/deltodo/<int:id_todo>/')
@@ -253,7 +255,6 @@ def deltodo(id_todo):
     else:
         return redirect(url_for('start_page'))
 
-
+#Site start
 if __name__ == "__main__":
     app.run(debug=True)
-

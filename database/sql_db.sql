@@ -1,4 +1,4 @@
-create table if not exists post (
+    create table if not exists post (
 id integer primary key autoincrement,
 title text not null,
 text text not null,

@@ -4,34 +4,55 @@
 {{ super() }}
 <style>
     h1 {
-        margin: 25px;
+    margin: 25px;
     }
     .post-text {
-        margin: 50px;
+    margin: 50px;
+    }
+    .comment-add {
+        margin-left: 50px;
+    }
+    .comments {
+        list-style-type: none;
+        margin-left: 50px;
+    }
+    .comment {
+        list-style-type: none;
+        width: 40%;
+        padding: 10px;
+        border-radius: 5px;
     }
 </style>
 {% for cat, msg in get_flashed_messages(True) %}
 <div class="flash {{cat}}"> {{msg}}</div>
 {% endfor %}
     <h1>{{ post_title }}</h1>
+    <hr>
     <p class="post-text">{{ post }}</p>
     {% if post_image %}
         <img src="{{ post_image }}" width="auto" height="auto">
     {% endif %}
-    <form method="post">
+    <form method="post" class="comment-add">
+        <h4>Добавить комментарий</h4>
         <p><input name="username" placeholder="Ник" required></p>
         <p><textarea placeholder="Текст комментария" name="text" required></textarea></p>
         <p><button type="submit">Отправить</button></p>
     </form>
-    {% if comments %}
-        {% for com in comments %}
-            <p>{{com.username}}</p>
-            <p>{{com.text}}</p>
-        {% if session %}
-            <p><a href="{{ url_for('delcom_page', id_post=com.postid, id_com=com.id) }}">Удалить</a></p>
+    <div class="comments">
+        {% if comments %}
+        <ul>
+            <li class="comment">
+            {% for com in comments %}
+                <p style="font-size:30px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;"><strong>{{com.username}}</strong></p>
+                <p style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif">{{com.text}}</p>
+            {% if session %}
+                <p style="font-size:30px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;"><a href="{{ url_for('delcom_page', id_post=com.postid, id_com=com.id) }}" style="text-decoration: none;">Удалить</a></p>
+            {% endif %}
+            {% endfor %}
+            </li>
+        </ul>
+        {% else %}
+            <h4>Тут пока ничего нет...</h4>
         {% endif %}
-        {% endfor %}
-    {% else %}
-        <h4>Тут пока ничего нет...</h4>
-    {% endif %}
+    </div>
 {% endblock %}

@@ -13,6 +13,26 @@
             margin: 10px 40px 0px 50px;
             position: relative;
             cursor: pointer;
+            font-family: Arial;
+	        font-size: 22px;
+	        font-weight: bold;
+	        text-shadow:
+		    -0   -1px 1px #000000,
+		     0   -1px 1px #000000,
+		    -0    1px 1px #000000,
+		     0    1px 1px #000000,
+		    -1px -0   1px #000000,
+		     1px -0   1px #000000,
+		    -1px  0   1px #000000,
+		     1px  0   1px #000000,
+		    -1px -1px 1px #000000,
+		     1px -1px 1px #000000,
+		    -1px  1px 1px #000000,
+		     1px  1px 1px #000000,
+		    -1px -1px 1px #000000,
+		     1px -1px 1px #000000,
+		    -1px  1px 1px #000000,
+		     1px  1px 1px #000000;
         }
         ul.menu li .last{
         float: right;
@@ -50,7 +70,6 @@
 
             {% endblock menu -%}
 
-<hr>
 {% with messages = get_flashed_messages() %}
 {% if messages %}
 <ul>
