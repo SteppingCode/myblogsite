@@ -44,3 +44,10 @@ text text not null,
 photo text not null,
 time integer not null
 );
+
+create table if not exists likes (
+id integer primary key autoincrement,
+like integer not null,
+dislike integer not null,
+updateid integer not null
+);

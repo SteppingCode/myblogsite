@@ -10,7 +10,7 @@ class Config():
 
 app = Flask(__name__)
 app.config.from_object(Config)
-app.config.update(dict(DATABASE=os.path.join(app.root_path,'../posts.db')))
+app.config.update(dict(DATABASE=os.path.join(app.root_path,'../../posts.db')))
 
 def connect_db():
     conn = sq.connect(app.config['DATABASE'])
@@ -309,6 +309,57 @@ class FDataBase:
             return False
         return True
 
+    def addLike(self, updateid):
+        try:
+            self.__cur.execute("INSERT INTO likes VALUES (NULL, ?, ?, ?)", (0, 0, updateid))
+            self.__db.commit()
+        except sq.Error as e:
+            print(str(e))
+            return False
+        return True
+
+    def likeUpdate(self, updateid):
+        try:
+            self.__cur.execute(f"UPDATE likes SET like = like + 1 WHERE updateid = {updateid}")
+            self.__db.commit()
+        except sq.Error as e:
+            print(str(e))
+            return False
+        return True
+
+    def dislikeUpdate(self, updateid):
+        try:
+            self.__cur.execute(f"UPDATE likes SET dislike = dislike + 1 WHERE updateid = {updateid}")
+            self.__db.commit()
+        except sq.Error as e:
+            print(str(e))
+            return False
+        return True
+    def DELlikeUpdate(self, updateid):
+        try:
+            self.__cur.execute(f"UPDATE likes SET like = like - 1 WHERE updateid = {updateid}")
+            self.__db.commit()
+        except sq.Error as e:
+            print(str(e))
+            return False
+        return True
+
+    def DELdislikeUpdate(self, updateid):
+        try:
+            self.__cur.execute(f"UPDATE likes SET dislike = dislike - 1 WHERE updateid = {updateid}")
+            self.__db.commit()
+        except sq.Error as e:
+            print(str(e))
+            return False
+        return True
+    def getLikes(self, updateid):
+        try:
+            self.__cur.execute(f"SELECT like, dislike FROM likes WHERE updateid == {updateid}")
+            res = self.__cur.fetchall()
+            return res
+        except sq.Error as e:
+            print(str(e))
+            return False
 
 if __name__ == "__main__":
     #from app import connect_db

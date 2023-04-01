@@ -190,7 +190,7 @@ def delcom_page(id_post, id_com):
     else:
         return redirect(url_for('start_page'))
 
-#Update page
+#Updates page
 @app.route('/updates_log', methods=['POST', 'GET'])
 def update_page():
     db = get_db()
@@ -207,6 +207,41 @@ def update_page():
                     return redirect(url_for('update_page'))
             return render_template('updates.html', title='Обновления', menu=database.getAdminMenu(), updates=database.getUpdatesAnnoce())
     return render_template('updates.html', title='Обновления', menu=database.getMenu(), updates=database.getUpdatesAnnoce())
+
+#Update page
+@app.route('/update/<int:id_update>', methods=['POST', 'GET'])
+def showUpdate(id_update):
+    db = get_db()
+    database = FDataBase(db)
+    title, aticle, photo = database.getUpdate(id_update)
+    likes = database.getLikes(id_update)
+    return render_template('update_page.html', title=title, menu=database.getMenu(), update_text=aticle, update_title=title, update_image=photo, likes=likes, id_update=id_update)
+
+#Like update
+@app.route('/like/<int:id_update>/')
+def update_like(id_update):
+    db = get_db()
+    database = FDataBase(db)
+    addlike = database.likeUpdate(id_update)
+    if addlike:
+        return redirect(url_for('showUpdate', id_update=id_update))
+    if 'userlogged' in session:
+        if session['userlogged'] == 'admin':
+            return render_template('update_page.html', menu=database.getAdminMenu(), id_update=id_update, add_like=database.addLike(id_update))
+    return render_template('update_page.html', menu=database.getMenu(), id_update=id_update, add_like=database.addLike(id_update))
+
+#Dislike update
+@app.route('/dislike/<int:id_update>/')
+def update_dislike(id_update):
+    db = get_db()
+    database = FDataBase(db)
+    adddislike = database.dislikeUpdate(id_update)
+    if adddislike:
+        return redirect(url_for('showUpdate', id_update=id_update))
+    if 'userlogged' in session:
+        if session['userlogged'] == 'admin':
+            return render_template('update_page.html', menu=database.getAdminMenu(), id_update=id_update, add_like=database.addLike(id_update))
+    return render_template('update_page.html', menu=database.getMenu(), id_update=id_update, add_like=database.addLike(id_update))
 
 #Edit update
 @app.route('/editupdate/<int:id_update>', methods=['POST', 'GET'])

@@ -50,7 +50,7 @@
   {% if updates %}
       {% for upd in updates %}
         <li>
-          <p class="title" style="font-size:30px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">{{ upd.title }}</p> <strong>{{ upd.time }}</strong>
+          <p class="title" style="font-size:30px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;"><a href="{{url_for('showUpdate', id_update=upd.id)}}" style="text-decoration: none; color: black;">{{ upd.title }}</a></p> <strong>{{ upd.time }}</strong>
           <p style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif">{{upd.text}}</p>
           {% if upd.photo %}
             <img src="{{ upd.photo }}" width="auto" height="auto">

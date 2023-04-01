@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+{{ super() }}
+<style>
+    h1 {
+    margin: 25px;
+    }
+    .post-text {
+    margin: 50px;
+    }
+    .update-image {
+        margin-left: 50px;
+    }
+    .likes {
+        background-color: lightgreen;
+        width: 20px;
+        position: fixed;
+        margin-left: 60px;
+        text-align: center;
+    }
+    .dislikes {
+        background-color: tomato;
+        width: 20px;
+        position: fixed;
+        margin-left: 100px;
+        text-align: center;
+    }
+    .image.like {
+        margin-left: 20px;
+        position: fixed;
+        padding: 5px;
+    }
+    .image.dislike {
+        margin-left: 120px;
+        position: fixed;
+        padding: 5px;
+    }
+    .image.like:hover {
+
+    }
+</style>
+    <h1>{{ update_title }}</h1>
+    <hr>
+    <p class="post-text">{{ update_text }}</p>
+    {% if update_image %}
+        <img src="{{ update_image }}" width="auto" height="auto" class="update-image">
+    {% endif %}
+    {% if likes %}
+        {% for like in likes %}
+            <p><a class="image like" href="{{url_for('update_like', id_update=id_update)}}" title="Мне нравится" style="text-decoration: none; color: black;"><img src="https://cdn-icons-png.flaticon.com/512/633/633759.png" width="125px" height="50px">{{like.like}}</a></p>
+            <p><a class="image dislike" href="{{url_for('update_dislike', id_update=id_update)}}" title="Мне не нравится" style="text-decoration: none; color: black;"><img src="https://cdn-icons-png.flaticon.com/512/633/633758.png" width="125px" height="50px">{{like.dislike}}</a></p>
+        {% endfor %}
+    {% else %}
+        <p><a class="image like" href="{{url_for('update_like', id_update=id_update)}}" title="Мне нравится"><img src="https://cdn-icons-png.flaticon.com/512/633/633759.png" width="125px" height="50px"></a></p>
+        <p><a class="image dislike" href="{{url_for('update_dislike', id_update=id_update)}}" title="Мне не нравится"><img src="https://cdn-icons-png.flaticon.com/512/633/633758.png" width="125px" height="50px"></a></p>
+    {% endif %}
+{% endblock %}
