@@ -9,6 +9,9 @@
     .post-text {
     margin: 50px;
     }
+    .post-image {
+    margin-left: 50px;
+    }
     .comment-add {
         margin-left: 50px;
     }
@@ -30,11 +33,10 @@
     <hr>
     <p class="post-text">{{ post }}</p>
     {% if post_image %}
-        <img src="{{ post_image }}" width="auto" height="auto">
+        <img src="{{ post_image }}" width="auto" height="auto" class="post-image">
     {% endif %}
     <form method="post" class="comment-add">
         <h4>Добавить комментарий</h4>
-        <p><input name="username" placeholder="Ник" required></p>
         <p><textarea placeholder="Текст комментария" name="text" required></textarea></p>
         <p><button type="submit">Отправить</button></p>
     </form>

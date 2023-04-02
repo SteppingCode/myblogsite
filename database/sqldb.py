@@ -367,6 +367,7 @@ if __name__ == "__main__":
     db = FDataBase(db)
     #create_db()
     #print(db.delData(0))
+    #print(db.addData('admin', '111'))
     #print(db.delMenu(0))
     #print(db.addMenu('Главная', 'start_page'))
     #print(db.addMenu('Авторизация', 'login'))
@@ -379,5 +380,5 @@ if __name__ == "__main__":
     #print(db.addAdminMenu('Admin', 'admin_page'))
     #print(db.addAdminMenu('Обновления', 'update_page'))
     #print(db.addAdminMenu('Выход', 'quit_login'))
-    #print(db.getLogin('111'))
+    print(db.addLike(2))
 

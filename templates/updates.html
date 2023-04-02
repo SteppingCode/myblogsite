@@ -64,13 +64,15 @@
         </li>
       {% endfor %}
   {% endif %}
-  {% if session %}
+  {% if 'userlogged' in session %}
+    {% if session['userlogged'] == 'admin' %}
     <form method="post">
       <p><input type="text" name="title" placeholder="Название обновления" required></p>
       <p><textarea name="text" rows="5" cols="40" placeholder="Текст" required></textarea></p>
       <p><input type="text" name="photo" placeholder="Ссылка на фото"></p>
       <button type="submit">Добавить</button>
     </form>
+    {% endif %}
   {% endif %}
   </ul>
 {% endblock %}

@@ -63,6 +63,9 @@ def register():
                     return redirect(url_for('start_page', username=session['userlogged']))
                 else:
                     return redirect(url_for('register'))
+            else:
+                flash("Пароли не совпадают", category='error')
+                return redirect(url_for('register'))
     return render_template('register.html', title='Регистрация')
 
 #Login
@@ -175,8 +178,8 @@ def showPost(id_post):
     comments = database.getComments(id_post)
     if comments:
         if request.method == 'POST':
-            if len(request.form['username']) > 3 and len(request.form['text']) > 3:
-                addcom = database.addComment(request.form['username'], request.form['text'], id_post)
+            if len(request.form['text']) > 3:
+                addcom = database.addComment(session['userlogged'], request.form['text'], id_post)
                 if addcom:
                     flash('Комментарий добавлен', category='success')
                     return redirect(url_for('showPost', id_post=id_post))
@@ -186,8 +189,8 @@ def showPost(id_post):
                 flash('Ошибка добавления комментария', category='error')
         return render_template('aticle.html', title=title, menu=database.getMenu(), post=aticle, post_title=title, post_image=photo, comments=comments)
     if request.method == 'POST':
-        if len(request.form['username']) > 3 and len(request.form['text']) > 3:
-            addcom = database.addComment(request.form['username'], request.form['text'], id_post)
+        if len(request.form['text']) > 3:
+            addcom = database.addComment(session['userlogged'], request.form['text'], id_post)
             if addcom:
                 flash('Комментарий добавлен', category='success')
                 return redirect(url_for('showPost', id_post=id_post))
@@ -237,7 +240,16 @@ def showUpdate(id_update):
     database = FDataBase(db)
     title, aticle, photo = database.getUpdate(id_update)
     likes = database.getLikes(id_update)
-    return render_template('update_page.html', title=title, menu=database.getMenu(), update_text=aticle, update_title=title, update_image=photo, likes=likes, id_update=id_update)
+    addlike = database.addLike(id_update)
+    if likes:
+        return render_template('update_page.html', title=title, menu=database.getMenu(), update_text=aticle, update_title=title, update_image=photo, likes=likes, id_update=id_update)
+    else:
+        return render_template('update_page.html', title=title, menu=database.getMenu(), update_text=aticle, update_title=title, update_image=photo, likes=likes, id_update=id_update, addlike=database.addLike(id_update)), addlike
+    return render_template('update_page.html', title=title, menu=database.getMenu(), update_text=aticle, update_title=title, update_image=photo, likes=likes, id_update=id_update, addlike=database.addLike(id_update))
+
+#    {% else %}
+#        <p><a class="image like" href="{{url_for('addlike', id_update=id_update)}}" title="Мне нравится"><img src="https://cdn-icons-png.flaticon.com/512/633/633759.png" width="125px" height="50px"></a></p>
+#        <p><a class="image dislike" href="{{url_for('addlike', id_update=id_update)}}" title="Мне не нравится"><img src="https://cdn-icons-png.flaticon.com/512/633/633758.png" width="125px" height="50px"></a></p>
 
 #Like update
 @app.route('/like/<int:id_update>/')
@@ -249,8 +261,8 @@ def update_like(id_update):
         return redirect(url_for('showUpdate', id_update=id_update))
     if 'userlogged' in session:
         if session['userlogged'] == 'admin':
-            return render_template('update_page.html', menu=database.getAdminMenu(), id_update=id_update, add_like=database.addLike(id_update))
-    return render_template('update_page.html', menu=database.getMenu(), id_update=id_update, add_like=database.addLike(id_update))
+            return render_template('update_page.html', menu=database.getAdminMenu(), id_update=id_update)
+    return render_template('update_page.html', menu=database.getMenu(), id_update=id_update)
 
 #Dislike update
 @app.route('/dislike/<int:id_update>/')
@@ -262,8 +274,8 @@ def update_dislike(id_update):
         return redirect(url_for('showUpdate', id_update=id_update))
     if 'userlogged' in session:
         if session['userlogged'] == 'admin':
-            return render_template('update_page.html', menu=database.getAdminMenu(), id_update=id_update, add_like=database.addLike(id_update))
-    return render_template('update_page.html', menu=database.getMenu(), id_update=id_update, add_like=database.addLike(id_update))
+            return render_template('update_page.html', menu=database.getAdminMenu(), id_update=id_update)
+    return render_template('update_page.html', menu=database.getMenu(), id_update=id_update)
 
 #Edit update
 @app.route('/editupdate/<int:id_update>', methods=['POST', 'GET'])
