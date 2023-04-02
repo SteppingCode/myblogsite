@@ -55,9 +55,11 @@
           {% if upd.photo %}
             <img src="{{ upd.photo }}" width="auto" height="auto">
           {% endif %}
-          {% if session %}
-            <p><a href="{{ url_for('editupdate_page', id_update=upd.id) }}" style="color: #9FCC56; border: 1px skyblue solid; border-radius: 2px; padding: 5px; font-size:20px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; text-decoration: none;">Редактировать</a></p>
-            <p><a href="{{ url_for('delupdate_page', id_update=upd.id) }}" style="color: red; border: 1px skyblue solid; border-radius: 2px; padding: 5px; font-size:20px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; text-decoration: none;">Удалить</a></p>
+          {% if 'userlogged' in session %}
+            {% if session['userlogged'] == 'admin' %}
+              <p><a href="{{ url_for('editupdate_page', id_update=upd.id) }}" style="color: #9FCC56; border: 1px skyblue solid; border-radius: 2px; padding: 5px; font-size:20px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; text-decoration: none;">Редактировать</a></p>
+              <p><a href="{{ url_for('delupdate_page', id_update=upd.id) }}" style="color: red; border: 1px skyblue solid; border-radius: 2px; padding: 5px; font-size:20px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; text-decoration: none;">Удалить</a></p>
+            {% endif %}
           {% endif %}
         </li>
       {% endfor %}

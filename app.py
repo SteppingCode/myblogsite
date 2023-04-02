@@ -45,6 +45,26 @@ def start_page():
             return render_template('allposts.html', title="Главная", menu=database.getAdminMenu(), posts=database.getPostAnnoce())
     return render_template('allposts.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce())
 
+#Register
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    db = get_db()
+    database = FDataBase(db)
+    if 'userlogged' in session:
+        return redirect(url_for('start_page', username=session['userlogged']))
+    if request.method == 'POST':
+        if database.getData(request.form['username'], request.form['password']):
+            flash('Некорректный логин', category='error')
+            return redirect('register')
+        else:
+            if request.form['password'] == request.form['password2']:
+                if database.addData(request.form["username"], request.form["password"]):
+                    session['userlogged'] = request.form['username']
+                    return redirect(url_for('start_page', username=session['userlogged']))
+                else:
+                    return redirect(url_for('register'))
+    return render_template('register.html', title='Регистрация')
+
 #Login
 @app.route('/login', methods=['POST', 'GET'])
 def login():
@@ -117,6 +137,8 @@ def post_edit(id_post):
 def quit_login():
     if 'userlogged' in session:
         return redirect(url_for('start_page')), session.clear()
+    else:
+        return redirect(url_for('start_page'))
 
 #Show all posts
 @app.route('/allposts')
