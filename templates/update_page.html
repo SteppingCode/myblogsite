@@ -6,7 +6,7 @@
     h1 {
     margin: 25px;
     }
-    .post-text {
+    .update-text {
     margin: 50px;
     }
     .update-image {
@@ -36,18 +36,23 @@
         position: fixed;
         padding: 5px;
     }
-    .image.like:hover {
-
-    }
 </style>
     <h1>{{ update_title }}</h1>
     <hr>
-    <p class="post-text">{{ update_text }}</p>
+    <p class="update-text">{{ update_text }}</p>
     {% if update_image %}
         <img src="{{ update_image }}" width="auto" height="auto" class="update-image">
     {% endif %}
     {% for like in likes %}
-        <p><a class="image like" href="{{url_for('update_like', id_update=id_update)}}" title="Мне нравится" style="text-decoration: none; color: black;"><img src="https://cdn-icons-png.flaticon.com/512/633/633759.png" width="125px" height="50px">{{like.like}}</a></p>
-        <p><a class="image dislike" href="{{url_for('update_dislike', id_update=id_update)}}" title="Мне не нравится" style="text-decoration: none; color: black;"><img src="https://cdn-icons-png.flaticon.com/512/633/633758.png" width="125px" height="50px">{{like.dislike}}</a></p>
+        {% if pressed_like %}
+            <p><a class="image dislike" href="{{url_for('update_dislike', id_update=id_update)}}" title="Мне не нравится" style="text-decoration: none; color: black;"><img src="https://i.ibb.co/p3wWBzX/Like-pressed.png" width="125px" height="50px">{{like.like}}</a></p>
+            <p><a class="image dislike" href="{{url_for('update_dislike', id_update=id_update)}}" title="Мне не нравится" style="text-decoration: none; color: black;"><img src="https://cdn-icons-png.flaticon.com/512/633/633758.png" width="125px" height="50px">{{like.dislike}}</a></p>
+        {% elif pressed_dis %}
+            <p><a class="image like" href="{{url_for('update_like', id_update=id_update)}}" title="Мне нравится" style="text-decoration: none; color: black;"><img src="https://cdn-icons-png.flaticon.com/512/633/633759.png" width="125px" height="50px">{{like.like}}</a></p>
+            <p><a class="image dislike" href="{{url_for('update_dislike', id_update=id_update)}}" title="Мне не нравится" style="text-decoration: none; color: black;"><img src="https://i.ibb.co/GtFJQ5j/Dislike-pressed.png" width="125px" height="50px">{{like.dislike}}</a></p>
+        {% else %}
+            <p><a class="image like" href="{{url_for('update_like', id_update=id_update)}}" title="Мне нравится" style="text-decoration: none; color: black;"><img src="https://cdn-icons-png.flaticon.com/512/633/633759.png" width="125px" height="50px">{{like.like}}</a></p>
+            <p><a class="image dislike" href="{{url_for('update_dislike', id_update=id_update)}}" title="Мне не нравится" style="text-decoration: none; color: black;"><img src="https://cdn-icons-png.flaticon.com/512/633/633758.png" width="125px" height="50px">{{like.dislike}}</a></p>
+        {% endif %}
     {% endfor %}
 {% endblock %}

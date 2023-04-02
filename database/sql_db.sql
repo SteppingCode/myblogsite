@@ -14,7 +14,7 @@ url text not null
 
 create table if not exists user (
 id integer primary key autoincrement,
-username text not null,
+username text not null unique,
 password text not null
 );
 

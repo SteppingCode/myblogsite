@@ -49,7 +49,7 @@
         }
     </style>
 <form action="{{url_for('login')}}" method="post" class="container">
-    <input type="text" name="username" placeholder="Логин" pattern="[A-Za-z ]*" required>
+    <input type="text" name="username" placeholder="Логин" pattern="[A-Za-z1-0 ]*" required>
     <input type="password" name="password" placeholder="Пароль" required>
     <button>Войти</button>
 </form>

@@ -380,5 +380,4 @@ if __name__ == "__main__":
     #print(db.addAdminMenu('Admin', 'admin_page'))
     #print(db.addAdminMenu('Обновления', 'update_page'))
     #print(db.addAdminMenu('Выход', 'quit_login'))
-    print(db.addLike(2))
 

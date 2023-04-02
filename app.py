@@ -53,19 +53,16 @@ def register():
     if 'userlogged' in session:
         return redirect(url_for('start_page', username=session['userlogged']))
     if request.method == 'POST':
-        if database.getData(request.form['username'], request.form['password']):
-            flash('Некорректный логин', category='error')
-            return redirect('register')
-        else:
-            if request.form['password'] == request.form['password2']:
-                if database.addData(request.form["username"], request.form["password"]):
-                    session['userlogged'] = request.form['username']
-                    return redirect(url_for('start_page', username=session['userlogged']))
-                else:
-                    return redirect(url_for('register'))
+        if request.form['password'] == request.form['password2']:
+            if database.addData(request.form["username"], request.form["password"]):
+                session['userlogged'] = request.form['username']
+                return redirect(url_for('start_page', username=session['userlogged']))
             else:
-                flash("Пароли не совпадают", category='error')
-                return redirect(url_for('register'))
+                flash('Некорректный логин', category='error')
+                return redirect('register')
+        else:
+            flash("Пароли не совпадают", category='error')
+            return redirect(url_for('register'))
     return render_template('register.html', title='Регистрация')
 
 #Login
@@ -240,12 +237,11 @@ def showUpdate(id_update):
     database = FDataBase(db)
     title, aticle, photo = database.getUpdate(id_update)
     likes = database.getLikes(id_update)
-    addlike = database.addLike(id_update)
     if likes:
         return render_template('update_page.html', title=title, menu=database.getMenu(), update_text=aticle, update_title=title, update_image=photo, likes=likes, id_update=id_update)
     else:
-        return render_template('update_page.html', title=title, menu=database.getMenu(), update_text=aticle, update_title=title, update_image=photo, likes=likes, id_update=id_update, addlike=database.addLike(id_update)), addlike
-    return render_template('update_page.html', title=title, menu=database.getMenu(), update_text=aticle, update_title=title, update_image=photo, likes=likes, id_update=id_update, addlike=database.addLike(id_update))
+        return render_template('update_page.html', title=title, menu=database.getMenu(), update_text=aticle, update_title=title, update_image=photo, likes=likes, id_update=id_update), database.addLike(id_update)
+    return render_template('update_page.html', title=title, menu=database.getMenu(), update_text=aticle, update_title=title, update_image=photo, likes=likes, id_update=id_update)
 
 #    {% else %}
 #        <p><a class="image like" href="{{url_for('addlike', id_update=id_update)}}" title="Мне нравится"><img src="https://cdn-icons-png.flaticon.com/512/633/633759.png" width="125px" height="50px"></a></p>
@@ -257,11 +253,14 @@ def update_like(id_update):
     db = get_db()
     database = FDataBase(db)
     addlike = database.likeUpdate(id_update)
-    if addlike:
-        return redirect(url_for('showUpdate', id_update=id_update))
     if 'userlogged' in session:
+        if addlike:
+            return redirect(url_for('showUpdate', id_update=id_update))
         if session['userlogged'] == 'admin':
             return render_template('update_page.html', menu=database.getAdminMenu(), id_update=id_update)
+        return render_template('update_page.html', menu=database.getMenu(), id_update=id_update)
+    else:
+        return redirect(url_for('update_page'))
     return render_template('update_page.html', menu=database.getMenu(), id_update=id_update)
 
 #Dislike update
@@ -270,11 +269,14 @@ def update_dislike(id_update):
     db = get_db()
     database = FDataBase(db)
     adddislike = database.dislikeUpdate(id_update)
-    if adddislike:
-        return redirect(url_for('showUpdate', id_update=id_update))
     if 'userlogged' in session:
+        if adddislike:
+            return redirect(url_for('showUpdate', id_update=id_update))
         if session['userlogged'] == 'admin':
             return render_template('update_page.html', menu=database.getAdminMenu(), id_update=id_update)
+        return render_template('update_page.html', menu=database.getMenu(), id_update=id_update)
+    else:
+        return redirect(url_for('update_page'))
     return render_template('update_page.html', menu=database.getMenu(), id_update=id_update)
 
 #Edit update
