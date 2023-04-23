@@ -42,8 +42,20 @@ def start_page():
     database = FDataBase(db)
     if 'userlogged' in session:
         if session['userlogged'] == 'admin':
-            return render_template('allposts.html', title="Главная", menu=database.getAdminMenu(), posts=database.getPostAnnoce())
-    return render_template('allposts.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce())
+            return render_template('index.html', title="Главная", menu=database.getAdminMenu())
+        return render_template('index.html', title="Главная", menu=database.getMenu())
+    return render_template('index.html', title="Главная", menu=database.getUnregMenu())
+
+#Posts page
+@app.route('/allposts', methods=['GET', 'POST'])
+def allposts():
+    db = get_db()
+    database = FDataBase(db)
+    if 'userlogged' in session:
+        if session['userlogged'] == 'admin':
+            return render_template('allposts.html', title="Посты", menu=database.getAdminMenu(), posts=database.getPostAnnoce())
+        return render_template('allposts.html', title="Посты", menu=database.getMenu(), posts=database.getPostAnnoce())
+    return render_template('allposts.html', title="Посты", menu=database.getUnregMenu(), posts=database.getPostAnnoce())
 
 #Register
 @app.route('/register', methods=['GET', 'POST'])
@@ -140,13 +152,6 @@ def quit_login():
     else:
         return redirect(url_for('start_page'))
 
-#Show all posts
-@app.route('/allposts')
-def allposts():
-    db = get_db()
-    database = FDataBase(db)
-    return render_template('allposts.html', title='Cписок постов', menu=database.getMenu(),
-                           posts=database.getPostAnnoce())
 
 #Deleting post
 @app.route('/delpost/<int:id_post>')

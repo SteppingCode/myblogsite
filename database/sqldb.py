@@ -110,6 +110,36 @@ class FDataBase:
             print(str(e))
             return False
 
+    def addUnregMenu(self, title, url):
+        try:
+            self.__cur.execute("INSERT INTO unregmenu VALUES (NULL, ?, ?)", (title, url))
+            self.__db.commit()
+        except sq.Error as e:
+            print(str(e))
+            return False
+        return True
+
+    def delUnregMenu(self, id=0):
+        try:
+            if id == 0:
+                self.__cur.execute("DELETE FROM unregmenu")
+            else:
+                self.__cur.execute(f"DELETE FROM unregmenu WHERE id == {id}")
+            self.__db.commit()
+        except sq.Error as e:
+            print(str(e))
+            return False
+        return True
+
+    def getUnregMenu(self):
+        try:
+            self.__cur.execute("SELECT * FROM unregmenu")
+            res = self.__cur.fetchall()
+            if res: return res
+        except sq.Error as e:
+            print(str(e))
+            return False
+
     def addAdminMenu(self, title, url):
         try:
             self.__cur.execute("INSERT INTO adminmenu VALUES (NULL, ?, ?)", (title, url))
@@ -368,10 +398,14 @@ if __name__ == "__main__":
     #create_db()
     #print(db.delData(0))
     #print(db.addData('admin', '111'))
+    #print(db.delUnregMenu(0))
+    #print(db.addUnregMenu('Главная', 'start_page'))
+    #print(db.addUnregMenu('Авторизация', 'login'))
+    #print(db.addUnregMenu('Регистрация', 'register'))
+    #print(db.addUnregMenu('Обновления', 'update_page'))
     #print(db.delMenu(0))
     #print(db.addMenu('Главная', 'start_page'))
-    #print(db.addMenu('Авторизация', 'login'))
-    #print(db.addMenu('Регистрация', 'register'))
+    #print(db.addMenu('Посты', 'allposts'))
     #print(db.addMenu('Обновления', 'update_page'))
     #print(db.addMenu('Выход', 'quit_login'))
     #print(db.delAdminMenu(0))

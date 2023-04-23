@@ -1,4 +1,4 @@
-    create table if not exists post (
+create table if not exists post (
 id integer primary key autoincrement,
 title text not null,
 text text not null,
@@ -16,6 +16,12 @@ create table if not exists user (
 id integer primary key autoincrement,
 username text not null unique,
 password text not null
+);
+
+create table if not exists unregmenu (
+id integer primary key autoincrement,
+title text not null,
+url text not null
 );
 
 create table if not exists adminmenu (

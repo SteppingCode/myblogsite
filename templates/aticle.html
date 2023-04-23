@@ -35,13 +35,16 @@
     {% if post_image %}
         <img src="{{ post_image }}" width="auto" height="auto" class="post-image">
     {% endif %}
-    <form method="post" class="comment-add">
-        <h4>Добавить комментарий</h4>
-        <p><textarea placeholder="Текст комментария" name="text" required></textarea></p>
-        <p><button type="submit">Отправить</button></p>
-    </form>
+    {% if 'userlogged' in session %}
+        <form method="post" class="comment-add">
+            <h4>Добавить комментарий</h4>
+            <p><textarea placeholder="Текст комментария" name="text" required></textarea></p>
+            <p><button type="submit">Отправить</button></p>
+        </form>
+    {% endif %}
     <div class="comments">
         {% if comments %}
+        <strong style="font-size: 30px; font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">Комментарии</strong>
         <ul>
             <li class="comment">
             {% for com in comments %}
@@ -59,4 +62,8 @@
             <h4>Тут пока ничего нет...</h4>
         {% endif %}
     </div>
+<hr>
+<footer style="text-align: center; height: 40px; padding-top: 5px; padding-bottom: 5px;">
+    &copy; 2023 <a href="https://github.com/dodik337">Степин Е.А.</a>
+</footer>
 {% endblock %}

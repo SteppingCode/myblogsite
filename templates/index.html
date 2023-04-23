@@ -3,15 +3,21 @@
 {% block content %}
 {{ super() }}
 
-<h2> Список постов </h2>
-<hr>
+<h2 style="margin-left: 10%;"> Главная </h2>
 
-<ul class="list-posts">
-  {% for p in posts %}
-  <li>
-    <p class="title" > <a href="{{ url_for('showPost', id_post=p.id) }}" > {{ p.title }}</a></p>
-    <p class="annonce"> {{ p.text[:50]}}</p>
-  </li>
-  {% endfor %}
-  </ul>
+<div style="border: 1px black solid; text-align: center;">
+  <img src="https://klike.net/uploads/posts/2019-11/1572612050_1.jpg">
+</div>
+<div class="container" style="">
+    <div style="display: flex; flex-direction: row; justify-content: space-around; padding: 15px;">
+        <div style="border: 1px black solid;">asda |</div>
+        <div style="border: 1px black solid;">sadsad |</div>
+        <div style="border: 1px black solid;">sadasd |</div>
+    </div>
+</div>
+
+<hr>
+<footer style="text-align: center; height: 40px; padding-top: 5px; padding-bottom: 5px;">
+    &copy; 2023 <a href="https://github.com/dodik337">Степин Е.А.</a>
+</footer>
 {% endblock %}

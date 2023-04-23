@@ -55,7 +55,6 @@
         ul.menu a:hover::after {
             transform: scaleX(-1);
         }
-
     </style>
 </head>
 <body>
@@ -69,7 +68,6 @@
         </ul>
 
             {% endblock menu -%}
-
 {% with messages = get_flashed_messages() %}
 {% if messages %}
 <ul>
@@ -80,6 +78,7 @@
 </ul>
 {% endif %}
 {% endwith %}
+<script src="/js/preloader.js"></script>
 {% endblock %}
 </body>
 </html>
