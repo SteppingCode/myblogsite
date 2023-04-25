@@ -3,6 +3,11 @@ from config import Config
 from database.sqldb import FDataBase
 import git, os, sqlite3
 
+#import time
+#
+#os.environ["TZ"] = "Europe/Moscow"
+#time.tzset()
+
 app = Flask(__name__)
 app.config.from_object(Config)
 app.config.update(dict(DATABASE=os.path.join(app.root_path,'../posts.db'))) #Создается база данных
@@ -179,6 +184,10 @@ def showPost(id_post):
     title, aticle, photo = database.getPost(id_post)
     comments = database.getComments(id_post)
     if comments:
+        if 'userlogged' in session:
+            if session['userlogged'] == 'admin':
+                return render_template('aticle.html', title=title, menu=database.getAdminMenu(), post=aticle, post_title=title, post_image=photo, comments=comments)
+            return render_template('aticle.html', title=title, menu=database.getMenu(), post=aticle, post_title=title, post_image=photo, comments=comments)
         if request.method == 'POST':
             if len(request.form['text']) > 3:
                 addcom = database.addComment(session['userlogged'], request.form['text'], id_post)
@@ -189,7 +198,7 @@ def showPost(id_post):
                     flash('Ошибка добавления комментария', category='error')
             else:
                 flash('Ошибка добавления комментария', category='error')
-        return render_template('aticle.html', title=title, menu=database.getMenu(), post=aticle, post_title=title, post_image=photo, comments=comments)
+        return render_template('aticle.html', title=title, menu=database.getUnregMenu(), post=aticle, post_title=title, post_image=photo, comments=comments)
     if request.method == 'POST':
         if len(request.form['text']) > 3:
             addcom = database.addComment(session['userlogged'], request.form['text'], id_post)
@@ -201,7 +210,13 @@ def showPost(id_post):
         else:
             flash('Ошибка добавления комментария', category='error')
         return render_template('aticle.html', title=title, menu=database.getMenu(), post=aticle, post_title=title, post_image=photo, comments=comments)
-    return render_template('aticle.html', title=title, menu=database.getMenu(), post=aticle, post_title=title, post_image=photo)
+    if 'userlogged' in session:
+        if session['userlogged'] == 'admin':
+            return render_template('aticle.html', title=title, menu=database.getAdminMenu(), post=aticle,
+                                   post_title=title, post_image=photo, comments=comments)
+        return render_template('aticle.html', title=title, menu=database.getMenu(), post=aticle, post_title=title,
+                               post_image=photo, comments=comments)
+    return render_template('aticle.html', title=title, menu=database.getUnregMenu(), post=aticle, post_title=title, post_image=photo)
 
 #Deleting comment
 @app.route('/delcom/<int:id_post>/<int:id_com>')

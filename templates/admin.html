@@ -3,20 +3,28 @@
 {% block content %}
 {{ super() }}
 <style>
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+    }
     .list-posts {
-        width: 50%
+        width: 50%;
         display: flexbox;
         position: absolute;
         align-items: flex-start;
     }
     ul.list-posts li {
         overflow: hidden;
+        width: auto;
     }
     .todo-list {
         width: 50%;
         display: flexbox;
         position: absolute;
-        margin-left: 45%;
+        overflow: auto;
+        margin-left: 40%;
+
     }
     #hz:hover {
         color: red;
