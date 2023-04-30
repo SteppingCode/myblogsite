@@ -382,11 +382,42 @@ class FDataBase:
             print(str(e))
             return False
         return True
+
     def getLikes(self, updateid):
         try:
             self.__cur.execute(f"SELECT like, dislike FROM likes WHERE updateid == {updateid}")
             res = self.__cur.fetchall()
             return res
+        except sq.Error as e:
+            print(str(e))
+            return False
+
+    def addProfile(self, nick, name, game, age):
+        try:
+            self.__cur.execute(f"INSERT INTO profile VALUES (NULL, ?, ?, ?, ?)", (nick, name, game, age))
+            self.__db.commit()
+            return True
+        except sq.Error as e:
+            print(str(e))
+            return False
+
+    def delProfile(self, id=0):
+        try:
+            if id == 0:
+                self.__cur.execute("DELETE FROM profile")
+            else:
+                self.__cur.execute(f"DELETE FROM profile WHERE {id} == id")
+            self.__db.commit()
+        except sq.Error as e:
+            print(str(e))
+            return False
+        return True
+
+    def getProfile(self, nick):
+        try:
+            self.__cur.execute(f"SELECT nick, name, age, game FROM profile WHERE ? = nick", (nick,))
+            res = self.__cur.fetchall()
+            if res: return res
         except sq.Error as e:
             print(str(e))
             return False

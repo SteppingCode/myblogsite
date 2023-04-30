@@ -248,7 +248,8 @@ def update_page():
                     flash('Обновление не опубликовано', category='error')
                     return redirect(url_for('update_page'))
             return render_template('updates.html', title='Обновления', menu=database.getAdminMenu(), updates=database.getUpdatesAnnoce())
-    return render_template('updates.html', title='Обновления', menu=database.getMenu(), updates=database.getUpdatesAnnoce())
+        return render_template('updates.html', title='Обновления', menu=database.getMenu(), updates=database.getUpdatesAnnoce())
+    return render_template('updates.html', title='Обновления', menu=database.getUnregMenu(), updates=database.getUpdatesAnnoce())
 
 #Update page
 @app.route('/update/<int:id_update>', methods=['POST', 'GET'])
@@ -266,6 +267,31 @@ def showUpdate(id_update):
 #    {% else %}
 #        <p><a class="image like" href="{{url_for('addlike', id_update=id_update)}}" title="Мне нравится"><img src="https://cdn-icons-png.flaticon.com/512/633/633759.png" width="125px" height="50px"></a></p>
 #        <p><a class="image dislike" href="{{url_for('addlike', id_update=id_update)}}" title="Мне не нравится"><img src="https://cdn-icons-png.flaticon.com/512/633/633758.png" width="125px" height="50px"></a></p>
+
+@app.route('/profile/<name>', methods=['GET', 'POST'])
+def profile_page(name):
+    db = get_db()
+    database = FDataBase(db)
+    profile = database.getProfile(name)
+    if 'userlogged' in session:
+        if profile:
+            return render_template('profile.html', menu=database.getMenu(), title=name, prof=profile)
+        return render_template('error.html', menu=database.getMenu(), title='Профиль не найден')
+    return redirect(url_for('start_page'))
+
+@app.route('/reg_profile', methods=['GET', 'POST'])
+def profile_reg():
+    db = get_db()
+    database = FDataBase(db)
+    if 'userlogged' in session:
+        if request.method == 'POST':
+            if database.addProfile(session['userlogged'], request.form["name"], request.form["age"], request.form["game"]):
+                return redirect(url_for('profile_page', name=session['userlogged']))
+            else:
+                flash('Некорректный логин', category='error')
+                return redirect('profile_reg')
+        return render_template('profile_reg.html', title='Регистрация профиля', menu=database.getMenu())
+    return redirect(url_for('start_page'))
 
 #Like update
 @app.route('/like/<int:id_update>/')

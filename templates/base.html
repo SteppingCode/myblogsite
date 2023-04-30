@@ -65,7 +65,11 @@
             {% for  m in menu -%}
             <li><a href="{{url_for(m.url)}}"> {{m.title}}</a></li>
             {% endfor -%}
+            {% if 'userlogged' in session %}
+                <li style="float:right;"><img src=""><a href="{{ url_for('profile_page', name=session['userlogged']) }}">{{ session['userlogged'] }}</a></li>
+            {% endif %}
         </ul>
+
 
             {% endblock menu -%}
 {% with messages = get_flashed_messages() %}

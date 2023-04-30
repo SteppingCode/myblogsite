@@ -1,4 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1> Страница не найдена, вернуться на <a href="{{url_for('start_page')}}"> главную</a>  страницу</h1>
+{{ super() }}
+<style>
+   h1 {
+    margin: 50px;
+   }
+</style>
+    <h1>Хм... Тут ничего нет. Создай профиль <a href="{{ url_for('profile_reg') }}">тут</a></h1>
 {% endblock %}

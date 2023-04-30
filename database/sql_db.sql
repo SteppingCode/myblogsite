@@ -24,6 +24,14 @@ title text not null,
 url text not null
 );
 
+create table if not exists profile (
+id integer primary key autoincrement,
+nick text not null unique,
+name text not null,
+game text not null,
+age integer not null
+);
+
 create table if not exists adminmenu (
 id integer primary key autoincrement,
 title text not null,
