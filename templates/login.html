@@ -7,11 +7,12 @@
             box-sizing: border-box;
         }
         body {
+
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-
+            flex-direction: column;
         }
         .container {
             display: flex;
@@ -20,6 +21,10 @@
             padding: 15px;
             border: 1px solid skyblue;
             border-radius: 5px;
+        }
+        .reg_link {
+            width: 300px;
+            padding: 15px;
         }
         input {
             margin: 5px 0px;
@@ -53,4 +58,5 @@
     <input type="password" name="password" placeholder="Пароль" required>
     <button>Войти</button>
 </form>
+<p class="reg_link" style="font-size: 20px;">Зарегистрировать аккаунт <a href="{{url_for('register')}}">тут</a></p>
 {% endblock %}

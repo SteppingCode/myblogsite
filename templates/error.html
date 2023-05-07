@@ -2,9 +2,18 @@
 {% block content %}
 {{ super() }}
 <style>
-   h1 {
-    margin: 50px;
+   .prof {
+   display: flex;
+   border: 1px black solid;
+   width: 202px;
+   padding: 15px;
+   text-align: center;
+   margin-left: 50%;
+   margin-top: 10%;
+   transform: translate(-50%, 50%);
    }
 </style>
-    <h1>Хм... Тут ничего нет. Создай профиль <a href="{{ url_for('profile_reg') }}">тут</a></h1>
+<div class="prof">
+    <a href="{{ url_for('profile_reg') }}" style="text-decoration: none; color: black;"><strong>Настроить профиль</strong></a>
+</div>
 {% endblock %}

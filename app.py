@@ -68,19 +68,19 @@ def register():
     db = get_db()
     database = FDataBase(db)
     if 'userlogged' in session:
-        return redirect(url_for('start_page', username=session['userlogged']))
+        return redirect(url_for('start_page'))
     if request.method == 'POST':
         if request.form['password'] == request.form['password2']:
             if database.addData(request.form["username"], request.form["password"]):
                 session['userlogged'] = request.form['username']
-                return redirect(url_for('start_page', username=session['userlogged']))
+                return redirect(url_for('start_page'))
             else:
                 flash('Некорректный логин', category='error')
                 return redirect('register')
         else:
             flash("Пароли не совпадают", category='error')
             return redirect(url_for('register'))
-    return render_template('register.html', title='Регистрация')
+    return render_template('register.html', title='Регистрация', menu=database.getUnregMenu())
 
 #Login
 @app.route('/login', methods=['POST', 'GET'])
@@ -88,10 +88,10 @@ def login():
     db = get_db()
     database = FDataBase(db)
     if 'userlogged' in session:
-        return redirect(url_for('start_page', username=session['userlogged']))
+        return redirect(url_for('start_page'))
     elif request.method == 'POST' and database.getData(request.form['username'], request.form['password']):
         session['userlogged'] = request.form['username']
-        return redirect(url_for('start_page', username=session['userlogged']))
+        return redirect(url_for('start_page'))
     return render_template('login.html', title="Авторизация")
 
 #Admin Page
