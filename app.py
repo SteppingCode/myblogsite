@@ -24,21 +24,21 @@ def get_db():
         g.link_db = connect_db()
         return g.link_db
 
-#Redirect to start_page
-@app.route('/', methods=['GET', 'POST'])
-def first_page():
-    return redirect(url_for('start_page'))
-
-#Git update (doesnt work)
+#Server updating
 @app.route('/update_server', methods=['POST', 'GET'])
 def webhook():
     if request.method == 'POST':
-        repo = git.Repo('dodik337/myblogsite')
+        repo = git.Repo('/home/dodik337/myblogsite')
         origin = repo.remotes.origin
         origin.pull()
         return 'Сайт обновился', 200
     else:
         return 'Возникла ошибка', 400
+
+#Redirect to start_page
+@app.route('/', methods=['GET', 'POST'])
+def first_page():
+    return redirect(url_for('start_page'))
 
 #Main page
 @app.route('/index', methods=['GET', 'POST'])
