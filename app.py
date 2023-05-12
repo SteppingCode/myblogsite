@@ -58,7 +58,8 @@ def allposts():
     database = FDataBase(db)
     if 'userlogged' in session:
         if session['userlogged'] == 'admin':
-            return render_template('allposts.html', title="Посты", menu=database.getAdminMenu(), posts=database.getPostAnnoce())
+            return render_template('allposts.html', title="Посты", menu=database.getAdminMenu(), \
+                                   posts=database.getPostAnnoce())
         return render_template('allposts.html', title="Посты", menu=database.getMenu(), posts=database.getPostAnnoce())
     return render_template('allposts.html', title="Посты", menu=database.getUnregMenu(), posts=database.getPostAnnoce())
 
@@ -108,7 +109,8 @@ def admin_page():
                 else:
                     flash('Дело не было добавлено!', category='error')
                 return redirect(url_for('admin_page'))
-            return render_template('admin.html', title='Admin Page', menu=database.getAdminMenu(), posts=database.getPostAnnoce(), todo=database.getTODO())
+            return render_template('admin.html', title='Admin Page', menu=database.getAdminMenu(), \
+                                   posts=database.getPostAnnoce(), todo=database.getTODO())
     return redirect(url_for('start_page'))
 
 #Create post
@@ -139,14 +141,16 @@ def post_edit(id_post):
         if session['userlogged'] == 'admin':
             if request.method == 'POST':
                 if len(request.form['title']) > 3 and len(request.form['text']) > 10:
-                    res = database.PostUpdate(request.form['title'], request.form['text'], request.form['photo'], id_post)
+                    res = database.PostUpdate(request.form['title'], request.form['text'], \
+                                              request.form['photo'], id_post)
                     if not res:
                         flash('Ошибка редактирования статьи', category='error')
                     else:
                         flash('Статья успешно редактирована', category='success')
                 else:
                     flash('Ошибка редактирования статьи', category='error')
-            return render_template('post_edit.html', title='Редактировать статью', menu=database.getAdminMenu(), post=database.getPost(id_post))
+            return render_template('post_edit.html', title='Редактировать статью', menu=database.getAdminMenu(), \
+                                   post=database.getPost(id_post))
     return redirect(url_for('start_page'))
 
 #Quit
@@ -172,7 +176,8 @@ def delpost_page(id_post):
                 abort(404)
             if delpost:
                 return redirect(url_for('admin_page'))
-            return render_template('admin.html', title='title', menu=database.getAdminMenu(), post=aticle, post_title=title)
+            return render_template('admin.html', title='title', menu=database.getAdminMenu(), post=aticle, \
+                                   post_title=title)
     else:
         return redirect(url_for('start_page'))
 
@@ -186,8 +191,12 @@ def showPost(id_post):
     if comments:
         if 'userlogged' in session:
             if session['userlogged'] == 'admin':
-                return render_template('aticle.html', title=title, menu=database.getAdminMenu(), post=aticle, post_title=title, post_image=photo, comments=comments)
-            return render_template('aticle.html', title=title, menu=database.getMenu(), post=aticle, post_title=title, post_image=photo, comments=comments)
+                return render_template('aticle.html', title=title, menu=database.getAdminMenu(), post=aticle, \
+                                       post_title=title, post_image=photo, comments=comments, \
+                                       posts=database.getPostAnnoce())
+            return render_template('aticle.html', title=title, menu=database.getMenu(), post=aticle, \
+                                   post_title=title, post_image=photo, comments=comments, \
+                                   posts=database.getPostAnnoce())
         if request.method == 'POST':
             if len(request.form['text']) > 3:
                 addcom = database.addComment(session['userlogged'], request.form['text'], id_post)
@@ -198,7 +207,8 @@ def showPost(id_post):
                     flash('Ошибка добавления комментария', category='error')
             else:
                 flash('Ошибка добавления комментария', category='error')
-        return render_template('aticle.html', title=title, menu=database.getUnregMenu(), post=aticle, post_title=title, post_image=photo, comments=comments)
+        return render_template('aticle.html', title=title, menu=database.getUnregMenu(), post=aticle, \
+                               post_title=title, post_image=photo, comments=comments, posts=database.getPostAnnoce())
     if request.method == 'POST':
         if len(request.form['text']) > 3:
             addcom = database.addComment(session['userlogged'], request.form['text'], id_post)
@@ -209,14 +219,17 @@ def showPost(id_post):
                 flash('Ошибка добавления комментария', category='error')
         else:
             flash('Ошибка добавления комментария', category='error')
-        return render_template('aticle.html', title=title, menu=database.getMenu(), post=aticle, post_title=title, post_image=photo, comments=comments)
+        return render_template('aticle.html', title=title, menu=database.getMenu(), post=aticle, \
+                               post_title=title, post_image=photo, comments=comments, posts=database.getPostAnnoce())
     if 'userlogged' in session:
         if session['userlogged'] == 'admin':
             return render_template('aticle.html', title=title, menu=database.getAdminMenu(), post=aticle,
-                                   post_title=title, post_image=photo, comments=comments)
+                                   post_title=title, post_image=photo, \
+                                   comments=comments, posts=database.getPostAnnoce())
         return render_template('aticle.html', title=title, menu=database.getMenu(), post=aticle, post_title=title,
-                               post_image=photo, comments=comments)
-    return render_template('aticle.html', title=title, menu=database.getUnregMenu(), post=aticle, post_title=title, post_image=photo)
+                               post_image=photo, comments=comments, posts=database.getPostAnnoce())
+    return render_template('aticle.html', title=title, menu=database.getUnregMenu(), post=aticle, \
+                           post_title=title, post_image=photo, posts=database.getPostAnnoce())
 
 #Deleting comment
 @app.route('/delcom/<int:id_post>/<int:id_com>')
@@ -247,9 +260,12 @@ def update_page():
                 else:
                     flash('Обновление не опубликовано', category='error')
                     return redirect(url_for('update_page'))
-            return render_template('updates.html', title='Обновления', menu=database.getAdminMenu(), updates=database.getUpdatesAnnoce())
-        return render_template('updates.html', title='Обновления', menu=database.getMenu(), updates=database.getUpdatesAnnoce())
-    return render_template('updates.html', title='Обновления', menu=database.getUnregMenu(), updates=database.getUpdatesAnnoce())
+            return render_template('updates.html', title='Обновления', menu=database.getAdminMenu(), \
+                                   updates=database.getUpdatesAnnoce())
+        return render_template('updates.html', title='Обновления', menu=database.getMenu(), \
+                               updates=database.getUpdatesAnnoce())
+    return render_template('updates.html', title='Обновления', menu=database.getUnregMenu(), \
+                           updates=database.getUpdatesAnnoce())
 
 #Update page
 @app.route('/update/<int:id_update>', methods=['POST', 'GET'])
@@ -259,10 +275,14 @@ def showUpdate(id_update):
     title, aticle, photo = database.getUpdate(id_update)
     likes = database.getLikes(id_update)
     if likes:
-        return render_template('update_page.html', title=title, menu=database.getMenu(), update_text=aticle, update_title=title, update_image=photo, likes=likes, id_update=id_update)
+        return render_template('update_page.html', title=title, menu=database.getMenu(), update_text=aticle, \
+                               update_title=title, update_image=photo, likes=likes, id_update=id_update)
     else:
-        return render_template('update_page.html', title=title, menu=database.getMenu(), update_text=aticle, update_title=title, update_image=photo, likes=likes, id_update=id_update), database.addLike(id_update)
-    return render_template('update_page.html', title=title, menu=database.getMenu(), update_text=aticle, update_title=title, update_image=photo, likes=likes, id_update=id_update)
+        return render_template('update_page.html', title=title, menu=database.getMenu(), update_text=aticle, \
+                               update_title=title, update_image=photo, likes=likes, id_update=id_update), \
+                        database.addLike(id_update)
+    return render_template('update_page.html', title=title, menu=database.getMenu(), update_text=aticle, \
+                           update_title=title, update_image=photo, likes=likes, id_update=id_update)
 
 #    {% else %}
 #        <p><a class="image like" href="{{url_for('addlike', id_update=id_update)}}" title="Мне нравится"><img src="https://cdn-icons-png.flaticon.com/512/633/633759.png" width="125px" height="50px"></a></p>
@@ -285,7 +305,8 @@ def profile_reg():
     database = FDataBase(db)
     if 'userlogged' in session:
         if request.method == 'POST':
-            if database.addProfile(session['userlogged'], request.form["name"], request.form["age"], request.form["game"]):
+            if database.addProfile(session['userlogged'], request.form["name"], request.form["age"], \
+                                   request.form["game"]):
                 return redirect(url_for('profile_page', name=session['userlogged']))
             else:
                 flash('Некорректный логин', category='error')
@@ -334,14 +355,16 @@ def editupdate_page(id_update):
         if session['userlogged'] == 'admin':
             if request.method == 'POST':
                 if len(request.form['title']) > 3 and len(request.form['text']) > 10:
-                    res = database.UpdateUpdate(request.form['title'], request.form['text'], request.form['photo'], id_update)
+                    res = database.UpdateUpdate(request.form['title'], request.form['text'], \
+                                                request.form['photo'], id_update)
                     if not res:
                         flash('Ошибка редактирования обновления', category='error')
                     else:
                         flash('Обновление успешно редактировано', category='success')
                 else:
                     flash('Ошибка редактирования обновления', category='error')
-            return render_template('update_edit.html', title='Редактировать обновление', menu=database.getAdminMenu(), update=database.getUpdate(id_update))
+            return render_template('update_edit.html', title='Редактировать обновление', menu=database.getAdminMenu(), \
+                                   update=database.getUpdate(id_update))
     return redirect(url_for('start_page'))
 
 #Deleting update

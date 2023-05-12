@@ -25,42 +25,61 @@
         padding: 10px;
         border-radius: 5px;
     }
+    .content-block {
+        display:flex;
+    }
+    .post-info {
+        
+    }
+    .border-list {
+
+    }
 </style>
 {% for cat, msg in get_flashed_messages(True) %}
 <div class="flash {{cat}}"> {{msg}}</div>
 {% endfor %}
-    <h1>{{ post_title }}</h1>
-    <hr>
-    <p class="post-text">{{ post }}</p>
-    {% if post_image %}
-        <img src="{{ post_image }}" width="auto" height="auto" class="post-image">
-    {% endif %}
-    {% if 'userlogged' in session %}
-        <form method="post" class="comment-add">
-            <h4>Добавить комментарий</h4>
-            <p><textarea placeholder="Текст комментария" name="text" required></textarea></p>
-            <p><button type="submit">Отправить</button></p>
-        </form>
-    {% endif %}
-    <div class="comments">
-        {% if comments %}
-        <strong style="font-size: 30px; font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">Комментарии</strong>
-        <ul>
-            <li class="comment">
-            {% for com in comments %}
-                <p style="font-size:30px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;"><strong>{{com.username}}</strong></p>
-                <p style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif">{{com.text}}</p>
-            {% if 'userlogged' in session %}
-                {% if session['userlogged'] == 'admin' %}
-                    <p style="font-size:30px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;"><a href="{{ url_for('delcom_page', id_post=com.postid, id_com=com.id) }}" style="text-decoration: none;">Удалить</a></p>
-                {% endif %}
+    <div class="content-block">
+        <div class="post-info">
+            <h1>{{ post_title }}</h1>
+            <hr>
+            <p class="post-text">{{ post }}</p>
+            {% if post_image %}
+                <img src="{{ post_image }}" width="auto" height="auto" class="post-image">
             {% endif %}
-            {% endfor %}
-            </li>
-        </ul>
-        {% else %}
-            <h4>Тут пока ничего нет...</h4>
-        {% endif %}
+            <div class="border-list">
+                {% for p in posts %}
+                    <h2>{{p.title}}</h2>
+                    <p>{{p.text[:20]}}...</p>
+                {% endfor %}
+            </div>
+            {% if 'userlogged' in session %}
+                <form method="post" class="comment-add">
+                    <h4>Добавить комментарий</h4>
+                    <p><textarea placeholder="Текст комментария" name="text" required></textarea></p>
+                    <p><button type="submit">Отправить</button></p>
+                </form>
+            {% endif %}
+            <div class="comments">
+                {% if comments %}
+                <strong style="font-size: 30px; font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">Комментарии</strong>
+                <ul>
+                    <li class="comment">
+                    {% for com in comments %}
+                        <p style="font-size:30px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;"><strong>{{com.username}}</strong></p>
+                        <p style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif">{{com.text}}</p>
+                    {% if 'userlogged' in session %}
+                        {% if session['userlogged'] == 'admin' %}
+                            <p style="font-size:30px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;"><a href="{{ url_for('delcom_page', id_post=com.postid, id_com=com.id) }}" style="text-decoration: none;">Удалить</a></p>
+                        {% endif %}
+                    {% endif %}
+                    {% endfor %}
+                    </li>
+                </ul>
+                {% else %}
+                    <h4>Тут пока ничего нет...</h4>
+                {% endif %}
+            </div>
+        </div>
     </div>
 <div id="footer-block">
   <hr>
