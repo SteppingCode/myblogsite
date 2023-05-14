@@ -17,7 +17,6 @@ def connect_db():
     conn.row_factory = sq.Row
     return conn
 
-
 def get_db():
     if not hasattr(g, 'link_db'):
         g.link_db = connect_db()
@@ -34,17 +33,6 @@ def create_db():
     db.close()
     return True
 
-def connect_db():
-    conn = sq.connect(app.config['DATABASE'])
-    conn.row_factory = sq.Row
-    return conn
-
-def get_db():
-    if not hasattr(g, 'link_db'):
-        g.link_db = connect_db()
-        return g.link_db
-
-#Создаем класс
 class FDataBase:
     def __init__(self, db):
         self.__db = db

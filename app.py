@@ -76,7 +76,7 @@ def register():
                 session['userlogged'] = request.form['username']
                 return redirect(url_for('start_page'))
             else:
-                flash('Некорректный логин', category='error')
+                flash('Такой аккаунт уже существует', category='error')
                 return redirect('register')
         else:
             flash("Пароли не совпадают", category='error')
