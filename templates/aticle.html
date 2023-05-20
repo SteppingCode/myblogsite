@@ -26,13 +26,19 @@
         border-radius: 5px;
     }
     .content-block {
-        display:flex;
+        display: flex;
     }
     .post-info {
-        
+        width: 75%;
     }
     .border-list {
-
+        width: 22%;
+        position: absolute;
+        border-left: 2px black solid;
+        border-bottom: 2px black solid;
+        left: 76%;
+        top: 8%;
+        padding-left: 8px;
     }
 </style>
 {% for cat, msg in get_flashed_messages(True) %}
@@ -48,8 +54,14 @@
             {% endif %}
             <div class="border-list">
                 {% for p in posts %}
-                    <h2>{{p.title}}</h2>
-                    <p>{{p.text[:20]}}...</p>
+                    {% if post_title == p.title %}
+                        <h2 style="color: purple;">{{p.title}}</h2>
+                        <p>{{p.text[:20]}}...</p>
+                    {% else %}
+                        <h2><a href="{{url_for('showPost', id_post=p.id)}}" style="text-decoration:none; color: black;">{{p.title}}</a></h2>
+                        <p>{{p.text[:20]}}...</p>
+                    {% endif %}
+
                 {% endfor %}
             </div>
             {% if 'userlogged' in session %}
@@ -81,10 +93,4 @@
             </div>
         </div>
     </div>
-<div id="footer-block">
-  <hr>
-    <footer style="text-align: center; height: 40px; padding-top: 5px; padding-bottom: 5px;">
-        &copy; 2023 <a href="https://github.com/dodik337">Степин Е.А.</a>
-    </footer>
-</div>
 {% endblock %}
