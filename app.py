@@ -188,48 +188,23 @@ def showPost(id_post):
     database = FDataBase(db)
     title, aticle, photo = database.getPost(id_post)
     comments = database.getComments(id_post)
-    if comments:
-        if 'userlogged' in session:
-            if session['userlogged'] == 'admin':
-                return render_template('aticle.html', title=title, menu=database.getAdminMenu(), post=aticle, \
-                                       post_title=title, post_image=photo, comments=comments, \
-                                       posts=database.getPostAnnoce())
-            return render_template('aticle.html', title=title, menu=database.getMenu(), post=aticle, \
-                                   post_title=title, post_image=photo, comments=comments, \
-                                   posts=database.getPostAnnoce())
-        if request.method == 'POST':
-            if len(request.form['text']) > 3:
-                addcom = database.addComment(session['userlogged'], request.form['text'], id_post)
-                if addcom:
-                    flash('Комментарий добавлен', category='success')
-                    return redirect(url_for('showPost', id_post=id_post))
-                else:
-                    flash('Ошибка добавления комментария', category='error')
-            else:
-                flash('Ошибка добавления комментария', category='error')
-        return render_template('aticle.html', title=title, menu=database.getUnregMenu(), post=aticle, \
-                               post_title=title, post_image=photo, comments=comments, posts=database.getPostAnnoce())
-    if request.method == 'POST':
-        if len(request.form['text']) > 3:
-            addcom = database.addComment(session['userlogged'], request.form['text'], id_post)
-            if addcom:
-                flash('Комментарий добавлен', category='success')
-                return redirect(url_for('showPost', id_post=id_post))
-            else:
-                flash('Ошибка добавления комментария', category='error')
-        else:
-            flash('Ошибка добавления комментария', category='error')
-        return render_template('aticle.html', title=title, menu=database.getMenu(), post=aticle, \
-                               post_title=title, post_image=photo, comments=comments, posts=database.getPostAnnoce())
     if 'userlogged' in session:
+        if comments:
+            if request.method == 'POST':
+                if len(request.form['text']) > 3:
+                    addcom = database.addComment(session['userlogged'], request.form['text'], id_post)
+                    if addcom:
+                        return redirect(url_for('showPost', id_post=id_post))
+                return render_template('aticle.html', title=title, menu=database.getMenu(), post=aticle, \
+                                       post_title=title, post_image=photo, comments=comments, posts=database.getPostAnnoce())
         if session['userlogged'] == 'admin':
             return render_template('aticle.html', title=title, menu=database.getAdminMenu(), post=aticle,
-                                   post_title=title, post_image=photo, \
-                                   comments=comments, posts=database.getPostAnnoce())
+                                       post_title=title, post_image=photo, \
+                                       comments=comments, posts=database.getPostAnnoce())
         return render_template('aticle.html', title=title, menu=database.getMenu(), post=aticle, post_title=title,
-                               post_image=photo, comments=comments, posts=database.getPostAnnoce())
+                            post_image=photo, comments=comments, posts=database.getPostAnnoce())
     return render_template('aticle.html', title=title, menu=database.getUnregMenu(), post=aticle, \
-                           post_title=title, post_image=photo, posts=database.getPostAnnoce())
+                           post_title=title, post_image=photo, posts=database.getPostAnnoce(), comments=comments)
 
 #Deleting comment
 @app.route('/delcom/<int:id_post>/<int:id_com>')
