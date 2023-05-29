@@ -90,7 +90,7 @@ def login():
     database = FDataBase(db)
     if 'userlogged' in session:
         return redirect(url_for('start_page'))
-    elif request.method == 'POST' and database.getData(request.form['username'], request.form['password']):
+    if request.method == 'POST' and database.getData(request.form['username'], request.form['password']):
         session['userlogged'] = request.form['username']
         return redirect(url_for('start_page'))
     return render_template('login.html', title="Авторизация")
