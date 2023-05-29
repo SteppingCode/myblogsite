@@ -380,9 +380,9 @@ class FDataBase:
             print(str(e))
             return False
 
-    def addProfile(self, nick, name, game, age):
+    def addProfile(self, nick, name, age, about):
         try:
-            self.__cur.execute(f"INSERT INTO profile VALUES (NULL, ?, ?, ?, ?)", (nick, name, game, age))
+            self.__cur.execute(f"INSERT INTO profile VALUES (NULL, ?, ?, ?, ?)", (nick, name, age, about))
             self.__db.commit()
             return True
         except sq.Error as e:
@@ -403,7 +403,7 @@ class FDataBase:
 
     def getProfile(self, nick):
         try:
-            self.__cur.execute(f"SELECT nick, name, age, game FROM profile WHERE ? = nick", (nick,))
+            self.__cur.execute(f"SELECT nick, name, age, about FROM profile WHERE ? = nick", (nick,))
             res = self.__cur.fetchall()
             if res: return res
         except sq.Error as e:

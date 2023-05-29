@@ -28,8 +28,8 @@ create table if not exists profile (
 id integer primary key autoincrement,
 nick text not null unique,
 name text not null,
-game text not null,
-age integer not null
+age integer not null,
+about text not null
 );
 
 create table if not exists adminmenu (
