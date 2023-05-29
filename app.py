@@ -249,14 +249,20 @@ def showUpdate(id_update):
     database = FDataBase(db)
     title, aticle, photo = database.getUpdate(id_update)
     likes = database.getLikes(id_update)
-    if likes:
+    if 'userlogged' in session:
+        if session['userlogged'] == 'admin':
+            return render_template('update_page.html', title=title, menu=database.getAdminMenu(), update_text=aticle, \
+                                   update_title=title, update_image=photo, likes=likes, id_update=id_update)
+        if likes:
+            return render_template('update_page.html', title=title, menu=database.getMenu(), update_text=aticle, \
+                                   update_title=title, update_image=photo, likes=likes, id_update=id_update)
+        else:
+            return render_template('update_page.html', title=title, menu=database.getMenu(), update_text=aticle, \
+                                   update_title=title, update_image=photo, likes=likes, id_update=id_update), \
+                            database.addLike(id_update)
         return render_template('update_page.html', title=title, menu=database.getMenu(), update_text=aticle, \
                                update_title=title, update_image=photo, likes=likes, id_update=id_update)
-    else:
-        return render_template('update_page.html', title=title, menu=database.getMenu(), update_text=aticle, \
-                               update_title=title, update_image=photo, likes=likes, id_update=id_update), \
-                        database.addLike(id_update)
-    return render_template('update_page.html', title=title, menu=database.getMenu(), update_text=aticle, \
+    return render_template('update_page.html', title=title, menu=database.getUnregMenu(), update_text=aticle, \
                            update_title=title, update_image=photo, likes=likes, id_update=id_update)
 
 #    {% else %}
