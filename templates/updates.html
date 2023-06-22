@@ -42,6 +42,14 @@
       max-width: 40%;
       max-height: 40%;
     }
+    footer {
+      margin-top: 150%;
+    }
+    @media (max-width: 992px) {
+        footer {
+          display: none;
+        }
+    }
 </style>
 <h2> Список обновлений </h2>
 
@@ -74,11 +82,5 @@
     </form>
     {% endif %}
   {% endif %}
-  </ul>
-<div id="footer-block">
-  <hr>
-    <footer style="text-align: center; height: 40px; padding-top: 5px; padding-bottom: 5px;">
-        &copy; 2023 <a href="https://github.com/dodik337">Степин Е.А.</a>
-    </footer>
-</div>
+</ul>
 {% endblock %}

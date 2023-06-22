@@ -58,30 +58,35 @@
     </style>
 </head>
 <body>
-
 {% block content %}
-            {%- block menu -%}
-        <ul class="menu">
-            {% for  m in menu -%}
-            <li><a href="{{url_for(m.url)}}"> {{m.title}}</a></li>
-            {% endfor -%}
-            {% if 'userlogged' in session %}
-                <li style="float:right;"><img src=""><a href="{{ url_for('profile_page', name=session['userlogged']) }}">{{ session['userlogged'] }}</a></li>
+    <div class="wrapper">
+        {%- block menu -%}
+            <ul class="menu">
+                {% for  m in menu -%}
+                <li><a href="{{url_for(m.url)}}"> {{m.title}}</a></li>
+                {% endfor -%}
+                {% if 'userlogged' in session %}
+                    <li style="float: right;"><img src="{{url_for('static', filename='img/favicon.ico')}}" style="position: absolute; margin-top: -8px; margin-left: -50px;" width="40" height="40"><a href="{{ url_for('profile_page', name=session['userlogged']) }}">{{ session['userlogged'] }}</a></li>
+                {% else %}
+                    <li style="float:right;"><a href="{{ url_for('profile_page', name=session['userlogged']) }}">{{ session['userlogged'] }}</a></li>
+                {% endif %}
+            </ul>
+        {% endblock menu -%}
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul>
+                    {% for message in messages  %}
+                    <li>{{message}}     </li>
+                    {% endfor %}
+
+                </ul>
             {% endif %}
-        </ul>
-
-
-            {% endblock menu -%}
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-<ul>
-    {% for message in messages  %}
-    <li>{{message}}     </li>
-    {% endfor %}
-
-</ul>
-{% endif %}
-{% endwith %}
+        {% endwith %}
+    </div>
+    <footer id="footer">
+        <hr width="17%">
+        <span id="author">&copy; 2023 <a href="https://github.com/dodik337">Степин Е.А.</a></span>
+    </footer>
 {% endblock %}
 </body>
 </html>

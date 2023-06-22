@@ -29,6 +29,15 @@
     #hz:hover {
         color: red;
     }
+    @media (max-width: 992px) {
+      .list-posts {
+        width: 58%;
+      }
+      .todo-list {
+        width: 33.3%;
+        margin-left: 62%;
+      }
+    }
 </style>
 <ul class="list-posts">
   {% for p in posts %}
