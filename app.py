@@ -1,3 +1,4 @@
+# taskkill /f /im python.exe
 from flask import render_template, Flask, request, redirect, url_for, session, g, abort, flash
 from config import Config
 from database.sqldb import FDataBase
