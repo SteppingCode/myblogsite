@@ -1,16 +1,13 @@
-import math
 import sqlite3 as sq
-import time
-
 from flask import Flask, g
-import os
+import os, time
 
 class Config():
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'privet _will day its okey'
 
 app = Flask(__name__)
 app.config.from_object(Config)
-app.config.update(dict(DATABASE=os.path.join(app.root_path,'../../posts.db')))
+app.config.update(dict(DATABASE=os.path.join(app.root_path,'../posts.db')))
 
 def connect_db():
     conn = sq.connect(app.config['DATABASE'])
@@ -97,67 +94,6 @@ class FDataBase:
         except sq.Error as e:
             print(str(e))
             return False
-
-    def addUnregMenu(self, title, url):
-        try:
-            self.__cur.execute("INSERT INTO unregmenu VALUES (NULL, ?, ?)", (title, url))
-            self.__db.commit()
-        except sq.Error as e:
-            print(str(e))
-            return False
-        return True
-
-    def delUnregMenu(self, id=0):
-        try:
-            if id == 0:
-                self.__cur.execute("DELETE FROM unregmenu")
-            else:
-                self.__cur.execute(f"DELETE FROM unregmenu WHERE id == {id}")
-            self.__db.commit()
-        except sq.Error as e:
-            print(str(e))
-            return False
-        return True
-
-    def getUnregMenu(self):
-        try:
-            self.__cur.execute("SELECT * FROM unregmenu")
-            res = self.__cur.fetchall()
-            if res: return res
-        except sq.Error as e:
-            print(str(e))
-            return False
-
-    def addAdminMenu(self, title, url):
-        try:
-            self.__cur.execute("INSERT INTO adminmenu VALUES (NULL, ?, ?)", (title, url))
-            self.__db.commit()
-        except sq.Error as e:
-            print(str(e))
-            return False
-        return True
-
-    def delAdminMenu(self, id=0):
-        try:
-            if id == 0:
-                self.__cur.execute("DELETE FROM adminmenu")
-            else:
-                self.__cur.execute("DELETE FROM adminmenu WHERE ? == id", (id))
-            self.__db.commit()
-        except sq.Error as e:
-            print(str(e))
-            return False
-        return True
-
-    def getAdminMenu(self):
-        try:
-            self.__cur.execute("SELECT * FROM adminmenu")
-            res = self.__cur.fetchall()
-            if res: return res
-        except sq.Error as e:
-            print(str(e))
-            return False
-        return True
 
     def addPost(self, title, text, photo):
         try:
@@ -417,22 +353,7 @@ if __name__ == "__main__":
     #create_db()
     #print(db.delData(0))
     #print(db.addData('admin', '111'))
-    #print(db.delUnregMenu(0))
-    #print(db.addUnregMenu('Главная', 'start_page'))
-    #print(db.addUnregMenu('Посты', 'allposts'))
-    #print(db.addUnregMenu('Авторизация', 'login'))
-    #print(db.addUnregMenu('Регистрация', 'register'))
-    #print(db.addUnregMenu('Обновления', 'update_page'))
     #print(db.delMenu(0))
     #print(db.addMenu('Главная', 'start_page'))
-    #print(db.addMenu('Посты', 'allposts'))
     #print(db.addMenu('Обновления', 'update_page'))
-    #print(db.addMenu('Выход', 'quit_login'))
-    #print(db.delAdminMenu(0))
-    #print(db.addAdminMenu('Главная', 'start_page'))
-    #print(db.addAdminMenu('Посты', 'allposts'))
-    #print(db.addAdminMenu('Добавить пост', 'post'))
-    #print(db.addAdminMenu('Admin', 'admin_page'))
-    #print(db.addAdminMenu('Обновления', 'update_page'))
-    #print(db.addAdminMenu('Выход', 'quit_login'))
 

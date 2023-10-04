@@ -59,34 +59,35 @@
 </head>
 <body>
 {% block content %}
-    <div class="wrapper">
-        {%- block menu -%}
-            <ul class="menu">
-                {% for  m in menu -%}
-                <li><a href="{{url_for(m.url)}}"> {{m.title}}</a></li>
-                {% endfor -%}
-                {% if 'userlogged' in session %}
-                    <li style="float: right;"><img src="{{url_for('static', filename='img/favicon.ico')}}" style="position: absolute; margin-top: -8px; margin-left: -50px;" width="40" height="40"><a href="{{ url_for('profile_page', name=session['userlogged']) }}">{{ session['userlogged'] }}</a></li>
-                {% else %}
-                    <li style="float:right;"><a href="{{ url_for('profile_page', name=session['userlogged']) }}">{{ session['userlogged'] }}</a></li>
-                {% endif %}
-            </ul>
-        {% endblock menu -%}
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
+    {%- block menu -%}
+        <div class="burger" id="burger" onmouseenter="document.getElementById('menu').style.left='0'; document.getElementById('burger').style.display='none';">
+            <span id="span_1"></span>
+            <span id="span_2"></span>
+            <span id="span_3"></span>
+        </div>
+        <div class="menu" id="menu" onmouseleave="document.getElementById('menu').style.left='-500px'; document.getElementById('burger').style.display='block';">
+            <div class="list_menu">
                 <ul>
-                    {% for message in messages  %}
-                    <li>{{message}}     </li>
-                    {% endfor %}
-
+                    {% for m in menu -%}
+                        <li><a href="{{url_for(m.url)}}"> {{m.title}}</a></li>
+                    {% endfor -%}
+                    {% if 'userlogged' in session %}
+                        {% if session['userlogged'] == 'admin' %}
+                            <li><a href="{{ url_for('post') }}">Добавить пост</a></li>
+                            <li><a href="{{ url_for('admin_page') }}">Админ</a></li>
+                        {% endif %}
+                        <li><a href="{{ url_for('profile_page', name=session['userlogged']) }}">{{ session['userlogged'] }}</a></li>
+                        <li><a href="{{ url_for('quit_login') }}">Выход</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for('login') }}">Вход</a></li>
+                    {% endif %}
                 </ul>
-            {% endif %}
-        {% endwith %}
-    </div>
-    <footer id="footer">
-        <hr width="17%">
-        <span id="author">&copy; 2023 <a href="https://github.com/dodik337">Степин Е.А.</a></span>
-    </footer>
+            </div>
+        </div>
+    {% endblock menu -%}
 {% endblock %}
+<footer id="footer">
+    <span id="author">&copy; 2023 <a href="https://github.com/dodik337">Степин Е.А.</a></span>
+</footer>
 </body>
 </html>

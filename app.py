@@ -10,7 +10,7 @@ import git, os, sqlite3
 
 app = Flask(__name__)
 app.config.from_object(Config)
-app.config.update(dict(DATABASE=os.path.join(app.root_path,'../posts.db'))) #Создается база данных
+app.config.update(dict(DATABASE=os.path.join(app.root_path,'posts.db'))) #Создается база данных
 
 #Соединение с базой данных
 def connect_db():
@@ -35,53 +35,12 @@ def webhook():
     else:
         return 'Возникла ошибка', 400
 
-#Redirect to start_page
-@app.route('/', methods=['GET', 'POST'])
-def first_page():
-    return redirect(url_for('start_page'))
-
 #Main page
-@app.route('/index', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def start_page():
     db = get_db()
     database = FDataBase(db)
-    if 'userlogged' in session:
-        if session['userlogged'] == 'admin':
-            return render_template('index.html', title="Главная", menu=database.getAdminMenu())
-        return render_template('index.html', title="Главная", menu=database.getMenu())
-    return render_template('index.html', title="Главная", menu=database.getUnregMenu())
-
-#Posts page
-@app.route('/allposts', methods=['GET', 'POST'])
-def allposts():
-    db = get_db()
-    database = FDataBase(db)
-    if 'userlogged' in session:
-        if session['userlogged'] == 'admin':
-            return render_template('allposts.html', title="Посты", menu=database.getAdminMenu(), \
-                                   posts=database.getPostAnnoce())
-        return render_template('allposts.html', title="Посты", menu=database.getMenu(), posts=database.getPostAnnoce())
-    return render_template('allposts.html', title="Посты", menu=database.getUnregMenu(), posts=database.getPostAnnoce())
-
-#Register
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    db = get_db()
-    database = FDataBase(db)
-    if 'userlogged' in session:
-        return redirect(url_for('start_page'))
-    if request.method == 'POST':
-        if request.form['password'] == request.form['password2']:
-            if database.addData(request.form["username"], request.form["password"]):
-                session['userlogged'] = request.form['username']
-                return redirect(url_for('start_page'))
-            else:
-                flash('Такой аккаунт уже существует', category='error')
-                return redirect('register')
-        else:
-            flash("Пароли не совпадают", category='error')
-            return redirect(url_for('register'))
-    return render_template('register.html', title='Регистрация', menu=database.getUnregMenu())
+    return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce())
 
 #Login
 @app.route('/login', methods=['POST', 'GET'])
@@ -90,10 +49,27 @@ def login():
     database = FDataBase(db)
     if 'userlogged' in session:
         return redirect(url_for('start_page'))
-    if request.method == 'POST' and database.getData(request.form['username'], request.form['password']):
-        session['userlogged'] = request.form['username']
-        return redirect(url_for('start_page'))
-    return render_template('login.html', title="Авторизация")
+    if request.method == 'POST':
+        if database.getData(request.form['username'], request.form['password']):
+            session['userlogged'] = request.form['username']
+            return redirect(url_for('start_page'))
+    return render_template('login.html', title="Вход", menu=database.getMenu())
+
+@app.route('/login', methods=['POST', 'GET'])
+def register():
+    db = get_db()
+    database = FDataBase(db)
+    if request.method == 'POST':
+        if request.form['reg_password'] == request.form['reg_password2']:
+            if database.addData(request.form["reg_username"], request.form["reg_password"]):
+                session['userlogged'] = request.form['reg_username']
+                return redirect(url_for('start_page'))
+            else:
+                flash('Такой аккаунт уже существует', category='error')
+                return redirect('login')
+        else:
+            flash("Пароли не совпадают", category='error')
+            return redirect(url_for('login'))
 
 #Admin Page
 @app.route('/admin', methods=['POST', 'GET'])
@@ -109,7 +85,7 @@ def admin_page():
                 else:
                     flash('Дело не было добавлено!', category='error')
                 return redirect(url_for('admin_page'))
-            return render_template('admin.html', title='Admin Page', menu=database.getAdminMenu(), \
+            return render_template('admin.html', title='Admin Page', menu=database.getMenu(), \
                                    posts=database.getPostAnnoce(), todo=database.getTODO())
     return redirect(url_for('start_page'))
 
@@ -129,7 +105,7 @@ def post():
                         flash('Статья добавлена успешно', category='success')
                 else:
                     flash('Ошибка добавления статьи', category='error')
-            return render_template('post.html', title='Добавить статью', menu=database.getAdminMenu())
+            return render_template('post.html', title='Добавить статью', menu=database.getMenu())
     return redirect(url_for('start_page'))
 
 #Edit post
@@ -149,7 +125,7 @@ def post_edit(id_post):
                         flash('Статья успешно редактирована', category='success')
                 else:
                     flash('Ошибка редактирования статьи', category='error')
-            return render_template('post_edit.html', title='Редактировать статью', menu=database.getAdminMenu(), \
+            return render_template('post_edit.html', title='Редактировать статью', menu=database.getMenu(), \
                                    post=database.getPost(id_post))
     return redirect(url_for('start_page'))
 
@@ -176,7 +152,7 @@ def delpost_page(id_post):
                 abort(404)
             if delpost:
                 return redirect(url_for('admin_page'))
-            return render_template('admin.html', title='title', menu=database.getAdminMenu(), post=aticle, \
+            return render_template('admin.html', title='title', menu=database.getMenu(), post=aticle, \
                                    post_title=title)
     else:
         return redirect(url_for('start_page'))
@@ -197,13 +173,9 @@ def showPost(id_post):
                         return redirect(url_for('showPost', id_post=id_post))
                 return render_template('aticle.html', title=title, menu=database.getMenu(), post=aticle, \
                                        post_title=title, post_image=photo, comments=comments, posts=database.getPostAnnoce())
-        if session['userlogged'] == 'admin':
-            return render_template('aticle.html', title=title, menu=database.getAdminMenu(), post=aticle,
-                                       post_title=title, post_image=photo, \
-                                       comments=comments, posts=database.getPostAnnoce())
         return render_template('aticle.html', title=title, menu=database.getMenu(), post=aticle, post_title=title,
                             post_image=photo, comments=comments, posts=database.getPostAnnoce())
-    return render_template('aticle.html', title=title, menu=database.getUnregMenu(), post=aticle, \
+    return render_template('aticle.html', title=title, menu=database.getMenu(), post=aticle, \
                            post_title=title, post_image=photo, posts=database.getPostAnnoce(), comments=comments)
 
 #Deleting comment
@@ -216,7 +188,7 @@ def delcom_page(id_post, id_com):
             delcom = database.delComment(id_post, id_com)
             if delcom:
                 return redirect(url_for('showPost', id_post=id_post))
-            return render_template('aticle.html', menu=database.getAdminMenu())
+            return render_template('aticle.html', menu=database.getMenu())
     else:
         return redirect(url_for('start_page'))
 
@@ -235,11 +207,11 @@ def update_page():
                 else:
                     flash('Обновление не опубликовано', category='error')
                     return redirect(url_for('update_page'))
-            return render_template('updates.html', title='Обновления', menu=database.getAdminMenu(), \
+            return render_template('updates.html', title='Обновления', menu=database.getMenu(), \
                                    updates=database.getUpdatesAnnoce())
         return render_template('updates.html', title='Обновления', menu=database.getMenu(), \
                                updates=database.getUpdatesAnnoce())
-    return render_template('updates.html', title='Обновления', menu=database.getUnregMenu(), \
+    return render_template('updates.html', title='Обновления', menu=database.getMenu(), \
                            updates=database.getUpdatesAnnoce())
 
 #Update page
@@ -250,9 +222,6 @@ def showUpdate(id_update):
     title, aticle, photo = database.getUpdate(id_update)
     likes = database.getLikes(id_update)
     if 'userlogged' in session:
-        if session['userlogged'] == 'admin':
-            return render_template('update_page.html', title=title, menu=database.getAdminMenu(), update_text=aticle, \
-                                   update_title=title, update_image=photo, likes=likes, id_update=id_update)
         if likes:
             return render_template('update_page.html', title=title, menu=database.getMenu(), update_text=aticle, \
                                    update_title=title, update_image=photo, likes=likes, id_update=id_update)
@@ -260,9 +229,7 @@ def showUpdate(id_update):
             return render_template('update_page.html', title=title, menu=database.getMenu(), update_text=aticle, \
                                    update_title=title, update_image=photo, likes=likes, id_update=id_update), \
                             database.addLike(id_update)
-        return render_template('update_page.html', title=title, menu=database.getMenu(), update_text=aticle, \
-                               update_title=title, update_image=photo, likes=likes, id_update=id_update)
-    return render_template('update_page.html', title=title, menu=database.getUnregMenu(), update_text=aticle, \
+    return render_template('update_page.html', title=title, menu=database.getMenu(), update_text=aticle, \
                            update_title=title, update_image=photo, likes=likes, id_update=id_update)
 
 #    {% else %}
@@ -304,12 +271,9 @@ def update_like(id_update):
     if 'userlogged' in session:
         if addlike:
             return redirect(url_for('showUpdate', id_update=id_update))
-        if session['userlogged'] == 'admin':
-            return render_template('update_page.html', menu=database.getAdminMenu(), id_update=id_update)
         return render_template('update_page.html', menu=database.getMenu(), id_update=id_update)
     else:
         return redirect(url_for('update_page'))
-    return render_template('update_page.html', menu=database.getMenu(), id_update=id_update)
 
 #Dislike update
 @app.route('/dislike/<int:id_update>/')
@@ -320,12 +284,9 @@ def update_dislike(id_update):
     if 'userlogged' in session:
         if adddislike:
             return redirect(url_for('showUpdate', id_update=id_update))
-        if session['userlogged'] == 'admin':
-            return render_template('update_page.html', menu=database.getAdminMenu(), id_update=id_update)
         return render_template('update_page.html', menu=database.getMenu(), id_update=id_update)
     else:
         return redirect(url_for('update_page'))
-    return render_template('update_page.html', menu=database.getMenu(), id_update=id_update)
 
 #Edit update
 @app.route('/editupdate/<int:id_update>', methods=['POST', 'GET'])
@@ -344,7 +305,7 @@ def editupdate_page(id_update):
                         flash('Обновление успешно редактировано', category='success')
                 else:
                     flash('Ошибка редактирования обновления', category='error')
-            return render_template('update_edit.html', title='Редактировать обновление', menu=database.getAdminMenu(), \
+            return render_template('update_edit.html', title='Редактировать обновление', menu=database.getMenu(), \
                                    update=database.getUpdate(id_update))
     return redirect(url_for('start_page'))
 
@@ -358,7 +319,7 @@ def delupdate_page(id_update):
             delupdate = database.delUpdates(id_update)
             if delupdate:
                 return redirect(url_for('update_page'))
-            return render_template('updates.html', menu=database.getAdminMenu())
+            return render_template('updates.html', menu=database.getMenu())
     else:
         return redirect(url_for('update_page'))
 
@@ -372,7 +333,7 @@ def deltodo(id_todo):
             deltodo = database.delTODO(id_todo)
             if deltodo:
                 return redirect(url_for('admin_page'))
-            return render_template('admin.html', menu=database.getAdminMenu())
+            return render_template('admin.html', menu=database.getMenu())
     else:
         return redirect(url_for('start_page'))
 

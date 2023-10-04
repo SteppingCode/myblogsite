@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
+    {{ super() }}
 <link type="text/css" rel="stylesheet" href="{{url_for('static', filename='css/login.css')}}">
 <section>
     <div class="form-box">
         <div class="form-value">
-            <form action="{{url_for('login')}}" method="post">
+            <form action="{{url_for('login')}}" method="post" id="login">
                 <h2>Login</h2>
                 <div class="inputbox">
                     <ion-icon name="mail-outline"></ion-icon>
@@ -18,7 +19,29 @@
                 </div>
                 <button>Log in</button>
                 <div class="register">
-                    <p>Don't have a account. <a href="{{url_for('register')}}">Register</a></p>
+                    <p>Don't have a account. <a style="cursor: pointer" onclick="document.getElementById('register').style.display='block'; document.getElementById('login').style.display='none';">Register</a></p>
+                </div>
+            </form>
+            <form action="{{url_for('register')}}" method="post" style="display: none" id="register">
+                <h2>Register</h2>
+                <div class="inputbox">
+                    <ion-icon name="person-circle-outline"></ion-icon>
+                    <input type="text" name="reg_username" pattern="[A-Za-z1-0 ]*" required>
+                    <label for="">Username</label>
+                </div>
+                <div class="inputbox">
+                    <ion-icon name="lock-closed-outline"></ion-icon>
+                    <input type="password" name="reg_password" required>
+                    <label for="">Password</label>
+                </div>
+                <div class="inputbox">
+                    <ion-icon name="lock-closed-outline"></ion-icon>
+                    <input type="password" name="reg_password2" required>
+                    <label for="">Password</label>
+                </div>
+                <button>Create account</button>
+                <div class="register">
+                    <p><a style="cursor: pointer" onclick="document.getElementById('register').style.display='none'; document.getElementById('login').style.display='block';">I have an account</a></p>
                 </div>
             </form>
         </div>

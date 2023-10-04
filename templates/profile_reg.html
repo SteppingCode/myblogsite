@@ -1,15 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
-{{super()}}
-{% for cat, msg in get_flashed_messages(True) %}
-<div class="flash {{cat}}"> {{msg}}</div>
-{% endfor %}
+{{ super() }}
+    <style>
+        body {
+            margin-top: -22px;
+        }
+    </style>
 <form action="{{url_for('profile_reg')}}" method="post" class='form-contact'>
     <h1>Создание профиля</h1>
-        <p><label> Имя: </label> <input type="text" name="name" value="" required></p>
-        <p><label> Возраст: </label> <input type="text" name="age" value="" required></p>
-        <p><label> О себе: </label> <input type="text" name="game" value="" required></p>
-        <p><input type="submit"></p>
-
+    <p><label> Имя: <input type="text" name="name" value="" required></label></p>
+    <p><label> Возраст: <input type="text" name="age" value="" required></label></p>
+    <p><label> О себе: <input type="text" name="game" value="" required></label></p>
+    <p><input type="submit"></p>
 </form>
 {% endblock %}
