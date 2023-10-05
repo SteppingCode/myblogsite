@@ -51,26 +51,24 @@ def login():
     if 'userlogged' in session:
         return redirect(url_for('start_page'))
     if request.method == 'POST':
-        if database.getData(request.form['username'], request.form['password']):
-            session['userlogged'] = request.form['username']
-            return redirect(url_for('start_page'))
-    return render_template('login.html', title="Вход", menu=database.getMenu())
-
-@app.route('/login', methods=['POST', 'GET'])
-def register():
-    db = get_db()
-    database = FDataBase(db)
-    if request.method == 'POST':
-        if request.form['reg_password'] == request.form['reg_password2']:
-            if database.addData(request.form["reg_username"], request.form["reg_password"]):
-                session['userlogged'] = request.form['reg_username']
+        if len(request.form['username']) > 0 and len(request.form['password']) > 0:
+            if database.getData(request.form['username'], request.form['password']):
+                session['userlogged'] = request.form['username']
                 return redirect(url_for('start_page'))
+        if len(request.form['reg_username']) > 0 and len(request.form['reg_password']) > 0:
+            if request.form['reg_password'] == request.form['reg_password2']:
+                if database.addData(request.form["reg_username"], request.form["reg_password"]):
+                    session['userlogged'] = request.form['reg_username']
+                    return redirect(url_for('start_page'))
+                else:
+                    flash('Такой аккаунт уже существует', category='error')
+                    return redirect('login')
             else:
-                flash('Такой аккаунт уже существует', category='error')
-                return redirect('login')
+                flash("Пароли не совпадают", category='error')
+                return redirect(url_for('login'))
         else:
-            flash("Пароли не совпадают", category='error')
             return redirect(url_for('login'))
+    return render_template('login.html', title="Вход", menu=database.getMenu())
 
 #Admin Page
 @app.route('/admin', methods=['POST', 'GET'])
