@@ -3,14 +3,17 @@
 {% block content %}
 {{ super() }}
 <style>
+    .content-block {
+        margin-left: 60px;
+    }
     h1 {
-    margin: 25px;
+        margin: 25px;
     }
     .post-text {
-    margin: 50px;
+        margin: 50px;
     }
     .post-image {
-    margin-left: 50px;
+        margin-left: 50px;
     }
     .comment-add {
         margin-left: 50px;
@@ -31,15 +34,6 @@
     .post-info {
         width: 75%;
     }
-    .border-list {
-        width: 22%;
-        position: absolute;
-        border-left: 2px black solid;
-        border-bottom: 2px black solid;
-        left: 76%;
-        top: 8%;
-        padding-left: 8px;
-    }
 </style>
 {% for cat, msg in get_flashed_messages(True) %}
 <div class="flash {{cat}}"> {{msg}}</div>
@@ -47,23 +41,10 @@
     <div class="content-block">
         <div class="post-info">
             <h1>{{ post_title }}</h1>
-            <hr>
             <p class="post-text">{{ post }}</p>
             {% if post_image %}
                 <img src="{{ post_image }}" width="auto" height="auto" class="post-image">
             {% endif %}
-            <div class="border-list">
-                {% for p in posts %}
-                    {% if post_title == p.title %}
-                        <h2 style="color: purple;">{{p.title}}</h2>
-                        <p>{{p.text[:20]}}...</p>
-                    {% else %}
-                        <h2><a href="{{url_for('showPost', id_post=p.id)}}" style="text-decoration:none; color: black;">{{p.title}}</a></h2>
-                        <p>{{p.text[:20]}}...</p>
-                    {% endif %}
-
-                {% endfor %}
-            </div>
             {% if 'userlogged' in session %}
                 <form method="post" class="comment-add">
                     <h4>Добавить комментарий</h4>

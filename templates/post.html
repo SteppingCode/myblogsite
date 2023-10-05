@@ -1,14 +1,42 @@
 {% extends 'base.html' %}
 {% block content %}
 {{super()}}
-{% for cat, msg in get_flashed_messages(True) %}
-<div class="flash {{cat}}"> {{msg}}</div>
-{% endfor %}
-<form action="{{url_for('post')}}" method="post" class='form-contact'>
-    <p><label>Название статьи: </label> <input type="text" name="name" value="" required></p>
-    <p><label>Текст статьи: </label> <br>
-        <textarea name="post" rows="7" cols="40"> </textarea></p>
-    <p><label>Ссылка на картинку: </label><input type="text" name="photo" value=""></p>
-    <p><input type="submit" value="Добавить"></p>
-</form>
+    <style>
+        .post {
+            border: 1px black solid;
+            padding: 20px;
+            width: 500px;
+            margin-left: 50%;
+            transform: translate(-50%, 40px);
+            border-radius: 20px;
+            background: transparent;
+            backdrop-filter: blur(15px);
+            text-align: center;
+        }
+        .form-contact h2 {
+            color: white;
+        }
+        .form-contact .other {
+            width: 400px;
+            margin: auto 20px auto 20px;
+        }
+        .form-contact textarea {
+            margin: auto 20px auto 20px;
+            max-width: 400px;
+            max-height: 220px;
+            width: 400px;
+        }
+    </style>
+    {% for cat, msg in get_flashed_messages(True) %}
+    <div class="flash {{cat}}"> {{msg}}</div>
+    {% endfor %}
+    <div class="post">
+        <form action="{{url_for('post')}}" method="post" class='form-contact'>
+            <h2>Написание статьи</h2>
+            <p><input class="other" placeholder="Название статьи" type="text" name="name" value="" required></p>
+            <p><textarea placeholder="Текст" name="post" rows="7" cols="40"></textarea></p>
+            <p><input class="other" type="file" name="photo"></p>
+            <p><input class="other" type="submit" value="Добавить"></p>
+        </form>
+    </div>
 {% endblock %}

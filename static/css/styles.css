@@ -3,8 +3,10 @@ html, body {
     padding: 0;
     height: 100%;
     width: 100%;
-    background: rgb(2,0,36);
-    background: linear-gradient(27deg, rgba(2,0,36,1) 0%, rgba(66,66,98,1) 50%, rgba(46,121,136,1) 100%);
+
+    background: url('/static/img/background6.jpg')no-repeat;
+    background-position: center;
+    background-size: cover;
 }
 
 h1 {
@@ -140,7 +142,6 @@ h1 {
     height: auto;
 }
 
-
 input:invalid {
     animation: shake 300ms;
     color: rgb(255,  35, 35);
@@ -166,6 +167,10 @@ input:invalid {
     background: #FF9C9C;
 }
 
+.content-block {
+    margin-left: 60px;
+}
+
 footer {
     padding: 50px;
     color: lightgrey;
@@ -174,7 +179,7 @@ footer {
     border-top: 1px white solid;
     width: 50%;
     margin-left: 50%;
-    transform: translate(-50%);
+    transform: translate(-50%, 50%);
 }
 
 footer a {

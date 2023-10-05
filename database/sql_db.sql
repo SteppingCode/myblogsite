@@ -1,9 +1,9 @@
-create table if not exists post (
-id integer primary key autoincrement,
-title text not null,
-text text not null,
-photo text not null,
-time integer not null
+CREATE TABLE IF NOT EXISTS post(
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+title TEXT,
+text TEXT,
+photo BLOB,
+time INTEGER
 );
 
 create table if not exists menu (
