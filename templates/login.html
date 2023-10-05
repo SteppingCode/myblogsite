@@ -10,39 +10,39 @@
                     <h2>Login</h2>
                     <div class="inputbox">
                         <ion-icon name="mail-outline"></ion-icon>
-                        <input type="text" name="username" pattern="[A-Za-z1-0 ]*">
+                        <input id="input1" type="text" name="username" pattern="[A-Za-z1-0 ]*">
                         <label for="">Username</label>
                     </div>
                     <div class="inputbox">
                         <ion-icon name="lock-closed-outline"></ion-icon>
-                        <input type="password" name="password">
+                        <input id="input2" type="password" name="password">
                         <label for="">Password</label>
                     </div>
                     <button type="submit">Log in</button>
                     <div class="register">
-                        <p>Don't have a account. <a style="cursor: pointer" onclick="document.getElementById('register').style.display='block'; document.getElementById('login').style.display='none';">Register</a></p>
+                        <p>Don't have a account. <a style="cursor: pointer" onclick="document.getElementById('register').style.display='block'; document.getElementById('login').style.display='none'; document.getElementById('input1').value=''; document.getElementById('input2').value='';">Register</a></p>
                     </div>
                 </div>
                 <div style="display: none" id="register">
                     <h2>Register</h2>
                     <div class="inputbox">
                         <ion-icon name="person-circle-outline"></ion-icon>
-                        <input type="text" name="reg_username" pattern="[A-Za-z1-0 ]*">
+                        <input id="input3" type="text" name="reg_username" pattern="[A-Za-z1-0 ]*">
                         <label for="">Username</label>
                     </div>
                     <div class="inputbox">
                         <ion-icon name="lock-closed-outline"></ion-icon>
-                        <input type="password" name="reg_password">
+                        <input id="input4" type="password" name="reg_password">
                         <label for="">Password</label>
                     </div>
                     <div class="inputbox">
                         <ion-icon name="lock-closed-outline"></ion-icon>
-                        <input type="password" name="reg_password2">
+                        <input id="input5" type="password" name="reg_password2">
                         <label for="">Password</label>
                     </div>
                     <button type="submit">Create account</button>
                     <div class="register">
-                        <p><a style="cursor: pointer" onclick="document.getElementById('register').style.display='none'; document.getElementById('login').style.display='block';">I have an account</a></p>
+                        <p><a style="cursor: pointer" onclick="document.getElementById('register').style.display='none'; document.getElementById('login').style.display='block'; document.getElementById('input3').value=''; document.getElementById('input4').value=''; document.getElementById('input5').value='';">I have an account</a></p>
                     </div>
                 </div>
             </form>
