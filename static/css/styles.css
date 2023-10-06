@@ -27,11 +27,13 @@ h1 {
     list-style: none;
 }
 .list_menu a:hover{
-	border-left: 2px solid #F5B7C7;
 	transition: 0.2s ease;
-	padding-left: 10px;
-	text-decoration: underline;
-	color: #999999;
+    text-decoration: underline;
+    color: royalblue;
+    padding-left: 10px;
+    -webkit-animation: glow 1s ease-in-out infinite alternate;
+    -moz-animation: glow 1s ease-in-out infinite alternate;
+    animation: glow 1s ease-in-out infinite alternate;
 }
 .list_menu li{
 	margin: 20px 0;
@@ -48,7 +50,8 @@ h1 {
 	padding: 25vh 50px;
 	background: rgba(20, 20, 20, .8);
 	height: 100vh;
-	border-right: 7px solid #3d3d88;
+	border-right: 7px solid #6161c9;
+    box-shadow: 0 0 200px #6161c9;
 	position: fixed;
 	left: -500px;
 	transition: 0.4s ease;
@@ -168,7 +171,30 @@ input:invalid {
 }
 
 .content-block {
-    margin-left: 60px;
+    margin-left: 100px;
+    margin-right: 100px;
+    background: transparent;
+    backdrop-filter: blur(15px);
+    border-right: 7px #5151b0 solid;
+    border-left: 7px #5151b0 solid;
+    border-radius: 20px;
+    transform: translate(0, 30px);
+}
+
+/**
+  -webkit-animation: glow 1s ease-in-out infinite alternate;
+  -moz-animation: glow 1s ease-in-out infinite alternate;
+  animation: glow 1s ease-in-out infinite alternate;
+ **/
+
+@-webkit-keyframes glow {
+  from {
+    text-shadow: 0 0 10px #fff, 0 0 20px #ffffff, 0 0 30px royalblue, 0 0 40px royalblue, 0 0 50px royalblue, 0 0 60px royalblue, 0 0 70px royalblue;
+  }
+
+  to {
+    text-shadow: 0 0 20px #fff, 0 0 30px dodgerblue, 0 0 40px dodgerblue, 0 0 50px dodgerblue, 0 0 60px dodgerblue, 0 0 70px dodgerblue, 0 0 80px dodgerblue;
+  }
 }
 
 footer {
