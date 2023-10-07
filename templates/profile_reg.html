@@ -2,15 +2,14 @@
 {% block content %}
 {{ super() }}
     <style>
-        body {
-            margin-top: -22px;
-        }
     </style>
-<form action="{{url_for('profile_reg')}}" method="post" class='form-contact'>
-    <h1>Создание профиля</h1>
-    <p><label> Имя: <input type="text" name="name" value="" required></label></p>
-    <p><label> Возраст: <input type="text" name="age" value="" required></label></p>
-    <p><label> О себе: <input type="text" name="game" value="" required></label></p>
-    <p><input type="submit"></p>
-</form>
+    <div class="content-block">
+        <form action="{{url_for('profile_reg')}}" method="post" class='form-contact'>
+            Создание профиля
+            <p><label> Имя: <input type="text" name="name" value="" required></label></p>
+            <p><label> Возраст: <input type="text" name="age" value="" required></label></p>
+            <p><label> О себе: <input type="text" name="game" value="" required></label></p>
+            <p><input type="submit" value="Создать"></p>
+        </form>
+    </div>
 {% endblock %}
