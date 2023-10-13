@@ -3,9 +3,6 @@
 {% block content %}
 {{ super() }}
 <style>
-    .content-block {
-        margin-left: 60px;
-    }
     h1 {
         margin: 25px;
     }
@@ -32,7 +29,7 @@
         display: flex;
     }
     .post-info {
-        width: 75%;
+        max-width: 100%;
     }
 </style>
 {% for cat, msg in get_flashed_messages(True) %}

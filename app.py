@@ -41,7 +41,8 @@ def webhook():
 def start_page():
     db = get_db()
     database = FDataBase(db)
-    return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce())
+    page = 0
+    return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page)
 
 #Login
 @app.route('/login', methods=['POST', 'GET'])
@@ -53,11 +54,11 @@ def login():
     if request.method == 'POST':
         if len(request.form['username']) > 0 and len(request.form['password']) > 0:
             if database.getData(request.form['username'], request.form['password']):
-                session['userlogged'] = request.form['username']
+                session['userlogged'] = database.getData(request.form['username'], request.form['password'])[0][0]
                 return redirect(url_for('start_page'))
         if len(request.form['reg_username']) > 0 and len(request.form['reg_password']) > 0:
             if request.form['reg_password'] == request.form['reg_password2']:
-                if database.addData(request.form["reg_username"], request.form["reg_password"]):
+                if database.addData(request.form["reg_username"], request.form["reg_password"], request.form['reg_email']):
                     session['userlogged'] = request.form['reg_username']
                     return redirect(url_for('start_page'))
                 else:
@@ -99,13 +100,17 @@ def post():
                 if len(request.form['name']) > 3 and len(request.form['post']) > 10:
                     res = database.addPost(request.form['name'], request.form['post'], request.form['photo'])
                     if not res:
-                        flash('Ошибка добавления статьи', category='error')
+                        return redirect(url_for('post'))
                     else:
-                        flash('Статья добавлена успешно', category='success')
-                else:
-                    flash('Ошибка добавления статьи', category='error')
+                        return redirect(url_for('post'))
             return render_template('post.html', title='Добавить статью', menu=database.getMenu())
     return redirect(url_for('start_page'))
+
+@app.route('/post/page/<int:page>/<int:last_id>')
+def post_page(page, last_id):
+    db = connect_db()
+    database = FDataBase(db)
+    return render_template('post_page.html', title=f'Страница {page}', menu=database.getMenu(), posts=database.getPostAnnocePages(last_id), page=page, last_id=last_id)
 
 #Edit post
 @app.route('/editpost/<int:id_post>', methods=['POST', 'GET'])

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% block content %}
 {{ super() }}
     <style>
@@ -24,17 +24,7 @@
         }
     </style>
     <div class="content-block">
-        <div class="container">
-            <div style="display: flex; flex-direction: row; justify-content: space-around;">
-                <div style="overflow: auto;">
-                    <h2>О чем сайт?</h2>
-                    <p>Этот сайт создан как <a href="https://github.com/dodik337" style="text-decoration: none;">мой</a> личный блог</p>
-                    <em>А также из за скуки)</em>
-                </div>
-            </div>
-        </div>
-            <hr width="90%">
-            <ul class="list-posts" style="max-width: 90%">
+        <ul class="list-posts" style="max-width: 90%; margin: 0;">
             {% for p in posts %}
                 <li>
                 <p class="title" style="font-size:30px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;"><a href="{{ url_for('showPost', id_post=p.id) }}" style="text-decoration: none; color: black;">{{ p.title }}</a> <strong style="font-size: 15px; color: black;">{{ p.time }}</strong></p>
@@ -45,16 +35,16 @@
                 {% endif %}
                 </li>
             {% endfor %}
-            <div class="buttons">
-                {% if page - 1 == -1 %}
-
-                {% elif page - 1 == 0 %}
-                    <a href="{{ url_for('start_page') }}"><p class="arrow_left"><-</p></a>
-                {% else %}
-                    <a href="{{ url_for('post_page', page=page - 1) }}"><p class="arrow_left"><-</p></a>
-                {% endif %}
-                <a href="{{ url_for('post_page', page=page + 1, last_id=1) }}"><p class="arrow_right">-></p></a>
-            </div>
         </ul>
+        <div class="buttons">
+            {% if page - 1 == -1 %}
+
+            {% elif page - 1 == 0 %}
+                <a href="{{ url_for('start_page') }}"><p class="arrow_left"><-</p></a>
+            {% else %}
+                <a href="{{ url_for('post_page', page=page - 1, last_id=last_id - 3) }}"><p class="arrow_left"><-</p></a>
+            {% endif %}
+            <a href="{{ url_for('post_page', page=page + 1, last_id=last_id + 3) }}"><p class="arrow_right">-></p></a>
+        </div>
     </div>
 {% endblock %}

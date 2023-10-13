@@ -35,9 +35,9 @@ class FDataBase:
         self.__db = db
         self.__cur = db.cursor()
 
-    def addData(self, username, password):
+    def addData(self, username, password, email):
         try:
-            self.__cur.execute("INSERT INTO user VALUES (NULL, ?, ?)", (username, password))
+            self.__cur.execute("INSERT INTO user VALUES (NULL, ?, ?, ?)", (username, password, email))
             self.__db.commit()
         except sq.Error as e:
             print(str(e))
@@ -58,7 +58,7 @@ class FDataBase:
 
     def getData(self, username, password):
         try:
-            self.__cur.execute("SELECT username, password FROM user WHERE ? = username AND ? = password", (username, password))
+            self.__cur.execute("SELECT username, password, email FROM user WHERE ? = email AND ? = password OR ? = username AND ? = password", (username, password, username, password))
             res = self.__cur.fetchall()
             return res
         except sq.Error as e:
@@ -119,7 +119,17 @@ class FDataBase:
 
     def getPostAnnoce(self):
         try:
-            self.__cur.execute(f"SELECT id, title, text, photo, time FROM post ORDER BY time DESC")
+            self.__cur.execute(f"SELECT id, title, text, photo, time FROM post ORDER BY time LIMIT 1")
+            res = self.__cur.fetchall()
+            if res: return res
+        except sq.Error as e:
+            print("Ошибка получения статей из БД" + str(e))
+        return []
+
+
+    def getPostAnnocePages(self, last_id):
+        try:
+            self.__cur.execute(f"SELECT id, title, text, photo, time FROM post WHERE id > ? ORDER BY id ASC LIMIT 3", (last_id,))
             res = self.__cur.fetchall()
             if res: return res
         except sq.Error as e:
@@ -352,7 +362,7 @@ if __name__ == "__main__":
     db = FDataBase(db)
     #create_db()
     #print(db.delData(0))
-    #print(db.addData('admin', '111'))
+    #print(db.addData('admin', '111', 'admin@gmail.com'))
     #print(db.delMenu(0))
     #print(db.addMenu('Главная', 'start_page'))
     #print(db.addMenu('Обновления', 'update_page'))

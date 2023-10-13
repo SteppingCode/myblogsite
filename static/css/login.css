@@ -41,17 +41,13 @@ h2{
 }
 .inputbox label{
     position: absolute;
-    top: 50%;
     left: 5px;
     transform: translateY(-50%);
     color: #fff;
     font-size: 1em;
     pointer-events: none;
     transition: .5s;
-}
-input:focus ~ label,
-input:valid ~ label{
-top: -5px;
+    top: -5px;
 }
 .inputbox input {
     width: 100%;

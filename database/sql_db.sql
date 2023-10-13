@@ -15,13 +15,8 @@ url text not null
 create table if not exists user (
 id integer primary key autoincrement,
 username text not null unique,
-password text not null
-);
-
-create table if not exists unregmenu (
-id integer primary key autoincrement,
-title text not null,
-url text not null
+password text not null,
+email text not null unique
 );
 
 create table if not exists profile (
@@ -30,12 +25,6 @@ nick text not null unique,
 name text not null,
 age integer not null,
 about text not null
-);
-
-create table if not exists adminmenu (
-id integer primary key autoincrement,
-title text not null,
-url text not null
 );
 
 create table if not exists comments (

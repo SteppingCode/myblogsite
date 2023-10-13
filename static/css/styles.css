@@ -198,7 +198,7 @@ input:invalid {
 }
 
 footer {
-    padding: 50px;
+    padding-top: 50px;
     color: lightgrey;
     text-align: center;
     font-family: 'Disket Mono', sans-serif;
