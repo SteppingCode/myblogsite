@@ -5,26 +5,27 @@
         body {
             max-height: 100vh;
         }
-        ul.list-posts {
+        .list-posts {
             list-style-type: none;
+            max-width: 100%;
+            margin: 0;
         }
-        ul.list-posts li {
+        .list-posts li {
             overflow: hidden;
             font-weight: bold;
         }
         .buttons {
-            margin-left: 50%;
-            transform: translate(-5%);
+            text-align: center;
         }
         .buttons p {
             display: inline-block;
             border: 1px black solid;
             color: white;
-            padding: 10px;
+            padding: 8px;
         }
     </style>
     <div class="content-block">
-        <ul class="list-posts" style="max-width: 90%; margin: 0;">
+        <ul class="list-posts">
             {% for p in posts %}
                 <li>
                 <p class="title" style="font-size:30px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;"><a href="{{ url_for('showPost', id_post=p.id) }}" style="text-decoration: none; color: black;">{{ p.title }}</a> <strong style="font-size: 15px; color: black;">{{ p.time }}</strong></p>
@@ -44,7 +45,11 @@
             {% else %}
                 <a href="{{ url_for('post_page', page=page - 1, last_id=last_id - 3) }}"><p class="arrow_left"><-</p></a>
             {% endif %}
-            <a href="{{ url_for('post_page', page=page + 1, last_id=last_id + 3) }}"><p class="arrow_right">-></p></a>
+            {% if page == MAX_PAGES %}
+
+            {% else %}
+                <a href="{{ url_for('post_page', page=page + 1, last_id=last_id + 3) }}"><p class="arrow_right">-></p></a>
+            {% endif %}
         </div>
     </div>
 {% endblock %}

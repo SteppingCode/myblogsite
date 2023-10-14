@@ -1,4 +1,6 @@
 # taskkill /f /im python.exe
+import math
+
 from flask import render_template, Flask, request, redirect, url_for, session, g, abort, flash
 from config import Config
 from database.sqldb import FDataBase
@@ -110,7 +112,17 @@ def post():
 def post_page(page, last_id):
     db = connect_db()
     database = FDataBase(db)
-    return render_template('post_page.html', title=f'Страница {page}', menu=database.getMenu(), posts=database.getPostAnnocePages(last_id), page=page, last_id=last_id)
+    MAX_PAGES = (database.getAllPostsId()[-1][0] - 1) // 3
+    if ((database.getAllPostsId()[-1][0] - 1) / 3 - MAX_PAGES) == 0:
+        if page > MAX_PAGES:
+            return redirect(url_for('post_page', page=MAX_PAGES, last_id=(MAX_PAGES * 3) - 2))
+        return render_template('post_page.html', title=f'Страница {page}', menu=database.getMenu(), posts=database.getPostAnnocePages(last_id), page=page, last_id=last_id, MAX_PAGES=MAX_PAGES)
+    elif (MAX_PAGES - (database.getAllPostsId()[-1][0] - 1) / 3) != 0:
+        MAX_PAGES = math.floor(MAX_PAGES + 1)
+        if page > MAX_PAGES:
+            return redirect(url_for('post_page', page=MAX_PAGES, last_id=(MAX_PAGES * 3) - 2))
+        return render_template('post_page.html', title=f'Страница {page}', menu=database.getMenu(), posts=database.getPostAnnocePages(last_id), page=page, last_id=last_id, MAX_PAGES=MAX_PAGES)
+    return render_template('post_page.html', title=f'Страница {page}', menu=database.getMenu(), posts=database.getPostAnnocePages(last_id), page=page, last_id=last_id, MAX_PAGES=MAX_PAGES)
 
 #Edit post
 @app.route('/editpost/<int:id_post>', methods=['POST', 'GET'])
@@ -197,44 +209,42 @@ def delcom_page(id_post, id_com):
         return redirect(url_for('start_page'))
 
 #Updates page
-@app.route('/updates_log', methods=['POST', 'GET'])
-def update_page():
+@app.route('/updates', methods=['POST', 'GET'])
+def updates():
     db = get_db()
     database = FDataBase(db)
+    page = 0
     if 'userlogged' in session:
         if session['userlogged'] == 'admin':
             if request.method == 'POST':
                 addupd = database.addUpdates(request.form['title'], request.form['text'], request.form['photo'])
                 if addupd:
-                    flash('Обновление опубликовано!', category='success')
-                    return redirect(url_for('update_page'))
+                    return redirect(url_for('updates'))
                 else:
-                    flash('Обновление не опубликовано', category='error')
-                    return redirect(url_for('update_page'))
+                    return redirect(url_for('updates'))
             return render_template('updates.html', title='Обновления', menu=database.getMenu(), \
-                                   updates=database.getUpdatesAnnoce())
+                                   updates=database.getUpdatesAnnoce(), page=page)
         return render_template('updates.html', title='Обновления', menu=database.getMenu(), \
-                               updates=database.getUpdatesAnnoce())
+                               updates=database.getUpdatesAnnoce(), page=page)
     return render_template('updates.html', title='Обновления', menu=database.getMenu(), \
-                           updates=database.getUpdatesAnnoce())
+                           updates=database.getUpdatesAnnoce(), page=page)
 
 #Update page
-@app.route('/update/<int:id_update>', methods=['POST', 'GET'])
-def showUpdate(id_update):
-    db = get_db()
+@app.route('/updates/page/<int:page>/<int:last_id>')
+def update_page(page, last_id):
+    db = connect_db()
     database = FDataBase(db)
-    title, aticle, photo = database.getUpdate(id_update)
-    likes = database.getLikes(id_update)
-    if 'userlogged' in session:
-        if likes:
-            return render_template('update_page.html', title=title, menu=database.getMenu(), update_text=aticle, \
-                                   update_title=title, update_image=photo, likes=likes, id_update=id_update)
-        else:
-            return render_template('update_page.html', title=title, menu=database.getMenu(), update_text=aticle, \
-                                   update_title=title, update_image=photo, likes=likes, id_update=id_update), \
-                            database.addLike(id_update)
-    return render_template('update_page.html', title=title, menu=database.getMenu(), update_text=aticle, \
-                           update_title=title, update_image=photo, likes=likes, id_update=id_update)
+    MAX_PAGES = (database.getAllUpdatesId()[-1][0] // 3) - 1
+    if ((((database.getAllUpdatesId()[-1][0]) / 3) - 1) - MAX_PAGES) == 0:
+        if page > MAX_PAGES:
+            return redirect(url_for('update_page', page=MAX_PAGES, last_id=(MAX_PAGES * 3)))
+        return render_template('update_page.html', title=f'Страница {page}', menu=database.getMenu(), posts=database.getUpdateAnnocePages(last_id), page=page, last_id=last_id, MAX_PAGES=MAX_PAGES)
+    elif (MAX_PAGES - ((database.getAllUpdatesId()[-1][0]) / 3) - 1) != 0:
+        MAX_PAGES = math.floor(MAX_PAGES + 1)
+        if page > MAX_PAGES:
+            return redirect(url_for('update_page', page=MAX_PAGES, last_id=(MAX_PAGES * 3)))
+        return render_template('update_page.html', title=f'Страница {page}', menu=database.getMenu(), posts=database.getUpdateAnnocePages(last_id), page=page, last_id=last_id, MAX_PAGES=MAX_PAGES)
+    return render_template('update_page.html', title=f'Страница {page}', menu=database.getMenu(), posts=database.getUpdateAnnocePages(last_id), page=page, last_id=last_id, MAX_PAGES=MAX_PAGES)
 
 #    {% else %}
 #        <p><a class="image like" href="{{url_for('addlike', id_update=id_update)}}" title="Мне нравится"><img src="https://cdn-icons-png.flaticon.com/512/633/633759.png" width="125px" height="50px"></a></p>
@@ -248,7 +258,7 @@ def profile_page(name):
     if 'userlogged' in session:
         if profile:
             return render_template('profile.html', menu=database.getMenu(), title=name, prof=profile)
-        return render_template('error.html', menu=database.getMenu(), title='Профиль не найден')
+        return render_template('profile.html', menu=database.getMenu(), title='Профиль не найден')
     return redirect(url_for('start_page'))
 
 @app.route('/reg_profile', methods=['GET', 'POST'])

@@ -1,46 +1,58 @@
-{% extends "base.html" %}
-
+{% extends 'base.html' %}
 {% block content %}
 {{ super() }}
-<style>
-    h1 {
-    margin: 25px;
-    }
-    .update-text {
-    margin: 50px;
-    }
-    .update-image {
-        margin-left: 50px;
-    }
-    .likes {
-        background-color: lightgreen;
-        width: 20px;
-        position: fixed;
-        margin-left: 60px;
-        text-align: center;
-    }
-    .dislikes {
-        background-color: tomato;
-        width: 20px;
-        position: fixed;
-        margin-left: 100px;
-        text-align: center;
-    }
-    .image.like {
-        margin-left: 20px;
-        position: fixed;
-        padding: 5px;
-    }
-    .image.dislike {
-        margin-left: 120px;
-        position: fixed;
-        padding: 5px;
-    }
-</style>
-    <h1>{{ update_title }}</h1>
-    <hr>
-    <p class="update-text">{{ update_text }}</p>
-    {% if update_image %}
-        <img src="{{ update_image }}" width="auto" height="auto" class="update-image">
-    {% endif %}
+    <style>
+        body {
+            max-height: 100vh;
+        }
+        .list-posts {
+            list-style-type: none;
+            max-width: 100%;
+            margin: 0;
+        }
+        .list-posts li {
+            overflow: hidden;
+            font-weight: bold;
+        }
+        .buttons {
+            text-align: center;
+        }
+        .buttons p {
+            display: inline-block;
+            border: 1px black solid;
+            color: white;
+            padding: 8px;
+        }
+        .content-block {
+            height: 455.333333px;
+        }
+    </style>
+    <div class="content-block">
+        <ul class="list-posts">
+            {% for p in posts %}
+                <li>
+                <p class="title" style="font-size:30px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">{{ p.title }} <strong style="font-size: 15px; color: black;">{{ p.time }}</strong></p>
+                {% if p.text[50] %}
+                  <p class="annonce" style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif">{{ p.text[:50]}}...</p>
+                {% else %}
+                  <p class="annonce" style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif">{{ p.text[:50]}}</p>
+                {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+        <div class="buttons">
+            {% if page - 1 == -1 %}
+
+            {% elif page - 1 == 0 %}
+                <a href="{{ url_for('updates') }}"><p class="arrow_left"><-</p></a>
+            {% else %}
+                <a href="{{ url_for('update_page', page=page - 1, last_id=last_id - 3) }}"><p class="arrow_left"><-</p></a>
+            {% endif %}
+            {% if page == MAX_PAGES %}
+
+            {% else %}
+                <a href="{{ url_for('update_page', page=page + 1, last_id=last_id + 3) }}"><p class="arrow_right">-></p></a>
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}

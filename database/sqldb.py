@@ -117,6 +117,15 @@ class FDataBase:
             return False
         return True
 
+    def getAllPostsId(self):
+        try:
+            self.__cur.execute(f"SELECT id time FROM post ORDER BY time")
+            res = self.__cur.fetchall()
+            if res: return res
+        except sq.Error as e:
+            print("Ошибка получения статей из БД" + str(e))
+        return []
+
     def getPostAnnoce(self):
         try:
             self.__cur.execute(f"SELECT id, title, text, photo, time FROM post ORDER BY time LIMIT 1")
@@ -237,13 +246,23 @@ class FDataBase:
             print("Ошибка получения обновления из БД" + str(e))
         return (False, False)
 
-    def getUpdatesAnnoce(self):
+
+    def getAllUpdatesId(self):
         try:
-            self.__cur.execute(f"SELECT id, title, text, photo, time FROM updates ORDER BY id DESC")
+            self.__cur.execute(f"SELECT id time FROM updates ORDER BY time")
             res = self.__cur.fetchall()
-            return res
+            if res: return res
         except sq.Error as e:
-            print("Ошибка получения обновлений из БД" + str(e))
+            print("Ошибка получения статей из БД" + str(e))
+        return []
+
+    def getUpdateAnnocePages(self, last_id):
+        try:
+            self.__cur.execute(f"SELECT * FROM updates WHERE id > ? ORDER BY id ASC LIMIT 3", (last_id,))
+            res = self.__cur.fetchall()
+            if res: return res
+        except sq.Error as e:
+            print("Ошибка получения статей из БД" + str(e))
         return []
 
     def UpdateUpdate(self, title, text, photo, id):
@@ -257,7 +276,7 @@ class FDataBase:
 
     def getUpdatesAnnoce(self):
         try:
-            self.__cur.execute(f"SELECT id, title, text, photo, time FROM updates ORDER BY id DESC")
+            self.__cur.execute(f"SELECT * FROM updates ORDER BY id ASC LIMIT 3")
             res = self.__cur.fetchall()
             return res
         except sq.Error as e:

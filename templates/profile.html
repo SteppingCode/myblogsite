@@ -1,16 +1,54 @@
 {% extends 'base.html' %}
 {% block content %}
 {{ super() }}
-    <div class="content-block">
-        {% for n in prof %}
-            <li style="list-style-type: none; border: 1px black solid; width: 20%;">
-                <ul style="overflow: auto; padding: 20px;">
+    <style>
+        body {
+            max-height: 100vh;
+        }
+        .prof {
+            border: 1px black solid;
+            width: 150px;
+            padding: 15px;
+            text-align: center;
+            margin-left: 50%;
+            transform: translate(-50%, -100px);
+        }
+        .content-block-prof {
+            padding-top: 200px;
+        }
+        .content-block-prof a {
+            text-decoration: none;
+            color: floralwhite;
+            font-family: 'Disket Mono', sans-serif;
+        }
+        .content-block-prof a:hover {
+            color: royalblue;
+            text-decoration: underline;
+        }
+        .content-block {
+            height: 455.333333px;
+        }
+    </style>
+    {% if prof %}
+        <div class="content-block">
+            {% for n in prof %}
+                <div style="overflow: auto; padding: 20px;">
                     <h1>{{n.nick}}</h1>
                     <h2>Имя: {{n.name}}</h2>
                     <h2>Возраст: {{n.age}}</h2>
                     <h2>{{n.about}}</h2>
-                </ul>
-            </li>
-        {% endfor %}
-    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="content-block">
+            <div class="content-block-prof">
+                <div class="prof">
+                    <a href="{{ url_for('profile_reg') }}">
+                        <strong>Настроить профиль</strong>
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}

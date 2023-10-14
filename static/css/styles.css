@@ -3,14 +3,9 @@ html, body {
     padding: 0;
     height: 100%;
     width: 100%;
-
     background: url('/static/img/background6.jpg')no-repeat;
     background-position: center;
     background-size: cover;
-}
-
-h1 {
-    padding: 10px;
 }
 
 .list_menu a{
@@ -63,6 +58,9 @@ h1 {
     height: 60px;
     position: fixed;
     z-index: 1;
+}
+.burger:hover {
+    cursor: pointer;
     background: rgba(105, 105, 105, .2);
 }
 #span_1 {
@@ -123,28 +121,6 @@ h1 {
     border-radius: 10px;
 }
 
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 2;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    padding-top: 50px;
-    background-color: rgba(240, 240, 240, .5);
-}
-
-.modal-content {
-    border-radius: 15px;
-    background-color: #fefefe;
-    margin: 10% auto 15% auto;
-    border: 1px solid #888;
-    width: 35%;
-    height: auto;
-}
-
 input:invalid {
     animation: shake 300ms;
     color: rgb(255,  35, 35);
@@ -154,20 +130,6 @@ input:invalid {
     25% { transform: translateX(4px); }
     50% { transform: translateX(-4px); }
     75% { transform: translateX(4px); }
-}
-
-.flash {
-    padding: 10px;
-}
-
-.flash.success{
-    border: 1px solid #21DB56;
-    background: #AEFFC5;
-}
-
-.flash.error{
-    border: 1px solid #FF4334;
-    background: #FF9C9C;
 }
 
 .content-block {

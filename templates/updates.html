@@ -1,75 +1,54 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% block content %}
 {{ super() }}
-<style>
-    .h2 {
-        margin-left: 50%;
-        color: #E5D6A5;
-	    font-size: 22px;
-	    font-weight: bold;
-	    text-shadow:
-		-0   -1px 1px #000000,
-		 0   -1px 1px #000000,
-		-0    1px 1px #000000,
-		 0    1px 1px #000000,
-		-1px -0   1px #000000,
-		 1px -0   1px #000000,
-		-1px  0   1px #000000,
-		 1px  0   1px #000000,
-		-1px -1px 1px #000000,
-		 1px -1px 1px #000000,
-		-1px  1px 1px #000000,
-		 1px  1px 1px #000000,
-		-1px -1px 1px #000000,
-		 1px -1px 1px #000000,
-		-1px  1px 1px #000000,
-		 1px  1px 1px #000000;
-    }
-    ul.list-updates {
-        list-style-type: none;
-    }
-    ul.list-updates li {
-        overflow: hidden;
-        font-weight: bold;
-    }
-    .title:hover {
-      color:skyblue;
-    }
-    img {
-      max-width: 40%;
-      max-height: 40%;
-    }
-</style>
-<span class="h2">Список обновлений</span>
+    <style>
+        body {
+            max-height: 100vh;
+        }
+        .list-posts {
+            list-style-type: none;
+            max-width: 100%;
+            margin: 0;
+        }
+        .list-posts li {
+            overflow: hidden;
+            font-weight: bold;
+        }
+        .buttons {
+            text-align: center;
+        }
+        .buttons p {
+            display: inline-block;
+            border: 1px black solid;
+            color: white;
+            padding: 8px;
+        }
+        .content-block {
+            height: 455.333333px;
+        }
+    </style>
+    <div class="content-block">
+        <ul class="list-posts">
+            {% for p in updates %}
+                <li>
+                <p class="title" style="font-size:30px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">{{ p.title }} <strong style="font-size: 15px; color: black;">{{ p.time }}</strong></p>
+                {% if p.text[50] %}
+                  <p class="annonce" style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif">{{ p.text[:50]}}...</p>
+                {% else %}
+                  <p class="annonce" style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif">{{ p.text[:50]}}</p>
+                {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+        <div class="buttons">
+            {% if page - 1 == -1 %}
 
-<hr>
-<ul class="list-updates">
-  {% if updates %}
-      {% for upd in updates %}
-        <li>
-          <p class="title" style="font-size:30px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;"><a href="{{url_for('showUpdate', id_update=upd.id)}}" style="text-decoration: none; color: black;">{{ upd.title }}</a></p> <strong>{{ upd.time }}</strong>
-          <p style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif">{{upd.text}}</p>
-          {% if upd.photo %}
-            <img src="{{ upd.photo }}" width="auto" height="auto">
-          {% endif %}
-          {% if 'userlogged' in session %}
-            {% if session['userlogged'] == 'admin' %}
-              <p><a href="{{ url_for('editupdate_page', id_update=upd.id) }}" style="color: #9FCC56; border: 1px skyblue solid; border-radius: 2px; padding: 5px; font-size:20px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; text-decoration: none;">Редактировать</a></p>
-              <p><a href="{{ url_for('delupdate_page', id_update=upd.id) }}" style="color: red; border: 1px skyblue solid; border-radius: 2px; padding: 5px; font-size:20px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; text-decoration: none;">Удалить</a></p>
             {% endif %}
-          {% endif %}
-        </li>
-      {% endfor %}
-  {% endif %}
-  {% if 'userlogged' in session %}
-    {% if session['userlogged'] == 'admin' %}
-    <form method="post">
-      <p><input type="text" name="title" placeholder="Название обновления" required></p>
-      <p><textarea name="text" rows="5" cols="40" placeholder="Текст" required></textarea></p>
-      <p><input type="text" name="photo" placeholder="Ссылка на фото"></p>
-      <button type="submit">Добавить</button>
-    </form>
-    {% endif %}
-  {% endif %}
-</ul>
+            {% if page == MAX_PAGES %}
+
+            {% else %}
+                <a href="{{ url_for('update_page', page=page + 1, last_id=3) }}"><p class="arrow_right">-></p></a>
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}
