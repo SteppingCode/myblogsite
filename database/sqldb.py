@@ -384,5 +384,5 @@ if __name__ == "__main__":
     #print(db.addData('admin', '111', 'admin@gmail.com'))
     #print(db.delMenu(0))
     #print(db.addMenu('Главная', 'start_page'))
-    #print(db.addMenu('Обновления', 'update_page'))
+    #print(db.addMenu('Обновления', 'updates'))
 

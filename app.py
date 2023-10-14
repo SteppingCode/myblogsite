@@ -44,7 +44,8 @@ def start_page():
     db = get_db()
     database = FDataBase(db)
     page = 0
-    return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page)
+    MAX_PAGES = (database.getAllPostsId()[-1][0])
+    return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=MAX_PAGES)
 
 #Login
 @app.route('/login', methods=['POST', 'GET'])

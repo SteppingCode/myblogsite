@@ -49,14 +49,11 @@
             {% endfor %}
         </ul>
         <div class="buttons">
-            {% if page - 1 == -1 %}
+            {% if page == MAX_PAGES %}
 
-            {% elif page - 1 == 0 %}
-                <a href="{{ url_for('start_page') }}"><p class="arrow_left"><-</p></a>
             {% else %}
-                <a href="{{ url_for('post_page', page=page - 1) }}"><p class="arrow_left"><-</p></a>
+                <a href="{{ url_for('post_page', page=page + 1, last_id=1) }}"><p class="arrow_right">-></p></a>
             {% endif %}
-            <a href="{{ url_for('post_page', page=page + 1, last_id=1) }}"><p class="arrow_right">-></p></a>
         </div>
     </div>
 {% endblock %}
