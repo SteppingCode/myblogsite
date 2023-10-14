@@ -7,7 +7,10 @@
         margin: 25px;
     }
     .post-text {
+        max-width: 100%;
+        overflow: auto;
         margin: 50px;
+        font-size: 20px;
     }
     .post-image {
         margin-left: 50px;
@@ -27,6 +30,7 @@
     }
     .content-block {
         display: flex;
+        min-height: 455.33333px;
     }
     .post-info {
         max-width: 100%;
@@ -38,7 +42,7 @@
     <div class="content-block">
         <div class="post-info">
             <h1>{{ post_title }}</h1>
-            <p class="post-text">{{ post }}</p>
+            <pre class="post-text">{{ post }}</pre>
             {% if post_image %}
                 <img src="{{ post_image }}" width="auto" height="auto" class="post-image">
             {% endif %}
