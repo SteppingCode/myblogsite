@@ -116,6 +116,8 @@ def post_page(page, last_id):
     MAX_PAGES = (database.getAllPostsId()[-1][0] - 1) // 3
     if ((database.getAllPostsId()[-1][0] - 1) / 3 - MAX_PAGES) == 0:
         if page > MAX_PAGES:
+            if MAX_PAGES == 0:
+                return redirect(url_for('start_page'))
             return redirect(url_for('post_page', page=MAX_PAGES, last_id=(MAX_PAGES * 3) - 2))
         return render_template('post_page.html', title=f'Страница {page}', menu=database.getMenu(), posts=database.getPostAnnocePages(last_id), page=page, last_id=last_id, MAX_PAGES=MAX_PAGES)
     elif (MAX_PAGES - (database.getAllPostsId()[-1][0] - 1) / 3) != 0:
