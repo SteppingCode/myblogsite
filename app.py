@@ -1,11 +1,12 @@
 # taskkill /f /im python.exe
+import base64
 import math
 
-from flask import render_template, Flask, request, redirect, url_for, session, g, abort, flash, Markup
+from flask import render_template, Flask, request, redirect, url_for, session, g, abort, flash, Markup, make_response
 from config import Config
 from database.sqldb import FDataBase
 import git, os, sqlite3
-from database.photos_db import Photo
+from database.photos_db import getLastPhotoName, PhotoAdd, getPhoto
 from werkzeug.utils import secure_filename
 
 #import time
@@ -20,7 +21,7 @@ ALLOWED_EXTENSIONS = {'png'}
 
 app = Flask(__name__)
 app.config.from_object(Config)
-app.config.update(dict(DATABASE=os.path.join(app.root_path,'posts.db'))) #Создается база данных
+app.config.update(dict(DATABASE=os.path.join(app.root_path, 'posts.db'))) #Создается база данных
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 #Соединение с базой данных
@@ -36,7 +37,6 @@ def get_db():
         return g.link_db
 
 def allowed_file(filename):
-    """ Функция проверки расширения файла """
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -147,7 +147,9 @@ def post():
                     if file.filename == '':
                         flash('Нет выбранного файла')
                     if file and allowed_file(file.filename):
-                        file.save(os.path.join(app.config['UPLOAD_FOLDER'], f'4' + '.png'))
+                        filename = getLastPhotoName() + 1
+                        file.save(os.path.join(app.config['UPLOAD_FOLDER'], f'{filename}' + '.png'))
+                        PhotoAdd(f'{filename}', request.form['name'])
                     if not res:
                         return redirect(url_for('post'))
                     else:
@@ -227,7 +229,8 @@ def delpost_page(id_post):
 def showPost(id_post):
     db = get_db()
     database = FDataBase(db)
-    title, aticle, photo = database.getPost(id_post)
+    title, aticle = database.getPost(id_post)
+    photo = getPhoto(title)
     comments = database.getComments(id_post)
     if 'userlogged' in session:
         if comments:

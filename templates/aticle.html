@@ -54,7 +54,7 @@
             <h1>{{ post_title }}</h1>
             <p class="post-text">{{ post }}</p>
             {% if post_image %}
-                <img src="{{ post_image }}" width="auto" height="auto" class="post-image">
+                <div class="post-image">{{ post_image }}</div>
             {% endif %}
         </div>
     </div>

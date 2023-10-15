@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS post(
 id INTEGER PRIMARY KEY,
-title TEXT,
+title TEXT UNIQUE,
 text TEXT,
 time INTEGER
 );

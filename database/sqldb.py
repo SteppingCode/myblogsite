@@ -128,7 +128,7 @@ class FDataBase:
 
     def getPostAnnoce(self):
         try:
-            self.__cur.execute(f"SELECT id, title, text, photo, time FROM post ORDER BY time LIMIT 1")
+            self.__cur.execute(f"SELECT id, title, text, time FROM post ORDER BY time LIMIT 1")
             res = self.__cur.fetchall()
             if res: return res
         except sq.Error as e:
@@ -138,7 +138,7 @@ class FDataBase:
 
     def getPostAnnocePages(self, last_id):
         try:
-            self.__cur.execute(f"SELECT id, title, text, photo, time FROM post WHERE id > ? ORDER BY id ASC LIMIT 3", (last_id,))
+            self.__cur.execute(f"SELECT id, title, text, time FROM post WHERE id > ? ORDER BY id ASC LIMIT 3", (last_id,))
             res = self.__cur.fetchall()
             if res: return res
         except sq.Error as e:
@@ -147,7 +147,7 @@ class FDataBase:
 
     def getPost(self, postid):
         try:
-            self.__cur.execute(f"SELECT title, text, photo FROM post WHERE id = {postid} LIMIT 1")
+            self.__cur.execute(f"SELECT title, text FROM post WHERE id = {postid} LIMIT 1")
             res = self.__cur.fetchone()
             if res: return res
         except sq.Error as e:
