@@ -1,78 +1,61 @@
 {% extends "base.html" %}
-
 {% block content %}
 {{ super() }}
-<style>
-    h1 {
-        margin: 25px;
-    }
-    .post-text {
-        max-width: 100%;
-        overflow: auto;
-        margin: 50px;
-        font-size: 20px;
-    }
-    .post-image {
-        margin-left: 50px;
-    }
-    .comment-add {
-        margin-left: 50px;
-    }
-    .comments {
-        list-style-type: none;
-        margin-left: 50px;
-    }
-    .comment {
-        list-style-type: none;
-        width: 40%;
-        padding: 10px;
-        border-radius: 5px;
-    }
-    .content-block {
-        display: flex;
-        min-height: 455.33333px;
-    }
-    .post-info {
-        max-width: 100%;
-    }
-</style>
-{% for cat, msg in get_flashed_messages(True) %}
-<div class="flash {{cat}}"> {{msg}}</div>
-{% endfor %}
+    <style>
+        h1 {
+            margin: 25px;
+            margin-left: 50px;
+            color: mediumpurple;
+            text-shadow: 2px 2px 20px rebeccapurple;
+            font-family: "Arial Black";
+        }
+        .post-text {
+            max-width: 100%;
+            overflow: auto;
+            margin: 50px;
+            font-size: 16px;
+            font-family: "Arial Black";
+            color: #6161c9;
+        }
+        .post-image {
+            margin-left: 50px;
+        }
+        .comment-add {
+            margin-left: 50px;
+        }
+        .comments {
+            list-style-type: none;
+            margin-left: 50px;
+        }
+        .comment {
+            list-style-type: none;
+            width: 40%;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .content-block {
+            display: flex;
+            min-height: 455.33333px;
+        }
+        .post-info {
+            max-width: 100%;
+        }
+        .post-text a {
+            color: grey;
+            text-decoration: none;
+        }
+        .post-text a:hover {
+            text-decoration: underline;
+            color: royalblue;
+        }
+    </style>
     <div class="content-block">
         <div class="post-info">
             <h1>{{ post_title }}</h1>
-            <pre class="post-text">{{ post }}</pre>
+            <p class="post-text">{{ post }}</p>
             {% if post_image %}
                 <img src="{{ post_image }}" width="auto" height="auto" class="post-image">
             {% endif %}
-            {% if 'userlogged' in session %}
-                <form method="post" class="comment-add">
-                    <h4>Добавить комментарий</h4>
-                    <p><textarea placeholder="Текст комментария" name="text" required></textarea></p>
-                    <p><button type="submit">Отправить</button></p>
-                </form>
-            {% endif %}
-            <div class="comments">
-                {% if comments %}
-                <strong style="font-size: 30px; font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">Комментарии</strong>
-                <ul>
-                    <li class="comment">
-                    {% for com in comments %}
-                        <p style="font-size:30px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;"><strong>{{com.username}}</strong></p>
-                        <p style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif">{{com.text}}</p>
-                    {% if 'userlogged' in session %}
-                        {% if session['userlogged'] == 'admin' %}
-                            <p style="font-size:30px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;"><a href="{{ url_for('delcom_page', id_post=com.postid, id_com=com.id) }}" style="text-decoration: none;">Удалить</a></p>
-                        {% endif %}
-                    {% endif %}
-                    {% endfor %}
-                    </li>
-                </ul>
-                {% else %}
-                    <h4>Тут пока ничего нет...</h4>
-                {% endif %}
-            </div>
         </div>
     </div>
 {% endblock %}

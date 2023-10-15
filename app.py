@@ -1,7 +1,7 @@
 # taskkill /f /im python.exe
 import math
 
-from flask import render_template, Flask, request, redirect, url_for, session, g, abort, flash
+from flask import render_template, Flask, request, redirect, url_for, session, g, abort, flash, Markup
 from config import Config
 from database.sqldb import FDataBase
 import git, os, sqlite3
@@ -194,11 +194,11 @@ def showPost(id_post):
                     addcom = database.addComment(session['userlogged'], request.form['text'], id_post)
                     if addcom:
                         return redirect(url_for('showPost', id_post=id_post))
-                return render_template('aticle.html', title=title, menu=database.getMenu(), post=aticle, \
+                return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), \
                                        post_title=title, post_image=photo, comments=comments, posts=database.getPostAnnoce())
-        return render_template('aticle.html', title=title, menu=database.getMenu(), post=aticle, post_title=title,
+        return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), post_title=title,
                             post_image=photo, comments=comments, posts=database.getPostAnnoce())
-    return render_template('aticle.html', title=title, menu=database.getMenu(), post=aticle, \
+    return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), \
                            post_title=title, post_image=photo, posts=database.getPostAnnoce(), comments=comments)
 
 #Deleting comment
