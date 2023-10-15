@@ -44,8 +44,12 @@ def start_page():
     db = get_db()
     database = FDataBase(db)
     page = 0
-    MAX_PAGES = (database.getAllPostsId()[-1][0])
-    return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=MAX_PAGES)
+    if database.getAllPostsId() == []:
+        return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=0)
+    elif database.getAllPostsId()[-1][0] == 1:
+        return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=0)
+    else:
+        return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=1)
 
 #Login
 @app.route('/login', methods=['POST', 'GET'])
