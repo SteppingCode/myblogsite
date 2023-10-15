@@ -1,14 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
 {{super()}}
-{% for cat, msg in get_flashed_messages(True) %}
-<div class="flash {{cat}}"> {{msg}}</div>
-{% endfor %}
-<form method="post" class='form-contact'>
-    <p><label>Название статьи: </label>{{post.title}} - <input type="text" name="title" value="" required></p>
-    <p><label>Текст статьи: </label> {{post.text}} <br>
-        <textarea name="text" rows="7" cols="40"></textarea> </p>
-    <p><label>Фото статьи:</label>{{post.photo}} <input type="text" name="photo" value=""></p>
-    <p><input type="submit" value="Добавить"></p>
-</form>
+    <form method="post" class='form-contact'>
+        <p><label>Название статьи: </label>{{post.title}} - <input type="text" name="title" value="" required></p>
+        <p><label>Текст статьи: </label> {{post.text}} <br>
+            <textarea name="text" rows="7" cols="40"></textarea> </p>
+        <p><label>Фото статьи:</label>{{post.photo}} <input type="text" name="photo" value=""></p>
+        <p><input type="submit" value="Добавить"></p>
+    </form>
 {% endblock %}

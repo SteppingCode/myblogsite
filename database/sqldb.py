@@ -95,10 +95,10 @@ class FDataBase:
             print(str(e))
             return False
 
-    def addPost(self, title, text, photo):
+    def addPost(self, title, text):
         try:
             tm = time.ctime()
-            self.__cur.execute("INSERT INTO post VALUES (NULL, ?, ?, ?, ?)", (title, text, photo, tm))
+            self.__cur.execute("INSERT INTO post VALUES (NULL, ?, ?, ?)", (title, text, tm))
             self.__db.commit()
         except sq.Error as e:
             print(str(e))
@@ -385,4 +385,3 @@ if __name__ == "__main__":
     #print(db.delMenu(0))
     #print(db.addMenu('Главная', 'start_page'))
     #print(db.addMenu('Обновления', 'updates'))
-

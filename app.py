@@ -5,15 +5,23 @@ from flask import render_template, Flask, request, redirect, url_for, session, g
 from config import Config
 from database.sqldb import FDataBase
 import git, os, sqlite3
+from database.photos_db import Photo
+from werkzeug.utils import secure_filename
 
 #import time
 #
 #os.environ["TZ"] = "Europe/Moscow"
 #time.tzset()
 
+# папка для сохранения загруженных файлов
+UPLOAD_FOLDER = 'photos'
+# расширения файлов, которые разрешено загружать
+ALLOWED_EXTENSIONS = {'png'}
+
 app = Flask(__name__)
 app.config.from_object(Config)
 app.config.update(dict(DATABASE=os.path.join(app.root_path,'posts.db'))) #Создается база данных
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 #Соединение с базой данных
 def connect_db():
@@ -27,6 +35,11 @@ def get_db():
         g.link_db = connect_db()
         return g.link_db
 
+def allowed_file(filename):
+    """ Функция проверки расширения файла """
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 #Server updating
 @app.route('/update_server', methods=['POST', 'GET'])
 def webhook():
@@ -37,6 +50,28 @@ def webhook():
         return 'Сайт обновился', 200
     else:
         return 'Возникла ошибка', 400
+
+@app.route('/upload', methods=['GET', 'POST'])
+def upload_file():
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            flash('Не могу прочитать файл')
+        file = request.files['file']
+        if file.filename == '':
+            flash('Нет выбранного файла')
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+    return '''
+    <!doctype html>
+    <title>Загрузить новый файл</title>
+    <h1>Загрузить новый файл</h1>
+    <form method=post enctype=multipart/form-data>
+      <input type=file name=file>
+      <input type=submit value=Upload>
+    </form>
+    </html>
+    '''
 
 #Main page
 @app.route('/', methods=['GET', 'POST'])
@@ -105,7 +140,14 @@ def post():
         if session['userlogged'] == 'admin':
             if request.method == 'POST':
                 if len(request.form['name']) > 3 and len(request.form['post']) > 10:
-                    res = database.addPost(request.form['name'], request.form['post'], request.form['photo'])
+                    res = database.addPost(request.form['name'], request.form['post'])
+                    if 'file' not in request.files:
+                        flash('Не могу прочитать файл')
+                    file = request.files['file']
+                    if file.filename == '':
+                        flash('Нет выбранного файла')
+                    if file and allowed_file(file.filename):
+                        file.save(os.path.join(app.config['UPLOAD_FOLDER'], f'4' + '.png'))
                     if not res:
                         return redirect(url_for('post'))
                     else:

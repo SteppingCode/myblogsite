@@ -180,6 +180,8 @@ footer a {
 footer a:hover {
     color: royalblue;
     text-decoration: underline;
+    font-size: 18px;
+    transition: .4s;
 }
 
 @media (max-width: 992px) {
