@@ -6,7 +6,7 @@ from flask import render_template, Flask, request, redirect, url_for, session, g
 from config import Config
 from database.sqldb import FDataBase
 import git, os, sqlite3
-from database.photos_db import getLastPhotoName, PhotoAdd, getPhoto
+from database.photos_db import PhotoAdd, getPhoto, PhotoDelete
 from werkzeug.utils import secure_filename
 
 #import time
@@ -15,14 +15,15 @@ from werkzeug.utils import secure_filename
 #time.tzset()
 
 # папка для сохранения загруженных файлов
-UPLOAD_FOLDER = 'photos'
+UPLOAD_FOLDER = 'static/photos'
 # расширения файлов, которые разрешено загружать
-ALLOWED_EXTENSIONS = {'png'}
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 app = Flask(__name__)
 app.config.from_object(Config)
 app.config.update(dict(DATABASE=os.path.join(app.root_path, 'posts.db'))) #Создается база данных
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
 
 #Соединение с базой данных
 def connect_db():
@@ -147,9 +148,9 @@ def post():
                     if file.filename == '':
                         flash('Нет выбранного файла')
                     if file and allowed_file(file.filename):
-                        filename = getLastPhotoName() + 1
-                        file.save(os.path.join(app.config['UPLOAD_FOLDER'], f'{filename}' + '.png'))
-                        PhotoAdd(f'{filename}', request.form['name'])
+                        filename = secure_filename(file.filename)
+                        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                        PhotoAdd(filename, request.form['name'], str(filename))
                     if not res:
                         return redirect(url_for('post'))
                     else:
@@ -212,12 +213,14 @@ def delpost_page(id_post):
     database = FDataBase(db)
     title = database.getPostAnnoce()
     aticle = database.getPostAnnoce()
+    post_name = database.getPost(id_post)[0]
     if 'userlogged' in session:
         if session['userlogged'] == 'admin':
             delpost = database.delPost(id_post)
+            delphoto = PhotoDelete(post_name)
             if not title:
                 abort(404)
-            if delpost:
+            if delpost and delphoto:
                 return redirect(url_for('admin_page'))
             return render_template('admin.html', title='title', menu=database.getMenu(), post=aticle, \
                                    post_title=title)
@@ -233,6 +236,11 @@ def showPost(id_post):
     photo = getPhoto(title)
     comments = database.getComments(id_post)
     if 'userlogged' in session:
+        if photo:
+            return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle),
+                                   post_title=title,
+                                   post_image=photo[2], comments=comments, posts=database.getPostAnnoce(),
+                                   id_post=id_post)
         if comments:
             if request.method == 'POST':
                 if len(request.form['text']) > 3:
@@ -240,11 +248,24 @@ def showPost(id_post):
                     if addcom:
                         return redirect(url_for('showPost', id_post=id_post))
                 return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), \
-                                       post_title=title, post_image=photo, comments=comments, posts=database.getPostAnnoce())
+                                       post_title=title, comments=comments, posts=database.getPostAnnoce(), id_post=id_post)
         return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), post_title=title,
-                            post_image=photo, comments=comments, posts=database.getPostAnnoce())
+                            comments=comments, posts=database.getPostAnnoce(), id_post=id_post)
+    if photo:
+        return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle),
+                               post_title=title,
+                               post_image=photo[2], comments=comments, posts=database.getPostAnnoce(), id_post=id_post)
     return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), \
-                           post_title=title, post_image=photo, posts=database.getPostAnnoce(), comments=comments)
+                           post_title=title, posts=database.getPostAnnoce(), comments=comments, id_post=id_post)
+
+@app.route('/display_image_by_name/<post_name>', methods=['POST', 'GET'])
+def display_image_by_name(post_name):
+    filename = getPhoto(post_name)[3]
+    return redirect(url_for('static', filename='photos/' + filename), code=301)
+
+@app.route('/display_image/<filename>', methods=['POST', 'GET'])
+def display_image(filename):
+    return redirect(url_for('static', filename='photos/' + filename), code=301)
 
 #Deleting comment
 @app.route('/delcom/<int:id_post>/<int:id_com>')

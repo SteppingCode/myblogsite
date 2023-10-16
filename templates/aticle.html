@@ -16,9 +16,14 @@
             font-size: 16px;
             font-family: "Arial Black";
             color: #6161c9;
+            max-height: 100px;
+            margin-bottom: 10px;
+            margin-top: 10px;
         }
         .post-image {
             margin-left: 50px;
+            max-width: 350px;
+            max-height: 240px;
         }
         .comment-add {
             margin-left: 50px;
@@ -48,13 +53,19 @@
             text-decoration: underline;
             color: royalblue;
         }
+        .other {
+            max-width: 350px;
+            max-height: 240px;
+        }
     </style>
     <div class="content-block">
         <div class="post-info">
             <h1>{{ post_title }}</h1>
             <p class="post-text">{{ post }}</p>
             {% if post_image %}
-                <div class="post-image">{{ post_image }}</div>
+                <div class="post-image">
+                    <img src="{{ url_for('display_image_by_name', post_name=post_title) }}" class="other">
+                </div>
             {% endif %}
         </div>
     </div>
