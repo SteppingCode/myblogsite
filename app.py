@@ -1,12 +1,11 @@
 # taskkill /f /im python.exe
-import base64
 import math
 
-from flask import render_template, Flask, request, redirect, url_for, session, g, abort, flash, Markup, make_response
+from flask import render_template, Flask, request, redirect, url_for, session, g, abort, flash, Markup
 from config import Config
 from database.sqldb import FDataBase
 import git, os, sqlite3
-from database.photos_db import PhotoAdd, getPhoto, PhotoDelete
+from database.photos_db import Photo
 from werkzeug.utils import secure_filename
 
 #import time
@@ -15,13 +14,14 @@ from werkzeug.utils import secure_filename
 #time.tzset()
 
 # папка для сохранения загруженных файлов
-UPLOAD_FOLDER = 'static/photos'
+UPLOAD_FOLDER = 'static/photos/'
 # расширения файлов, которые разрешено загружать
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 app = Flask(__name__)
 app.config.from_object(Config)
 app.config.update(dict(DATABASE=os.path.join(app.root_path, 'posts.db'))) #Создается база данных
+app.config.update(dict(PHOTOBASE=os.path.join(app.root_path, 'photo.db'))) #Создается база данных
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
 
@@ -30,6 +30,11 @@ def connect_db():
     conn = sqlite3.connect(app.config['DATABASE'])
     conn.row_factory = sqlite3.Row
     return conn
+
+def connect_photo():
+    photo = sqlite3.connect(app.config['PHOTOBASE'])
+    photo.row_factory = sqlite3.Row
+    return photo
 
 #Получение данных из базы данных
 def get_db():
@@ -137,6 +142,8 @@ def admin_page():
 def post():
     db = get_db()
     database = FDataBase(db)
+    ph = connect_photo()
+    photobase = Photo(ph)
     if 'userlogged' in session:
         if session['userlogged'] == 'admin':
             if request.method == 'POST':
@@ -150,7 +157,7 @@ def post():
                     if file and allowed_file(file.filename):
                         filename = secure_filename(file.filename)
                         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                        PhotoAdd(filename, request.form['name'], str(filename))
+                        photobase.PhotoAdd(filename, request.form['name'], str(filename))
                     if not res:
                         return redirect(url_for('post'))
                     else:
@@ -211,13 +218,15 @@ def quit_login():
 def delpost_page(id_post):
     db = get_db()
     database = FDataBase(db)
+    ph = connect_photo()
+    photobase = Photo(ph)
     title = database.getPostAnnoce()
     aticle = database.getPostAnnoce()
     post_name = database.getPost(id_post)[0]
     if 'userlogged' in session:
         if session['userlogged'] == 'admin':
             delpost = database.delPost(id_post)
-            delphoto = PhotoDelete(post_name)
+            delphoto = photobase.PhotoDelete(post_name)
             if not title:
                 abort(404)
             if delpost and delphoto:
@@ -232,8 +241,10 @@ def delpost_page(id_post):
 def showPost(id_post):
     db = get_db()
     database = FDataBase(db)
+    ph = connect_photo()
+    photobase = Photo(ph)
     title, aticle = database.getPost(id_post)
-    photo = getPhoto(title)
+    photo = photobase.getPhoto(title)
     comments = database.getComments(id_post)
     if 'userlogged' in session:
         if photo:
@@ -260,11 +271,10 @@ def showPost(id_post):
 
 @app.route('/display_image_by_name/<post_name>', methods=['POST', 'GET'])
 def display_image_by_name(post_name):
-    filename = getPhoto(post_name)[3]
-    return redirect(url_for('static', filename='photos/' + filename), code=301)
-
-@app.route('/display_image/<filename>', methods=['POST', 'GET'])
-def display_image(filename):
+    db = get_db()
+    ph = connect_photo()
+    photobase = Photo(ph)
+    filename = photobase.getPhoto(post_name)[3]
     return redirect(url_for('static', filename='photos/' + filename), code=301)
 
 #Deleting comment
