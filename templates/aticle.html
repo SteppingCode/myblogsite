@@ -20,6 +20,15 @@
             margin-bottom: 10px;
             margin-top: 10px;
         }
+        .post-text-noimg {
+            max-width: 100%;
+            overflow: auto;
+            margin: 50px;
+            font-size: 16px;
+            font-family: "Arial Black";
+            color: #6161c9;
+            max-height: 280px;
+        }
         .post-image {
             margin-left: 50px;
             max-width: 350px;
@@ -53,6 +62,14 @@
             text-decoration: underline;
             color: royalblue;
         }
+        .post-text-noimg a {
+            color: grey;
+            text-decoration: none;
+        }
+        .post-text-noimg a:hover {
+            text-decoration: underline;
+            color: royalblue;
+        }
         .other {
             max-width: 350px;
             max-height: 240px;
@@ -60,12 +77,15 @@
     </style>
     <div class="content-block">
         <div class="post-info">
-            <h1>{{ post_title }}</h1>
-            <p class="post-text">{{ post }}</p>
             {% if post_image %}
+                <h1>{{ post_title }}</h1>
+                <p class="post-text">{{ post }}</p>
                 <div class="post-image">
                     <img src="{{ url_for('display_image_by_name', post_name=post_title) }}" class="other">
                 </div>
+            {% else %}
+                <h1>{{ post_title }}</h1>
+                <p class="post-text-noimg">{{ post }}</p>
             {% endif %}
         </div>
     </div>
