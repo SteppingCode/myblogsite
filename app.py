@@ -434,6 +434,45 @@ def deltodo(id_todo):
     else:
         return redirect(url_for('start_page'))
 
+@app.route('/settings/', methods=['POST', 'GET'])
+def settings():
+    db = connect_db()
+    database = FDataBase(db)
+    if 'userlogged' in session:
+        if request.method == 'POST':
+            if len(request.form['cur_psw']) > 0 and len(request.form['psw']) > 0 and len(request.form['psw2']) > 0:
+                if database.getData(session['userlogged'], request.form['cur_psw']):
+                    if request.form['psw'] == request.form['psw2']:
+                        if database.UpdateUserPass(session['userlogged'], request.form['psw']):
+                            flash('Password was successfully changed', category='success')
+                            return redirect(url_for('settings'))
+                        else:
+                            flash('Error updating password in data base', category='error')
+                            return redirect(url_for('settings'))
+                    else:
+                        flash('Passwords are not match', category='error')
+                        return redirect(url_for('settings'))
+                else:
+                    flash('Incorrect password', category='error')
+                    return redirect(url_for('settings'))
+            if database.getEmail(session['userlogged'])[0] != '':
+                if len(request.form['email_upd']) > 0:
+                    if database.UpdateEmail(request.form['email_upd'], session['userlogged']):
+                        flash('Email was successfully changed', category='success')
+                        return redirect(url_for('settings'))
+                    else:
+                        flash('Error', category='error')
+                        return redirect(url_for('settings'))
+            if len(request.form['email_set']) > 0:
+                if database.UpdateEmail(request.form['email_set'], session['userlogged']):
+                    flash('Email was successfully changed', category='success')
+                    return redirect(url_for('settings'))
+                else:
+                    flash('Error', category='error')
+                    return redirect(url_for('settings'))
+        return render_template('settings.html', menu=database.getMenu(), title='Настройки', email=database.getEmail(session['userlogged'])[0])
+    return redirect(url_for('start_page'))
+
 #Site start
 if __name__ == "__main__":
     app.run(debug=True)

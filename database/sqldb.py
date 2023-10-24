@@ -65,6 +65,34 @@ class FDataBase:
             print(str(e))
             return False
 
+    def UpdateUserPass(self, username, new_password):
+        try:
+            self.__cur.execute("UPDATE user SET password = ? WHERE ? = email OR ? = username", (new_password, username, username,))
+            self.__db.commit()
+        except sq.Error as e:
+            print(str(e))
+            return False
+        return True
+
+    def getEmail(self, username):
+        try:
+            self.__cur.execute("SELECT email FROM user WHERE ? = email OR ? = username", (username, username,))
+            res = self.__cur.fetchone()
+            if res: return res
+        except sq.Error as e:
+            print(str(e))
+            return False
+        return []
+
+    def UpdateEmail(self, email, username):
+        try:
+            self.__cur.execute("UPDATE user SET email = ? WHERE ? = username", (email, username,))
+            self.__db.commit()
+        except sq.Error as e:
+            print(str(e))
+            return False
+        return True
+
     def addMenu(self, title, url):
         try:
             self.__cur.execute("INSERT INTO menu VALUES (NULL, ?, ?)", (title, url))

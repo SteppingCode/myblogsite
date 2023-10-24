@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block content %}
+    {{ super() }}
+    <style>
+        .password_change {
+            display: flex;
+            flex-direction: column;
+        }
+        .password_change input[type='password'] {
+            width: 200px;
+            margin-bottom: 4px;
+        }
+        .messages {
+            height: 20px;
+            font-family: "Arial Black";
+            text-align: center;
+        }
+        .flash.success{
+            color: green;
+        }
+        .flash.error{
+            color: red;
+        }
+        .content-block {
+            padding: 24px;
+        }
+        .email {
+            display: flex;
+            flex-direction: column;
+            width: 200px;
+        }
+        .email input {
+            margin-bottom: 4px;
+        }
+        .forms {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+        }
+    </style>
+    <div class="content-block">
+        <form action="{{ url_for('settings') }}" method="post">
+            <div class="messages">
+                {% for cat, msg in get_flashed_messages(True) %}
+                    <div class="flash {{cat}}"> {{msg}}</div>
+                {% endfor %}
+            </div>
+            <div class="forms">
+                <div class="password_change">
+                    <h2 style="margin-bottom: 4px;">Password change</h2>
+                    <input placeholder="Current password" type="password" name="cur_psw">
+                    <input placeholder="New password" type="password" name="psw">
+                    <input placeholder="Confirm password" type="password" name="psw2">
+                    <input type="submit" value="Update" onclick="empty();">
+                </div>
+                <div class="email_reg">
+                    <h2>Account email</h2>
+                    {% if email %}
+                        <div class="email">
+                            <input name="email_upd" id="email" value="{{ email }}" type="email" placeholder="Email" disabled>
+                            <input id="btn_email" type="button" value="Change" onclick="document.getElementById('email').disabled=false; this.disabled=true; document.getElementById('btn_apply').style.display='block'; document.getElementById('btn_apply').disabled=false">
+                            <input id="btn_apply" type="submit" value="Apply" disabled onclick="document.getElementById('email').disabled=false;">
+                        </div>
+                    {% else %}
+                        <div class="email">
+                            <input name="email_set" id="email" value="{{ email }}" type="email" placeholder="Email">
+                            <input id="btn_apply" type="submit" value="Set">
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+    <script type="javascript">
+        var input = document.getElementById('email')
+        function empty() {
+            input.value = '';
+        }
+    </script>
+{% endblock %}
