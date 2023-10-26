@@ -80,21 +80,30 @@ def start_page():
     if database.getAllPostsId() == []:
         if 'userlogged' in session:
             filename = str(session['userlogged']) + '.png'
-            if open(f'static/avatars/{filename}', 'rb'):
-                return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=0, ava=open(f'static/avatars/{filename}', 'rb'))
+            for i in os.listdir('static/avatars/'):
+                if filename in i:
+                    return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=1, ava=open(f'static/avatars/{filename}', 'rb'))
+            else:
+                return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=0, ava_empy=open(f'static/avatars/static.png', 'rb'))
         return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=0)
     elif database.getAllPostsId()[-1][0] == 1:
         if 'userlogged' in session:
             filename = str(session['userlogged']) + '.png'
-            if open(f'static/avatars/{filename}', 'rb'):
-                return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=0, ava=open(f'static/avatars/{filename}', 'rb'))
+            for i in os.listdir('static/avatars/'):
+                if filename in i:
+                    return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=1, ava=open(f'static/avatars/{filename}', 'rb'))
+            else:
+                return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=0, ava_empy=open(f'static/avatars/static.png', 'rb'))
         else:
             return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=0)
     else:
         if 'userlogged' in session:
             filename = str(session['userlogged']) + '.png'
-            if open(f'static/avatars/{filename}', 'rb'):
-                return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=1, ava=open(f'static/avatars/{filename}', 'rb'))
+            for i in os.listdir('static/avatars/'):
+                if filename in i:
+                    return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=1, ava=open(f'static/avatars/{filename}', 'rb'))
+            else:
+                return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=1, ava_empty=open(f'static/avatars/static.png', 'rb'))
         return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=1)
 
 #Login
@@ -139,8 +148,11 @@ def admin_page():
                 else:
                     flash('Дело не было добавлено!', category='error')
                 return redirect(url_for('admin_page'))
-            return render_template('admin.html', title='Admin Page', menu=database.getMenu(), \
-                                   posts=database.getPostAnnoce(), todo=database.getTODO(), ava=open(f'static/avatars/{filename}', 'rb'))
+            for i in os.listdir('static/avatars/'):
+                if filename in i:
+                    return render_template('admin.html', title='Admin Page', menu=database.getMenu(), posts=database.getPostAnnoce(), todo=database.getTODO(), ava=open(f'static/avatars/{filename}', 'rb'))
+            else:
+                return render_template('admin.html', title='Admin Page', menu=database.getMenu(), posts=database.getPostAnnoce(), todo=database.getTODO(), ava_empty=open(f'static/avatars/static.png', 'rb'))
     return redirect(url_for('start_page'))
 
 #Create post
@@ -150,8 +162,8 @@ def post():
     database = FDataBase(db)
     ph = connect_photo()
     photobase = Photo(ph)
-    filename = str(session['userlogged']) + '.png'
     if 'userlogged' in session:
+        filename = str(session['userlogged']) + '.png'
         if session['userlogged'] == 'admin':
             if request.method == 'POST':
                 if len(request.form['name']) > 3 and len(request.form['post']) > 10:
@@ -169,7 +181,11 @@ def post():
                         return redirect(url_for('post'))
                     else:
                         return redirect(url_for('post'))
-            return render_template('post.html', title='Добавить статью', menu=database.getMenu(), ava=open(f'static/avatars/{filename}', 'rb'))
+            for i in os.listdir('static/avatars/'):
+                if filename in i:
+                    return render_template('post.html', title='Добавить статью', menu=database.getMenu(), ava=open(f'static/avatars/{filename}', 'rb'))
+            else:
+                return render_template('post.html', title='Добавить статью', menu=database.getMenu(), ava_empty=open(f'static/avatars/static.png', 'rb'))
     return redirect(url_for('start_page'))
 
 @app.route('/post/page/<int:page>/<int:last_id>')
@@ -184,9 +200,11 @@ def post_page(page, last_id):
             return redirect(url_for('post_page', page=MAX_PAGES, last_id=(MAX_PAGES * 3) - 2))
         if 'userlogged' in session:
             filename = str(session['userlogged']) + '.png'
-            if open(f'static/avatars/{filename}', 'rb'):
-                return render_template('post_page.html', title=f'Страница {page}', menu=database.getMenu(), posts=database.getPostAnnocePages(last_id), page=page, last_id=last_id, MAX_PAGES=MAX_PAGES, ava=open(f'static/avatars/{filename}', 'rb'))
-
+            for i in os.listdir('static/avatars/'):
+                if filename in i:
+                    return render_template('post_page.html', title=f'Страница {page}', menu=database.getMenu(), posts=database.getPostAnnocePages(last_id), page=page, last_id=last_id, MAX_PAGES=MAX_PAGES, ava=open(f'static/avatars/{filename}', 'rb'))
+            else:
+                return render_template('post_page.html', title=f'Страница {page}', menu=database.getMenu(), posts=database.getPostAnnocePages(last_id), page=page, last_id=last_id, MAX_PAGES=MAX_PAGES, ava_empty=open(f'static/avatars/static.png', 'rb'))
         return render_template('post_page.html', title=f'Страница {page}', menu=database.getMenu(), posts=database.getPostAnnocePages(last_id), page=page, last_id=last_id, MAX_PAGES=MAX_PAGES)
     elif (MAX_PAGES - (database.getAllPostsId()[-1][0] - 1) / 3) != 0:
         MAX_PAGES = math.floor(MAX_PAGES + 1)
@@ -194,9 +212,11 @@ def post_page(page, last_id):
             return redirect(url_for('post_page', page=MAX_PAGES, last_id=(MAX_PAGES * 3) - 2))
         if 'userlogged' in session:
             filename = str(session['userlogged']) + '.png'
-            if open(f'static/avatars/{filename}', 'rb'):
-                return render_template('post_page.html', title=f'Страница {page}', menu=database.getMenu(), posts=database.getPostAnnocePages(last_id), page=page, last_id=last_id, MAX_PAGES=MAX_PAGES, ava=open(f'static/avatars/{filename}', 'rb'))
-
+            for i in os.listdir('static/avatars/'):
+                if filename in i:
+                    return render_template('post_page.html', title=f'Страница {page}', menu=database.getMenu(), posts=database.getPostAnnocePages(last_id), page=page, last_id=last_id, MAX_PAGES=MAX_PAGES, ava=open(f'static/avatars/{filename}', 'rb'))
+            else:
+                return render_template('post_page.html', title=f'Страница {page}', menu=database.getMenu(), posts=database.getPostAnnocePages(last_id), page=page, last_id=last_id, MAX_PAGES=MAX_PAGES, ava_empty=open(f'static/avatars/static.png', 'rb'))
         return render_template('post_page.html', title=f'Страница {page}', menu=database.getMenu(), posts=database.getPostAnnocePages(last_id), page=page, last_id=last_id, MAX_PAGES=MAX_PAGES)
     return render_template('post_page.html', title=f'Страница {page}', menu=database.getMenu(), posts=database.getPostAnnocePages(last_id), page=page, last_id=last_id, MAX_PAGES=MAX_PAGES)
 
@@ -218,8 +238,11 @@ def post_edit(id_post):
                         flash('Статья успешно редактирована', category='success')
                 else:
                     flash('Ошибка редактирования статьи', category='error')
-            return render_template('post_edit.html', title='Редактировать статью', menu=database.getMenu(), \
-                                   post=database.getPost(id_post), ava=open(f'static/avatars/{filename}', 'rb'))
+            for i in os.listdir('static/avatars/'):
+                if filename in i:
+                    return render_template('post_edit.html', title='Редактировать статью', menu=database.getMenu(), post=database.getPost(id_post), ava=open(f'static/avatars/{filename}', 'rb'))
+            else:
+                return render_template('post_edit.html', title='Редактировать статью', menu=database.getMenu(), post=database.getPost(id_post), ava_empty=open(f'static/avatars/static.png', 'rb'))
     return redirect(url_for('start_page'))
 
 #Quit
@@ -267,32 +290,34 @@ def showPost(id_post):
     if 'userlogged' in session:
         filename = str(session['userlogged']) + '.png'
         if photo:
-            if open(f'static/avatars/{filename}', 'rb'):
+            for i in os.listdir('static/avatars/'):
+                if filename in i:
+                    return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), post_title=title, post_image=photo[2], comments=comments, posts=database.getPostAnnoce(), id_post=id_post, ava=open(f'static/avatars/{filename}', 'rb'))
+            else:
                 return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle),
                                        post_title=title,
                                        post_image=photo[2], comments=comments, posts=database.getPostAnnoce(),
-                                       id_post=id_post, ava=open(f'static/avatars/{filename}', 'rb'))
-            return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle),
-                                   post_title=title,
-                                   post_image=photo[2], comments=comments, posts=database.getPostAnnoce(),
-                                   id_post=id_post)
+                                       id_post=id_post, ava_empty=open(f'static/avatars/static.png', 'rb'))
         if comments:
             if request.method == 'POST':
                 if len(request.form['text']) > 3:
                     addcom = database.addComment(session['userlogged'], request.form['text'], id_post)
                     if addcom:
                         return redirect(url_for('showPost', id_post=id_post))
-                    if open(f'static/avatars/{filename}', 'rb'):
-                        return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), \
-                                       post_title=title, comments=comments, posts=database.getPostAnnoce(), id_post=id_post, ava=open(f'static/avatars/{filename}', 'rb'))
+                    for i in os.listdir('static/avatars/'):
+                        if filename in i:
+                            return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), post_title=title, comments=comments, posts=database.getPostAnnoce(), id_post=id_post, ava=open(f'static/avatars/{filename}', 'rb'))
+                    else:
+                        return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), post_title=title, comments=comments, posts=database.getPostAnnoce(), id_post=id_post, ava_empty=open(f'static/avatars/static.png', 'rb'))
                 return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), \
                                        post_title=title, comments=comments, posts=database.getPostAnnoce(), id_post=id_post)
-
-        if open(f'static/avatars/{filename}', 'rb'):
-            return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), post_title=title,
+        for i in os.listdir('static/avatars/'):
+            if filename in i:
+                return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), post_title=title,
                             comments=comments, posts=database.getPostAnnoce(), id_post=id_post, ava=open(f'static/avatars/{filename}', 'rb'))
-        return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), post_title=title,
-                            comments=comments, posts=database.getPostAnnoce(), id_post=id_post)
+        else:
+            return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), post_title=title,
+                            comments=comments, posts=database.getPostAnnoce(), id_post=id_post, ava_empty=open(f'static/avatars/static.png', 'rb'))
     if photo:
         return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle),
                                post_title=title,
@@ -328,13 +353,19 @@ def profile_page(name):
     profile = database.getProfile(name)
     if 'userlogged' in session:
         filename = session['userlogged'] + '.png'
-        if open(f'static/avatars/{filename}', 'rb'):
-            return render_template('profile.html', title='Регистрация профиля', menu=database.getMenu(), ava=open(f'static/avatars/{filename}', 'rb'))
         if profile:
-            if open(f'static/avatars/{filename}', 'rb'):
-                return render_template('profile.html', menu=database.getMenu(), title=name, prof=profile, ava=open(f'static/avatars/{filename}', 'rb'))
-            return render_template('profile.html', menu=database.getMenu(), title=name, prof=profile)
-        return render_template('profile.html', menu=database.getMenu(), title='Профиль не найден')
+            for i in os.listdir('static/avatars/'):
+                if filename in i:
+                    return render_template('profile.html', menu=database.getMenu(), title=name, prof=profile,
+                                           ava=open(f'static/avatars/{filename}', 'rb'))
+            else:
+                return render_template('profile.html', menu=database.getMenu(), title=name, prof=profile,
+                                       ava_empty=open(f'static/avatars/static.png', 'rb'))
+        for i in os.listdir('static/avatars/'):
+            if filename in i:
+                return render_template('profile.html', menu=database.getMenu(), title='Профиль не найден', ava=open(f'static/avatars/{filename}', 'rb'))
+        else:
+            return render_template('profile.html', menu=database.getMenu(), title='Профиль не найден', ava_empty=open(f'static/avatars/static.png', 'rb'))
     return redirect(url_for('start_page'))
 
 @app.route('/reg_profile', methods=['GET', 'POST'])
@@ -343,8 +374,6 @@ def profile_reg():
     database = FDataBase(db)
     if 'userlogged' in session:
         filename = session['userlogged'] + '.png'
-        if open(f'static/avatars/{filename}', 'rb'):
-            return render_template('profile_reg.html', title='Регистрация профиля', menu=database.getMenu(), ava=open(f'static/avatars/{filename}', 'rb'))
         if request.method == 'POST':
             if database.addProfile(session['userlogged'], request.form["name"], request.form["age"], \
                                    request.form["game"]):
@@ -352,7 +381,11 @@ def profile_reg():
             else:
                 flash('Некорректный логин', category='error')
                 return redirect('profile_reg')
-        return render_template('profile_reg.html', title='Регистрация профиля', menu=database.getMenu())
+        for i in os.listdir('static/avatars/'):
+            if filename in i:
+                return render_template('profile_reg.html', title='Регистрация профиля', menu=database.getMenu(), ava=open(f'static/avatars/{filename}', 'rb'))
+        else:
+            return render_template('profile_reg.html', title='Регистрация профиля', menu=database.getMenu(), ava_empty=open(f'static/avatars/static.png', 'rb'))
     return redirect(url_for('start_page'))
 
 #Deleting to-do-list
@@ -375,8 +408,6 @@ def settings():
     database = FDataBase(db)
     if 'userlogged' in session:
         filename = session['userlogged'] + '.png'
-        if open(f'static/avatars/{filename}', 'rb'):
-            return render_template('settings.html', menu=database.getMenu(), title='Настройки', email=database.getEmail(session['userlogged'])[0], ava=open(f'static/avatars/{filename}', 'rb'))
         if request.method == 'POST':
             if len(request.form['cur_psw']) > 0 and len(request.form['psw']) > 0 and len(request.form['psw2']) > 0:
                 if database.getData(session['userlogged'], request.form['cur_psw']):
@@ -408,7 +439,16 @@ def settings():
                 else:
                     flash('Error', category='error')
                     return redirect(url_for('settings'))
-        return render_template('settings.html', menu=database.getMenu(), title='Настройки', email=database.getEmail(session['userlogged'])[0], ava=open(f'static/avatars/{filename}', 'rb'))
+            for i in os.listdir('static/avatars/'):
+                if filename in i:
+                    return render_template('settings.html', menu=database.getMenu(), title='Настройки', email=database.getEmail(session['userlogged'])[0], ava=open(f'static/avatars/{filename}', 'rb'))
+            else:
+                return render_template('settings.html', menu=database.getMenu(), title='Настройки', email=database.getEmail(session['userlogged'])[0], ava_empty=open(f'static/avatars/static.png', 'rb'))
+        for i in os.listdir('static/avatars/'):
+            if filename in i:
+                return render_template('settings.html', menu=database.getMenu(), title='Настройки', email=database.getEmail(session['userlogged'])[0], ava=open(f'static/avatars/{filename}', 'rb'))
+        else:
+            return render_template('settings.html', menu=database.getMenu(), title='Настройки', email=database.getEmail(session['userlogged'])[0], ava_empty=open(f'static/avatars/static.png', 'rb'))
     return redirect(url_for('start_page'))
 
 @app.route('/userava/<username>', methods=['POST', 'GET'])

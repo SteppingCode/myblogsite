@@ -56,7 +56,7 @@
                     {% if ava %}
                         <div class="avatar"><img src="{{ url_for('userava', username=session['userlogged']) }}" height="200" width="200"></div>
                     {% else %}
-                        <div class="avatar">У вас пока нету своего аватара :(</div>
+                        <div class="avatar"><img src="{{ url_for('userava', username='static') }}" height="200" width="200"></div>
                     {% endif %}
                     <div class="upload">
                         <input type="file" name="file">

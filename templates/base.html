@@ -78,6 +78,9 @@
                         {% endif %}
                         <li>
                             <a href="{{ url_for('profile_page', name=session['userlogged']) }}">
+                                {% if ava_empty %}
+                                    <img style="border-radius: 50%;" src="{{ url_for('userava', username='static') }}" height="30" width="30">
+                                {% endif %}
                                 {% if ava %}
                                     <img style="border-radius: 50%;" src="{{ url_for('userava', username=session['userlogged']) }}" height="30" width="30">
                                 {% endif %}
