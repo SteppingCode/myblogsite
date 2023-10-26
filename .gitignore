@@ -1,3 +1,6 @@
 /venv/
 /.idea/
 /posts.db
+/photo.db
+/static/avatars/
+/static/photos/

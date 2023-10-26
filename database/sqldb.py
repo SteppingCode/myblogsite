@@ -243,74 +243,6 @@ class FDataBase:
             print(str(e))
             return False
 
-    def addUpdates(self, title, text, photo):
-        try:
-            tm = time.ctime()
-            self.__cur.execute("INSERT INTO updates VALUES (NULL, ?, ?, ?, ?)", (title, text, photo, tm))
-            self.__db.commit()
-        except sq.Error as e:
-            print(str(e))
-            return False
-        return True
-
-    def delUpdates(self, id=0):
-        try:
-            if id == 0:
-                self.__cur.execute("DELETE FROM updates")
-            else:
-                self.__cur.execute(f"DELETE FROM updates WHERE {id} == id")
-            self.__db.commit()
-        except sq.Error as e:
-            print(str(e))
-            return False
-        return True
-
-    def getUpdate(self, updateid):
-        try:
-            self.__cur.execute(f"SELECT title, text, photo FROM updates WHERE id = {updateid} LIMIT 1")
-            res = self.__cur.fetchone()
-            if res: return res
-        except sq.Error as e:
-            print("Ошибка получения обновления из БД" + str(e))
-        return (False, False)
-
-
-    def getAllUpdatesId(self):
-        try:
-            self.__cur.execute(f"SELECT id time FROM updates ORDER BY time")
-            res = self.__cur.fetchall()
-            if res: return res
-        except sq.Error as e:
-            print("Ошибка получения статей из БД" + str(e))
-        return []
-
-    def getUpdateAnnocePages(self, last_id):
-        try:
-            self.__cur.execute(f"SELECT * FROM updates WHERE id > ? ORDER BY id ASC LIMIT 3", (last_id,))
-            res = self.__cur.fetchall()
-            if res: return res
-        except sq.Error as e:
-            print("Ошибка получения статей из БД" + str(e))
-        return []
-
-    def UpdateUpdate(self, title, text, photo, id):
-        try:
-            self.__cur.execute(f"UPDATE updates SET title == ?, text == ?, photo == ? WHERE id == ?", (title, text, photo, id))
-            self.__db.commit()
-        except sq.Error as e:
-            print(str(e))
-            return False
-        return True
-
-    def getUpdatesAnnoce(self):
-        try:
-            self.__cur.execute(f"SELECT * FROM updates ORDER BY id ASC LIMIT 3")
-            res = self.__cur.fetchall()
-            return res
-        except sq.Error as e:
-            print("Ошибка получения обновлений из БД" + str(e))
-        return []
-
     def PostUpdate(self, title, text, photo, postid):
         try:
             self.__cur.execute(f"UPDATE post SET title == ?, text == ?, photo == ? WHERE id == ?", (title, text, photo, postid))
@@ -319,59 +251,6 @@ class FDataBase:
             print(str(e))
             return False
         return True
-
-    def addLike(self, updateid):
-        try:
-            self.__cur.execute("INSERT INTO likes VALUES (NULL, ?, ?, ?)", (0, 0, updateid))
-            self.__db.commit()
-        except sq.Error as e:
-            print(str(e))
-            return False
-        return True
-
-    def likeUpdate(self, updateid):
-        try:
-            self.__cur.execute(f"UPDATE likes SET like = like + 1 WHERE updateid = {updateid}")
-            self.__db.commit()
-        except sq.Error as e:
-            print(str(e))
-            return False
-        return True
-
-    def dislikeUpdate(self, updateid):
-        try:
-            self.__cur.execute(f"UPDATE likes SET dislike = dislike + 1 WHERE updateid = {updateid}")
-            self.__db.commit()
-        except sq.Error as e:
-            print(str(e))
-            return False
-        return True
-    def DELlikeUpdate(self, updateid):
-        try:
-            self.__cur.execute(f"UPDATE likes SET like = like - 1 WHERE updateid = {updateid}")
-            self.__db.commit()
-        except sq.Error as e:
-            print(str(e))
-            return False
-        return True
-
-    def DELdislikeUpdate(self, updateid):
-        try:
-            self.__cur.execute(f"UPDATE likes SET dislike = dislike - 1 WHERE updateid = {updateid}")
-            self.__db.commit()
-        except sq.Error as e:
-            print(str(e))
-            return False
-        return True
-
-    def getLikes(self, updateid):
-        try:
-            self.__cur.execute(f"SELECT like, dislike FROM likes WHERE updateid == {updateid}")
-            res = self.__cur.fetchall()
-            return res
-        except sq.Error as e:
-            print(str(e))
-            return False
 
     def addProfile(self, nick, name, age, about):
         try:
@@ -412,4 +291,3 @@ if __name__ == "__main__":
     #print(db.addData('admin', '111', 'admin@gmail.com'))
     #print(db.delMenu(0))
     #print(db.addMenu('Главная', 'start_page'))
-    #print(db.addMenu('Обновления', 'updates'))

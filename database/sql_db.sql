@@ -38,18 +38,3 @@ id integer primary key,
 text text not null,
 time integer not null
 );
-
-create table if not exists updates (
-id integer primary key,
-title text not null,
-text text not null,
-photo text not null,
-time integer not null
-);
-
-create table if not exists likes (
-id integer primary key,
-like integer not null,
-dislike integer not null,
-updateid integer not null
-);

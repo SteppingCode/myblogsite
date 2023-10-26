@@ -1,7 +1,7 @@
 # taskkill /f /im python.exe
 import math
 
-from flask import render_template, Flask, request, redirect, url_for, session, g, abort, flash, Markup
+from flask import render_template, Flask, request, redirect, url_for, session, g, abort, flash, Markup, make_response
 from config import Config
 from database.sqldb import FDataBase
 import git, os, sqlite3
@@ -17,6 +17,7 @@ from werkzeug.utils import secure_filename
 UPLOAD_FOLDER = 'static/photos/'
 # расширения файлов, которые разрешено загружать
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+ALLOWED_EXTENSIONS_AVATAR = {'png'}
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -66,18 +67,9 @@ def upload_file():
         if file.filename == '':
             flash('Нет выбранного файла')
         if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-    return '''
-    <!doctype html>
-    <title>Загрузить новый файл</title>
-    <h1>Загрузить новый файл</h1>
-    <form method=post enctype=multipart/form-data>
-      <input type=file name=file>
-      <input type=submit value=Upload>
-    </form>
-    </html>
-    '''
+            filename = str(session['userlogged']) + '.png'
+            file.save(os.path.join('static/avatars/', filename))
+    return redirect(url_for('settings'))
 
 #Main page
 @app.route('/', methods=['GET', 'POST'])
@@ -86,10 +78,23 @@ def start_page():
     database = FDataBase(db)
     page = 0
     if database.getAllPostsId() == []:
+        if 'userlogged' in session:
+            filename = str(session['userlogged']) + '.png'
+            if open(f'static/avatars/{filename}', 'rb'):
+                return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=0, ava=open(f'static/avatars/{filename}', 'rb'))
         return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=0)
     elif database.getAllPostsId()[-1][0] == 1:
-        return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=0)
+        if 'userlogged' in session:
+            filename = str(session['userlogged']) + '.png'
+            if open(f'static/avatars/{filename}', 'rb'):
+                return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=0, ava=open(f'static/avatars/{filename}', 'rb'))
+        else:
+            return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=0)
     else:
+        if 'userlogged' in session:
+            filename = str(session['userlogged']) + '.png'
+            if open(f'static/avatars/{filename}', 'rb'):
+                return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=1, ava=open(f'static/avatars/{filename}', 'rb'))
         return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=1)
 
 #Login
@@ -125,6 +130,7 @@ def admin_page():
     db = get_db()
     database = FDataBase(db)
     if 'userlogged' in session:
+        filename = str(session['userlogged']) + '.png'
         if session['userlogged'] == 'admin':
             if request.method == 'POST':
                 addtodo = database.addTODO(request.form['text'])
@@ -134,7 +140,7 @@ def admin_page():
                     flash('Дело не было добавлено!', category='error')
                 return redirect(url_for('admin_page'))
             return render_template('admin.html', title='Admin Page', menu=database.getMenu(), \
-                                   posts=database.getPostAnnoce(), todo=database.getTODO())
+                                   posts=database.getPostAnnoce(), todo=database.getTODO(), ava=open(f'static/avatars/{filename}', 'rb'))
     return redirect(url_for('start_page'))
 
 #Create post
@@ -144,6 +150,7 @@ def post():
     database = FDataBase(db)
     ph = connect_photo()
     photobase = Photo(ph)
+    filename = str(session['userlogged']) + '.png'
     if 'userlogged' in session:
         if session['userlogged'] == 'admin':
             if request.method == 'POST':
@@ -162,7 +169,7 @@ def post():
                         return redirect(url_for('post'))
                     else:
                         return redirect(url_for('post'))
-            return render_template('post.html', title='Добавить статью', menu=database.getMenu())
+            return render_template('post.html', title='Добавить статью', menu=database.getMenu(), ava=open(f'static/avatars/{filename}', 'rb'))
     return redirect(url_for('start_page'))
 
 @app.route('/post/page/<int:page>/<int:last_id>')
@@ -175,11 +182,21 @@ def post_page(page, last_id):
             if MAX_PAGES == 0:
                 return redirect(url_for('start_page'))
             return redirect(url_for('post_page', page=MAX_PAGES, last_id=(MAX_PAGES * 3) - 2))
+        if 'userlogged' in session:
+            filename = str(session['userlogged']) + '.png'
+            if open(f'static/avatars/{filename}', 'rb'):
+                return render_template('post_page.html', title=f'Страница {page}', menu=database.getMenu(), posts=database.getPostAnnocePages(last_id), page=page, last_id=last_id, MAX_PAGES=MAX_PAGES, ava=open(f'static/avatars/{filename}', 'rb'))
+
         return render_template('post_page.html', title=f'Страница {page}', menu=database.getMenu(), posts=database.getPostAnnocePages(last_id), page=page, last_id=last_id, MAX_PAGES=MAX_PAGES)
     elif (MAX_PAGES - (database.getAllPostsId()[-1][0] - 1) / 3) != 0:
         MAX_PAGES = math.floor(MAX_PAGES + 1)
         if page > MAX_PAGES:
             return redirect(url_for('post_page', page=MAX_PAGES, last_id=(MAX_PAGES * 3) - 2))
+        if 'userlogged' in session:
+            filename = str(session['userlogged']) + '.png'
+            if open(f'static/avatars/{filename}', 'rb'):
+                return render_template('post_page.html', title=f'Страница {page}', menu=database.getMenu(), posts=database.getPostAnnocePages(last_id), page=page, last_id=last_id, MAX_PAGES=MAX_PAGES, ava=open(f'static/avatars/{filename}', 'rb'))
+
         return render_template('post_page.html', title=f'Страница {page}', menu=database.getMenu(), posts=database.getPostAnnocePages(last_id), page=page, last_id=last_id, MAX_PAGES=MAX_PAGES)
     return render_template('post_page.html', title=f'Страница {page}', menu=database.getMenu(), posts=database.getPostAnnocePages(last_id), page=page, last_id=last_id, MAX_PAGES=MAX_PAGES)
 
@@ -189,6 +206,7 @@ def post_edit(id_post):
     db = get_db()
     database = FDataBase(db)
     if 'userlogged' in session:
+        filename = str(session['userlogged']) + '.png'
         if session['userlogged'] == 'admin':
             if request.method == 'POST':
                 if len(request.form['title']) > 3 and len(request.form['text']) > 10:
@@ -201,7 +219,7 @@ def post_edit(id_post):
                 else:
                     flash('Ошибка редактирования статьи', category='error')
             return render_template('post_edit.html', title='Редактировать статью', menu=database.getMenu(), \
-                                   post=database.getPost(id_post))
+                                   post=database.getPost(id_post), ava=open(f'static/avatars/{filename}', 'rb'))
     return redirect(url_for('start_page'))
 
 #Quit
@@ -247,7 +265,13 @@ def showPost(id_post):
     photo = photobase.getPhoto(title)
     comments = database.getComments(id_post)
     if 'userlogged' in session:
+        filename = str(session['userlogged']) + '.png'
         if photo:
+            if open(f'static/avatars/{filename}', 'rb'):
+                return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle),
+                                       post_title=title,
+                                       post_image=photo[2], comments=comments, posts=database.getPostAnnoce(),
+                                       id_post=id_post, ava=open(f'static/avatars/{filename}', 'rb'))
             return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle),
                                    post_title=title,
                                    post_image=photo[2], comments=comments, posts=database.getPostAnnoce(),
@@ -258,8 +282,15 @@ def showPost(id_post):
                     addcom = database.addComment(session['userlogged'], request.form['text'], id_post)
                     if addcom:
                         return redirect(url_for('showPost', id_post=id_post))
+                    if open(f'static/avatars/{filename}', 'rb'):
+                        return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), \
+                                       post_title=title, comments=comments, posts=database.getPostAnnoce(), id_post=id_post, ava=open(f'static/avatars/{filename}', 'rb'))
                 return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), \
                                        post_title=title, comments=comments, posts=database.getPostAnnoce(), id_post=id_post)
+
+        if open(f'static/avatars/{filename}', 'rb'):
+            return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), post_title=title,
+                            comments=comments, posts=database.getPostAnnoce(), id_post=id_post, ava=open(f'static/avatars/{filename}', 'rb'))
         return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), post_title=title,
                             comments=comments, posts=database.getPostAnnoce(), id_post=id_post)
     if photo:
@@ -271,7 +302,6 @@ def showPost(id_post):
 
 @app.route('/display_image_by_name/<post_name>', methods=['POST', 'GET'])
 def display_image_by_name(post_name):
-    db = get_db()
     ph = connect_photo()
     photobase = Photo(ph)
     filename = photobase.getPhoto(post_name)[3]
@@ -291,55 +321,18 @@ def delcom_page(id_post, id_com):
     else:
         return redirect(url_for('start_page'))
 
-#Updates page
-@app.route('/updates', methods=['POST', 'GET'])
-def updates():
-    db = get_db()
-    database = FDataBase(db)
-    page = 0
-    if 'userlogged' in session:
-        if session['userlogged'] == 'admin':
-            if request.method == 'POST':
-                addupd = database.addUpdates(request.form['title'], request.form['text'], request.form['photo'])
-                if addupd:
-                    return redirect(url_for('updates'))
-                else:
-                    return redirect(url_for('updates'))
-            return render_template('updates.html', title='Обновления', menu=database.getMenu(), \
-                                   updates=database.getUpdatesAnnoce(), page=page)
-        return render_template('updates.html', title='Обновления', menu=database.getMenu(), \
-                               updates=database.getUpdatesAnnoce(), page=page)
-    return render_template('updates.html', title='Обновления', menu=database.getMenu(), \
-                           updates=database.getUpdatesAnnoce(), page=page)
-
-#Update page
-@app.route('/updates/page/<int:page>/<int:last_id>')
-def update_page(page, last_id):
-    db = connect_db()
-    database = FDataBase(db)
-    MAX_PAGES = (database.getAllUpdatesId()[-1][0] // 3) - 1
-    if ((((database.getAllUpdatesId()[-1][0]) / 3) - 1) - MAX_PAGES) == 0:
-        if page > MAX_PAGES:
-            return redirect(url_for('update_page', page=MAX_PAGES, last_id=(MAX_PAGES * 3)))
-        return render_template('update_page.html', title=f'Страница {page}', menu=database.getMenu(), posts=database.getUpdateAnnocePages(last_id), page=page, last_id=last_id, MAX_PAGES=MAX_PAGES)
-    elif (MAX_PAGES - ((database.getAllUpdatesId()[-1][0]) / 3) - 1) != 0:
-        MAX_PAGES = math.floor(MAX_PAGES + 1)
-        if page > MAX_PAGES:
-            return redirect(url_for('update_page', page=MAX_PAGES, last_id=(MAX_PAGES * 3)))
-        return render_template('update_page.html', title=f'Страница {page}', menu=database.getMenu(), posts=database.getUpdateAnnocePages(last_id), page=page, last_id=last_id, MAX_PAGES=MAX_PAGES)
-    return render_template('update_page.html', title=f'Страница {page}', menu=database.getMenu(), posts=database.getUpdateAnnocePages(last_id), page=page, last_id=last_id, MAX_PAGES=MAX_PAGES)
-
-#    {% else %}
-#        <p><a class="image like" href="{{url_for('addlike', id_update=id_update)}}" title="Мне нравится"><img src="https://cdn-icons-png.flaticon.com/512/633/633759.png" width="125px" height="50px"></a></p>
-#        <p><a class="image dislike" href="{{url_for('addlike', id_update=id_update)}}" title="Мне не нравится"><img src="https://cdn-icons-png.flaticon.com/512/633/633758.png" width="125px" height="50px"></a></p>
-
 @app.route('/profile/<name>', methods=['GET', 'POST'])
 def profile_page(name):
     db = get_db()
     database = FDataBase(db)
     profile = database.getProfile(name)
     if 'userlogged' in session:
+        filename = session['userlogged'] + '.png'
+        if open(f'static/avatars/{filename}', 'rb'):
+            return render_template('profile.html', title='Регистрация профиля', menu=database.getMenu(), ava=open(f'static/avatars/{filename}', 'rb'))
         if profile:
+            if open(f'static/avatars/{filename}', 'rb'):
+                return render_template('profile.html', menu=database.getMenu(), title=name, prof=profile, ava=open(f'static/avatars/{filename}', 'rb'))
             return render_template('profile.html', menu=database.getMenu(), title=name, prof=profile)
         return render_template('profile.html', menu=database.getMenu(), title='Профиль не найден')
     return redirect(url_for('start_page'))
@@ -349,6 +342,9 @@ def profile_reg():
     db = get_db()
     database = FDataBase(db)
     if 'userlogged' in session:
+        filename = session['userlogged'] + '.png'
+        if open(f'static/avatars/{filename}', 'rb'):
+            return render_template('profile_reg.html', title='Регистрация профиля', menu=database.getMenu(), ava=open(f'static/avatars/{filename}', 'rb'))
         if request.method == 'POST':
             if database.addProfile(session['userlogged'], request.form["name"], request.form["age"], \
                                    request.form["game"]):
@@ -358,67 +354,6 @@ def profile_reg():
                 return redirect('profile_reg')
         return render_template('profile_reg.html', title='Регистрация профиля', menu=database.getMenu())
     return redirect(url_for('start_page'))
-
-#Like update
-@app.route('/like/<int:id_update>/')
-def update_like(id_update):
-    db = get_db()
-    database = FDataBase(db)
-    addlike = database.likeUpdate(id_update)
-    if 'userlogged' in session:
-        if addlike:
-            return redirect(url_for('showUpdate', id_update=id_update))
-        return render_template('update_page.html', menu=database.getMenu(), id_update=id_update)
-    else:
-        return redirect(url_for('update_page'))
-
-#Dislike update
-@app.route('/dislike/<int:id_update>/')
-def update_dislike(id_update):
-    db = get_db()
-    database = FDataBase(db)
-    adddislike = database.dislikeUpdate(id_update)
-    if 'userlogged' in session:
-        if adddislike:
-            return redirect(url_for('showUpdate', id_update=id_update))
-        return render_template('update_page.html', menu=database.getMenu(), id_update=id_update)
-    else:
-        return redirect(url_for('update_page'))
-
-#Edit update
-@app.route('/editupdate/<int:id_update>', methods=['POST', 'GET'])
-def editupdate_page(id_update):
-    db = get_db()
-    database = FDataBase(db)
-    if 'userlogged' in session:
-        if session['userlogged'] == 'admin':
-            if request.method == 'POST':
-                if len(request.form['title']) > 3 and len(request.form['text']) > 10:
-                    res = database.UpdateUpdate(request.form['title'], request.form['text'], \
-                                                request.form['photo'], id_update)
-                    if not res:
-                        flash('Ошибка редактирования обновления', category='error')
-                    else:
-                        flash('Обновление успешно редактировано', category='success')
-                else:
-                    flash('Ошибка редактирования обновления', category='error')
-            return render_template('update_edit.html', title='Редактировать обновление', menu=database.getMenu(), \
-                                   update=database.getUpdate(id_update))
-    return redirect(url_for('start_page'))
-
-#Deleting update
-@app.route('/delupdate/<int:id_update>')
-def delupdate_page(id_update):
-    db = get_db()
-    database = FDataBase(db)
-    if 'userlogged' in session:
-        if session['userlogged'] == 'admin':
-            delupdate = database.delUpdates(id_update)
-            if delupdate:
-                return redirect(url_for('update_page'))
-            return render_template('updates.html', menu=database.getMenu())
-    else:
-        return redirect(url_for('update_page'))
 
 #Deleting to-do-list
 @app.route('/deltodo/<int:id_todo>/')
@@ -439,6 +374,9 @@ def settings():
     db = connect_db()
     database = FDataBase(db)
     if 'userlogged' in session:
+        filename = session['userlogged'] + '.png'
+        if open(f'static/avatars/{filename}', 'rb'):
+            return render_template('settings.html', menu=database.getMenu(), title='Настройки', email=database.getEmail(session['userlogged'])[0], ava=open(f'static/avatars/{filename}', 'rb'))
         if request.method == 'POST':
             if len(request.form['cur_psw']) > 0 and len(request.form['psw']) > 0 and len(request.form['psw2']) > 0:
                 if database.getData(session['userlogged'], request.form['cur_psw']):
@@ -470,8 +408,13 @@ def settings():
                 else:
                     flash('Error', category='error')
                     return redirect(url_for('settings'))
-        return render_template('settings.html', menu=database.getMenu(), title='Настройки', email=database.getEmail(session['userlogged'])[0])
+        return render_template('settings.html', menu=database.getMenu(), title='Настройки', email=database.getEmail(session['userlogged'])[0], ava=open(f'static/avatars/{filename}', 'rb'))
     return redirect(url_for('start_page'))
+
+@app.route('/userava/<username>', methods=['POST', 'GET'])
+def userava(username):
+    filename = str(username) + ".png"
+    return redirect(url_for('static', filename='avatars/' + filename), code=301)
 
 #Site start
 if __name__ == "__main__":

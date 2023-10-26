@@ -21,9 +21,6 @@
         .flash.error{
             color: red;
         }
-        .content-block {
-            padding: 24px;
-        }
         .email {
             display: flex;
             flex-direction: column;
@@ -37,9 +34,38 @@
             flex-direction: row;
             justify-content: space-around;
         }
+        .avatar {
+            height: 220px;
+            width: 200px;
+            margin-left: 50%;
+            transform: translate(-50%);
+        }
+        .avatar img {
+            border-radius: 50%;
+        }
     </style>
     <div class="content-block">
-        <form action="{{ url_for('settings') }}" method="post">
+        <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
+            <div class="messages">
+                {% for cat, msg in get_flashed_messages(True) %}
+                    <div class="flash {{cat}}"> {{msg}}</div>
+                {% endfor %}
+            </div>
+            <div class="profile_about">
+                <div class="avatar">
+                    {% if ava %}
+                        <div class="avatar"><img src="{{ url_for('userava', username=session['userlogged']) }}" height="200" width="200"></div>
+                    {% else %}
+                        <div class="avatar">У вас пока нету своего аватара :(</div>
+                    {% endif %}
+                    <div class="upload">
+                        <input type="file" name="file">
+                        <input type="submit" value="Set" onclick="empty(); empty_pass();">
+                    </div>
+                </div>
+            </div>
+        </form>
+        <form action="{{ url_for('settings') }}" method="post" enctype="multipart/form-data">
             <div class="messages">
                 {% for cat, msg in get_flashed_messages(True) %}
                     <div class="flash {{cat}}"> {{msg}}</div>
@@ -48,9 +74,9 @@
             <div class="forms">
                 <div class="password_change">
                     <h2 style="margin-bottom: 4px;">Password change</h2>
-                    <input placeholder="Current password" type="password" name="cur_psw">
-                    <input placeholder="New password" type="password" name="psw">
-                    <input placeholder="Confirm password" type="password" name="psw2">
+                    <input id="password" placeholder="Current password" type="password" name="cur_psw">
+                    <input id="password" placeholder="New password" type="password" name="psw">
+                    <input id="password" placeholder="Confirm password" type="password" name="psw2">
                     <input type="submit" value="Update" onclick="empty();">
                 </div>
                 <div class="email_reg">
@@ -73,8 +99,12 @@
     </div>
     <script type="javascript">
         var input = document.getElementById('email')
+        var pass = document.getElementById('password')
         function empty() {
             input.value = '';
+        }
+        function empty_pass() {
+            pass.value = '';
         }
     </script>
 {% endblock %}
