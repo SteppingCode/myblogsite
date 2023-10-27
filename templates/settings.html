@@ -88,7 +88,7 @@
                 <div class="profile">
                     {% if prof %}
                         {% for n in prof %}
-                            <input id="login" type="text" disabled value="{{ n.login }}" title="login">
+                            <input id="login" type="text" disabled value="{{ session['userlogged'] }}" title="login">
                             <input id="input1" name="nick" type="text" disabled placeholder="Nick" value="{{n.nick}}" title="nick">
                             <input id="input2" name="name" type="text" disabled placeholder="Name" value="{{n.name}}" title="name">
                             <input id="input3" name="age" type="number" disabled placeholder="Age" value="{{n.age}}" title="age">
@@ -97,10 +97,11 @@
                             <input value="Submit" type="submit">
                         {% endfor %}
                     {% else %}
-                        <h1><input id="input1" name="nick_reg" type="text" placeholder="Nick"></h1>
-                        <h2><input id="input2" name="name_reg" type="text" placeholder="Name"></h2>
-                        <h2><input id="input3" name="age_reg" type="number" placeholder="Age"></h2>
-                        <h2><input id="input4" name="about_reg" type="text" placeholder="About"></h2>
+                        <input id="login" type="text" disabled value="{{ session['userlogged'] }}" title="login">
+                        <input id="input1" name="nick_reg" type="text" placeholder="Nick">
+                        <input id="input2" name="name_reg" type="text" placeholder="Name">
+                        <input id="input3" name="age_reg" type="number" placeholder="Age">
+                        <input id="input4" name="about_reg" type="text" placeholder="About">
                         <input value="Submit" type="submit">
                     {% endif %}
                 </div>
