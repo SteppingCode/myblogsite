@@ -367,7 +367,6 @@ def profile():
     db = connect_db()
     database = FDataBase(db)
     if 'userlogged' in session:
-        # TODO сделать чтобы проверка для всех админовых действий велась через статус пользователя
         if request.method == 'POST':
             if database.getProfile(session['userlogged']):
                 if database.UpdateProfile(request.form['nick'], request.form['name'],  request.form['age'], request.form['about']):
