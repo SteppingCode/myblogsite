@@ -4,67 +4,156 @@
 {{ super() }}
 <style>
     body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    .content {
+        display: flex;
+        max-width: 100%;
+        flex-direction: row;
+        margin-left: 100px;
+        margin-right: 100px;
     }
     .list-posts {
         width: 50%;
-        display: flexbox;
-        position: absolute;
-        align-items: flex-start;
+        display: flex;
+        flex-direction: column;
+        overflow: auto;
+        max-height: 450px;
+        border: 1px black solid;
+        border-radius: 20px;
+        margin-right: 10px;
+        padding-right: 25px;
+        padding-left: 25px;
     }
-    ul.list-posts li {
-        overflow: hidden;
-        width: auto;
+    .list-posts a {
+        text-decoration: none;
+        font-family: "Arial Black";
+        color: black;
+        font-size: 20px;
+    }
+    .list-posts a:hover {
+        color: royalblue;
+    }
+    .list-posts li {
+        list-style: none;
+    }
+    .list-posts::-webkit-scrollbar {
+        width: 0;
     }
     .todo-list {
         width: 50%;
-        display: flexbox;
-        position: absolute;
+        display: flex;
+        flex-direction: column;
         overflow: auto;
-        margin-left: 40%;
-
+        max-height: 450px;
+        border: 1px black solid;
+        border-radius: 20px;
+        margin-left: 10px;
+        padding-right: 25px;
+        padding-left: 25px;
     }
-    #hz:hover {
+    .todo {
+        max-width: 100%;
+        overflow: auto;
+    }
+    .todo a {
+        text-decoration: none;
+        font-size: 20px;
+        font-family: "Arial Black";
+        color: black;
+    }
+    .todo a:hover {
         color: red;
     }
-    @media (max-width: 992px) {
-      .list-posts {
-        width: 58%;
-      }
-      .todo-list {
-        width: 33.3%;
-        margin-left: 62%;
-      }
+    .todo-list::-webkit-scrollbar {
+        width: 0;
+    }
+    .todo::-webkit-scrollbar {
+        width: 10px;
+        height: 8px;
+    }
+    .todo::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, .1);
+    }
+    .todo::-webkit-scrollbar-thumb {
+        box-shadow: inset 0 0 2px rgba(255, 255, 255, 0.6);
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 20px;
+    }
+    .annonce {
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    }
+    .title {
+        font-size:22px;
+        font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        overflow: auto;
+    }
+    .title a {
+        text-decoration: none;
+    }
+    .title::-webkit-scrollbar {
+        width: 10px;
+        height: 8px;
+    }
+    .title::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, .1);
+    }
+    .title::-webkit-scrollbar-thumb {
+        box-shadow: inset 0 0 2px rgba(255, 255, 255, 0.6);
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 20px;
+    }
+    .delete a {
+        color: red;
+        border: 1px skyblue solid;
+        border-radius: 2px;
+        padding: 5px;
+        font-size: 20px;
+        font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        text-decoration: none;
+    }
+    .edit a {
+        color: #9FCC56;
+        border: 1px skyblue solid;
+        border-radius: 2px;
+        padding: 5px;
+        font-size: 20px;
+        font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        text-decoration: none;
+    }
+    .delete a:hover, .edit a:hover {
+        color: royalblue;
     }
 </style>
-    <ul class="list-posts">
-        {% for p in posts %}
-            <li>
-                <p class="title" style="font-size:30px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;"><a href="{{ url_for('showPost', id_post=p.id) }}" style="text-decoration: none;">{{ p.title }}</a> | <strong>{{ p.time }}</strong></p>
-            {% if p.text[50] %}
-                <p class="annonce" style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif">{{ p.text[:50]}}...</p>
-            {% else %}
-                <p class="annonce" style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif">{{ p.text[:50]}}</p>
-            {% endif %}
-                <p><a href="{{url_for('post_edit', id_post=p.id)}}" style="color: #9FCC56; border: 1px skyblue solid; border-radius: 2px; padding: 5px; font-size:20px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; text-decoration: none;">Редактировать</a></p>
-                <p><a href="{{url_for('delpost_page', id_post=p.id)}}" style="color: red; border: 1px skyblue solid; border-radius: 2px; padding: 5px; font-size:20px; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; text-decoration: none;">Удалить</a></p>
-            </li>
-        {% endfor %}
-    </ul>
-    <ol class="todo-list">
-        <h2>TODO</h2>
-        {% if todo %}
-            {% for do in todo %}
+    <div class="content">
+        <ul class="list-posts">
+            {% for p in posts %}
                 <li>
-                    <p><a href="{{url_for('deltodo', id_todo=do.id)}}" style="text-decoration: none;"><span id="hz">{{do.text}}</span></a></p>
+                    <p class="title"><a href="{{ url_for('showPost', id_post=p.id) }}">{{ p.title }}</a> || <strong>{{ p.time }}</strong></p>
+                {% if p.text[50] %}
+                    <p class="annonce">{{ p.text[:50]}}...</p>
+                {% else %}
+                    <p class="annonce">{{ p.text[:50]}}</p>
+                {% endif %}
+                    <p class="edit"><a href="{{url_for('post_edit', id_post=p.id)}}">Edit</a></p>
+                    <p class="delete"><a href="{{url_for('delpost_page', id_post=p.id)}}">Delete</a></p>
                 </li>
             {% endfor %}
-        {% endif %}
-        <form method="post">
-            <p><input name="text" type="text" placeholder="Текст"></p>
-            <button type="submit">Добавить</button>
-        </form>
-    </ol>
+        </ul>
+        <ol class="todo-list">
+            <h2>TODO</h2>
+            {% if todo %}
+                {% for do in todo %}
+                    <li>
+                        <div class="todo"><a href="{{url_for('deltodo', id_todo=do.id)}}" style="text-decoration: none;">{{do.text}}</a></div>
+                    </li>
+                {% endfor %}
+            {% endif %}
+            <form method="post">
+                <p><input name="text" type="text" placeholder="Text"></p>
+                <input value="Add" type="submit">
+            </form>
+        </ol>
+    </div>
 {% endblock %}

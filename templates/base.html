@@ -77,7 +77,7 @@
                             <li><a href="{{ url_for('admin_page') }}">Админ</a></li>
                         {% endif %}
                         <li>
-                            <a href="{{ url_for('profile_page', name=session['userlogged']) }}">
+                            <a href="{{ url_for('settings') }}">
                                 {% if ava_empty %}
                                     <img style="border-radius: 50%;" src="{{ url_for('userava', username='static') }}" height="30" width="30">
                                 {% endif %}
@@ -87,7 +87,6 @@
                                 <div style="margin-top: -40px; margin-left: 48px;">{{ session['userlogged'] }}</div>
                             </a>
                         </li>
-                        <li><a href="{{ url_for('settings') }}">Настройки</a></li>
                         <li><a href="{{ url_for('quit_login') }}">Выход</a></li>
                     {% else %}
                         <li><a href="{{ url_for('login') }}">Вход</a></li>

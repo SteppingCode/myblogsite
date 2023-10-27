@@ -23,7 +23,8 @@ id integer primary key,
 nick text not null unique,
 name text not null,
 age integer not null,
-about text not null
+about text not null,
+login text not null unique
 );
 
 create table if not exists comments (

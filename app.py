@@ -58,19 +58,6 @@ def webhook():
     else:
         return 'Возникла ошибка', 400
 
-@app.route('/upload', methods=['GET', 'POST'])
-def upload_file():
-    if request.method == 'POST':
-        if 'file' not in request.files:
-            flash('Can not read the file')
-        file = request.files['file']
-        if file.filename == '':
-            flash('No choosen file')
-        if file and allowed_file(file.filename):
-            filename = str(session['userlogged']) + '.png'
-            file.save(os.path.join(f'{app.root_path + "/static/avatars/" + filename}'))
-    return redirect(url_for('settings'))
-
 #Main page
 @app.route('/', methods=['GET', 'POST'])
 def start_page():
@@ -144,15 +131,14 @@ def admin_page():
             if request.method == 'POST':
                 addtodo = database.addTODO(request.form['text'])
                 if addtodo:
-                    flash('Дело добавлено!', category='success')
+                    return redirect(url_for('admin_page'))
                 else:
-                    flash('Дело не было добавлено!', category='error')
-                return redirect(url_for('admin_page'))
+                    return redirect(url_for('admin_page'))
             for i in os.listdir(f'{app.root_path + "/static/avatars/"}'):
                 if filename in i:
-                    return render_template('admin.html', title='Admin Page', menu=database.getMenu(), posts=database.getPostAnnoce(), todo=database.getTODO(), ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'))
+                    return render_template('admin.html', title='Admin Page', menu=database.getMenu(), posts=database.getAllposts(), todo=database.getTODO(), ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'))
             else:
-                return render_template('admin.html', title='Admin Page', menu=database.getMenu(), posts=database.getPostAnnoce(), todo=database.getTODO(), ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'))
+                return render_template('admin.html', title='Admin Page', menu=database.getMenu(), posts=database.getAllposts(), todo=database.getTODO(), ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'))
     return redirect(url_for('start_page'))
 
 #Create post
@@ -345,48 +331,6 @@ def delcom_page(id_post, id_com):
     else:
         return redirect(url_for('start_page'))
 
-@app.route('/profile/<name>', methods=['GET', 'POST'])
-def profile_page(name):
-    db = get_db()
-    database = FDataBase(db)
-    profile = database.getProfile(name)
-    if 'userlogged' in session:
-        filename = session['userlogged'] + '.png'
-        if profile:
-            for i in os.listdir('static/avatars/'):
-                if filename in i:
-                    return render_template('profile.html', menu=database.getMenu(), title=name, prof=profile,
-                                           ava=open(f'static/avatars/{filename}', 'rb'))
-            else:
-                return render_template('profile.html', menu=database.getMenu(), title=name, prof=profile,
-                                       ava_empty=open(f'static/avatars/static.png', 'rb'))
-        for i in os.listdir(f'{app.root_path + "/static/avatars/"}'):
-            if filename in i:
-                return render_template('profile.html', menu=database.getMenu(), title='Профиль не найден', ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'))
-        else:
-            return render_template('profile.html', menu=database.getMenu(), title='Профиль не найден', ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'))
-    return redirect(url_for('start_page'))
-
-@app.route('/reg_profile', methods=['GET', 'POST'])
-def profile_reg():
-    db = get_db()
-    database = FDataBase(db)
-    if 'userlogged' in session:
-        filename = session['userlogged'] + '.png'
-        if request.method == 'POST':
-            if database.addProfile(session['userlogged'], request.form["name"], request.form["age"], \
-                                   request.form["game"]):
-                return redirect(url_for('profile_page', name=session['userlogged']))
-            else:
-                flash('Некорректный логин', category='error')
-                return redirect('profile_reg')
-        for i in os.listdir(f'{app.root_path + "/static/avatars/"}'):
-            if filename in i:
-                return render_template('profile_reg.html', title='Регистрация профиля', menu=database.getMenu(), ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'))
-        else:
-            return render_template('profile_reg.html', title='Регистрация профиля', menu=database.getMenu(), ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'))
-    return redirect(url_for('start_page'))
-
 #Deleting to-do-list
 @app.route('/deltodo/<int:id_todo>/')
 def deltodo(id_todo):
@@ -407,11 +351,51 @@ def settings():
     database = FDataBase(db)
     if 'userlogged' in session:
         filename = session['userlogged'] + '.png'
+        for i in os.listdir(f'{app.root_path + "/static/avatars/"}'):
+            if filename in i:
+                if database.getProfile(session['userlogged']):
+                    return render_template('settings.html', menu=database.getMenu(), title='Настройки', email=database.getEmail(session['userlogged'])[0], ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'), prof=database.getProfile(session['userlogged']))
+                return render_template('settings.html', menu=database.getMenu(), title='Настройки', email=database.getEmail(session['userlogged'])[0], ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'))
+        else:
+            if database.getProfile(session['userlogged']):
+                return render_template('settings.html', menu=database.getMenu(), title='Настройки', email=database.getEmail(session['userlogged'])[0], ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'), prof=database.getProfile(session['userlogged']))
+            return render_template('settings.html', menu=database.getMenu(), title='Настройки', email=database.getEmail(session['userlogged'])[0], ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'))
+    return redirect(url_for('start_page'))
+
+@app.route('/prfoile', methods=['POST', 'GET'])
+def profile():
+    db = connect_db()
+    database = FDataBase(db)
+    if 'userlogged' in session:
+        # TODO сделать чтобы проверка для всех админовых действий велась через статус пользователя
+        if request.method == 'POST':
+            if database.getProfile(session['userlogged']):
+                if database.UpdateProfile(request.form['nick'], request.form['name'],  request.form['age'], request.form['about']):
+                    flash('Profile has been updated', category='success')
+                    return redirect(url_for('settings'))
+                else:
+                    flash('Error', category='error')
+                    return redirect(url_for('settings'))
+            else:
+                if database.addProfile(request.form['nick_reg'], request.form['name_reg'],  request.form['age_reg'], request.form['about_reg'], session['userlogged']):
+                    flash('Profile has been updated', category='success')
+                    return redirect(url_for('settings'))
+                else:
+                    flash('Error', category='error')
+                    return redirect(url_for('settings'))
+    return redirect(url_for('start_page'))
+
+@app.route('/password', methods=['POST', 'GET'])
+def password():
+    db = connect_db()
+    database = FDataBase(db)
+    if 'userlogged' in session:
         if request.method == 'POST':
             if len(request.form['cur_psw']) > 0 and len(request.form['psw']) > 0 and len(request.form['psw2']) > 0:
                 if database.getData(session['userlogged'], request.form['cur_psw']):
                     if request.form['psw'] == request.form['psw2']:
                         if database.UpdateUserPass(session['userlogged'], request.form['psw']):
+                            print('dsf')
                             flash('Password was successfully changed', category='success')
                             return redirect(url_for('settings'))
                         else:
@@ -423,31 +407,38 @@ def settings():
                 else:
                     flash('Incorrect password', category='error')
                     return redirect(url_for('settings'))
-            if database.getEmail(session['userlogged'])[0] != '':
-                if len(request.form['email_upd']) > 0:
-                    if database.UpdateEmail(request.form['email_upd'], session['userlogged']):
-                        flash('Email was successfully changed', category='success')
-                        return redirect(url_for('settings'))
-                    else:
-                        flash('Error', category='error')
-                        return redirect(url_for('settings'))
-            if len(request.form['email_set']) > 0:
-                if database.UpdateEmail(request.form['email_set'], session['userlogged']):
+            return redirect(url_for('settings'))
+    return redirect(url_for('start_page'))
+
+@app.route('/email', methods=['POST', 'GET'])
+def email():
+    db = connect_db()
+    database = FDataBase(db)
+    if 'userlogged' in session:
+        if request.method == 'POST':
+            if len(request.form['email']) > 0:
+                if database.UpdateEmail(request.form['email'], session['userlogged']):
                     flash('Email was successfully changed', category='success')
                     return redirect(url_for('settings'))
                 else:
                     flash('Error', category='error')
                     return redirect(url_for('settings'))
-            for i in os.listdir(f'{app.root_path + "/static/avatars/"}'):
-                if filename in i:
-                    return render_template('settings.html', menu=database.getMenu(), title='Настройки', email=database.getEmail(session['userlogged'])[0], ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'))
-            else:
-                return render_template('settings.html', menu=database.getMenu(), title='Настройки', email=database.getEmail(session['userlogged'])[0], ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'))
-        for i in os.listdir(f'{app.root_path + "/static/avatars/"}'):
-            if filename in i:
-                return render_template('settings.html', menu=database.getMenu(), title='Настройки', email=database.getEmail(session['userlogged'])[0], ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'))
-        else:
-            return render_template('settings.html', menu=database.getMenu(), title='Настройки', email=database.getEmail(session['userlogged'])[0], ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'))
+            return redirect(url_for('settings'))
+    return redirect(url_for('start_page'))
+
+@app.route('/upload', methods=['GET', 'POST'])
+def upload_file():
+    if 'userlogged' in session:
+        if request.method == 'POST':
+            if 'file' not in request.files:
+                flash('Can not read the file', category='error')
+            file = request.files['file']
+            if file.filename == '':
+                flash('No choosen file', category='error')
+            if file and allowed_file(file.filename):
+                filename = str(session['userlogged']) + '.png'
+                file.save(os.path.join(f'{app.root_path + "/static/avatars/" + filename}'))
+        return redirect(url_for('settings'))
     return redirect(url_for('start_page'))
 
 @app.route('/userava/<username>', methods=['POST', 'GET'])

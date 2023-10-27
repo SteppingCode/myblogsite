@@ -163,6 +163,14 @@ class FDataBase:
             print("Ошибка получения статей из БД" + str(e))
         return []
 
+    def getAllposts(self):
+        try:
+            self.__cur.execute(f"SELECT id, title, text, time FROM post ORDER BY time")
+            res = self.__cur.fetchall()
+            if res: return res
+        except sq.Error as e:
+            print("Ошибка получения статей из БД" + str(e))
+        return []
 
     def getPostAnnocePages(self, last_id):
         try:
@@ -252,9 +260,18 @@ class FDataBase:
             return False
         return True
 
-    def addProfile(self, nick, name, age, about):
+    def addProfile(self, nick, name, age, about, login):
         try:
-            self.__cur.execute(f"INSERT INTO profile VALUES (NULL, ?, ?, ?, ?)", (nick, name, age, about))
+            self.__cur.execute(f"INSERT INTO profile VALUES(NULL, ?, ?, ?, ?, ?)", (nick, name, age, about, login,))
+            self.__db.commit()
+            return True
+        except sq.Error as e:
+            print(str(e))
+            return False
+
+    def UpdateProfile(self, nick, name, age, about):
+        try:
+            self.__cur.execute(f"UPDATE profile SET nick == ?, name == ?, age == ?, about == ?", (nick, name, age, about,))
             self.__db.commit()
             return True
         except sq.Error as e:
@@ -273,9 +290,9 @@ class FDataBase:
             return False
         return True
 
-    def getProfile(self, nick):
+    def getProfile(self, login):
         try:
-            self.__cur.execute(f"SELECT nick, name, age, about FROM profile WHERE ? = nick", (nick,))
+            self.__cur.execute(f"SELECT * FROM profile WHERE ? = login", (login,))
             res = self.__cur.fetchall()
             if res: return res
         except sq.Error as e:
@@ -291,3 +308,4 @@ if __name__ == "__main__":
     #print(db.addData('admin', '111', 'admin@gmail.com'))
     #print(db.delMenu(0))
     #print(db.addMenu('Главная', 'start_page'))
+    #print(connect_db().execute('ALTER TABLE profile ADD COLUMN "login" "text not null unique"'))

@@ -13,7 +13,7 @@
         .messages {
             height: 20px;
             font-family: "Arial Black";
-            text-align: center;
+            position: absolute;
         }
         .flash.success{
             color: green;
@@ -29,29 +29,84 @@
         .email input {
             margin-bottom: 4px;
         }
-        .forms {
+        .content-block {
             display: flex;
             flex-direction: row;
+            padding-left: 50px;
+            padding-right: 50px;
+            padding-top: 10px;
             justify-content: space-around;
+            max-height: 455.333333px;
+        }
+        .all-in {
+            display: flex;
+            align-items: center;
+            max-width: 100%;
+        }
+        .all-in form {
+            margin-right: 50px;
         }
         .avatar {
-            height: 220px;
-            width: 200px;
-            margin-left: 50%;
-            transform: translate(-50%);
+            display: flex;
+            flex-direction: column;
+            width: 50%;
+        }
+        .avatar input {
+            margin-bottom: 4px;
         }
         .avatar img {
             border-radius: 50%;
         }
+        .upload, .upload a {
+            display: flex;
+            flex-direction: column;
+            width: 250px;
+        }
+        #login {
+            cursor: not-allowed;
+        }
+        #email:disabled {
+            cursor: not-allowed;
+        }
+        .profile {
+            display: flex;
+            flex-direction: column;
+        }
+        .profile input {
+            margin-bottom: 4px;
+        }
     </style>
     <div class="content-block">
-        <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
-            <div class="messages">
-                {% for cat, msg in get_flashed_messages(True) %}
-                    <div class="flash {{cat}}"> {{msg}}</div>
-                {% endfor %}
-            </div>
-            <div class="profile_about">
+        <div class="messages">
+            {% for cat, msg in get_flashed_messages(True) %}
+                <div class="flash {{cat}}"> {{msg}}</div>
+            {% endfor %}
+        </div>
+        <div class="all-in">
+            <form action="{{ url_for('profile') }}" method="post" enctype="multipart/form-data">
+                <h2>Profile</h2>
+                <div class="profile">
+                    {% if prof %}
+                        {% for n in prof %}
+                            <input id="login" type="text" disabled value="{{ n.login }}" title="login">
+                            <input id="input1" name="nick" type="text" disabled placeholder="Nick" value="{{n.nick}}" title="nick">
+                            <input id="input2" name="name" type="text" disabled placeholder="Name" value="{{n.name}}" title="name">
+                            <input id="input3" name="age" type="number" disabled placeholder="Age" value="{{n.age}}" title="age">
+                            <input id="input4" name="about" type="text" disabled placeholder="About" value="{{n.about}}" title="about">
+                            <input type="button" value="Change" onclick="document.getElementById('input1').disabled=false; document.getElementById('input2').disabled=false; document.getElementById('input3').disabled=false; document.getElementById('input4').disabled=false;">
+                            <input value="Submit" type="submit">
+                        {% endfor %}
+                    {% else %}
+                        <h1><input id="input1" name="nick_reg" type="text" placeholder="Nick"></h1>
+                        <h2><input id="input2" name="name_reg" type="text" placeholder="Name"></h2>
+                        <h2><input id="input3" name="age_reg" type="number" placeholder="Age"></h2>
+                        <h2><input id="input4" name="about_reg" type="text" placeholder="About"></h2>
+                        <input value="Submit" type="submit">
+                    {% endif %}
+                </div>
+            </form>
+            <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
+                <h2>Profile avatar</h2>
                 <div class="avatar">
                     {% if ava %}
                         <div class="avatar"><img src="{{ url_for('userava', username=session['userlogged']) }}" height="200" width="200"></div>
@@ -60,47 +115,30 @@
                     {% endif %}
                     <div class="upload">
                         <input type="file" name="file">
-                        <input type="submit" value="Set" onclick="empty(); empty_pass();">
-                        <a href="{{ url_for('userava_delete', filename=session['userlogged']) }}"><input type="button" value="Delete avatar"></a>
+                        <input type="submit" value="Submit">
+                        <a style="text-decoration: none;" href="{{ url_for('userava_delete', filename=session['userlogged']) }}"><input type="button" value="Delete avatar"></a>
                     </div>
                 </div>
-            </div>
-        </form>
-        <form action="{{ url_for('settings') }}" method="post" enctype="multipart/form-data">
-            <div class="forms">
+            </form>
+            <form action="{{ url_for('password') }}" method="post" enctype="multipart/form-data">
                 <div class="password_change">
-                    <h2 style="margin-bottom: 4px;">Password change</h2>
+                    <h2>Password change</h2>
                     <input id="password" placeholder="Current password" type="password" name="cur_psw">
                     <input id="password" placeholder="New password" type="password" name="psw">
                     <input id="password" placeholder="Confirm password" type="password" name="psw2">
-                    <input type="submit" value="Update" onclick="empty();">
+                    <input type="submit" value="Update">
                 </div>
+            </form>
+            <form action="{{ url_for('email') }}" method="post" enctype="multipart/form-data">
                 <div class="email_reg">
                     <h2>Account email</h2>
-                    {% if email %}
-                        <div class="email">
-                            <input name="email_upd" id="email" value="{{ email }}" type="email" placeholder="Email" disabled>
-                            <input id="btn_email" type="button" value="Change" onclick="document.getElementById('email').disabled=false; this.disabled=true; document.getElementById('btn_apply').style.display='block'; document.getElementById('btn_apply').disabled=false">
-                            <input id="btn_apply" type="submit" value="Apply" disabled onclick="document.getElementById('email').disabled=false;">
-                        </div>
-                    {% else %}
-                        <div class="email">
-                            <input name="email_set" id="email" value="{{ email }}" type="email" placeholder="Email">
-                            <input id="btn_apply" type="submit" value="Set">
-                        </div>
-                    {% endif %}
+                    <div class="email">
+                        <input name="email" id="email" value="{{ email }}" type="email" placeholder="Email" disabled>
+                        <input id="btn_email" type="button" value="Change" onclick="document.getElementById('email').disabled=false; this.disabled=true; document.getElementById('btn_apply').style.display='block'; document.getElementById('btn_apply').disabled=false">
+                        <input id="btn_apply" type="submit" value="Submit" disabled onclick="document.getElementById('email').disabled=false;">
+                    </div>
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
-    <script type="javascript">
-        var input = document.getElementById('email')
-        var pass = document.getElementById('password')
-        function empty() {
-            input.value = '';
-        }
-        function empty_pass() {
-            pass.value = '';
-        }
-    </script>
 {% endblock %}
