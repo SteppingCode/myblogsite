@@ -71,7 +71,7 @@ def start_page():
                 if filename in i:
                     return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=0, ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'))
             else:
-                return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=0, ava_empy=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'))
+                return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=0, ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'))
         return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=0)
     elif database.getAllPostsId()[-1][0] == 1:
         if 'userlogged' in session:
@@ -80,7 +80,7 @@ def start_page():
                 if filename in i:
                     return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=0, ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'))
             else:
-                return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=0, ava_empy=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'))
+                return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=0, ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'))
         else:
             return render_template('index.html', title="Главная", menu=database.getMenu(), posts=database.getPostAnnoce(), page=page, MAX_PAGES=0)
     else:
