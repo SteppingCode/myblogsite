@@ -61,16 +61,12 @@
                     <div class="upload">
                         <input type="file" name="file">
                         <input type="submit" value="Set" onclick="empty(); empty_pass();">
+                        <a href="{{ url_for('userava_delete', filename=session['userlogged']) }}"><input type="button" value="Delete avatar"></a>
                     </div>
                 </div>
             </div>
         </form>
         <form action="{{ url_for('settings') }}" method="post" enctype="multipart/form-data">
-            <div class="messages">
-                {% for cat, msg in get_flashed_messages(True) %}
-                    <div class="flash {{cat}}"> {{msg}}</div>
-                {% endfor %}
-            </div>
             <div class="forms">
                 <div class="password_change">
                     <h2 style="margin-bottom: 4px;">Password change</h2>
