@@ -111,7 +111,7 @@
                     <img src="{{ url_for('display_image_by_name', post_name=post_title) }}" class="other">
                 </div>
             {% else %}
-                <h1>{{ post_title }}</h1>
+                <h1 class="post-title">{{ post_title }}</h1>
                 <p class="post-text-noimg">{{ post }}</p>
             {% endif %}
         </div>

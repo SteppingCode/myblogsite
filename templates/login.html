@@ -10,25 +10,27 @@
     <section>
         <div class="form-box" id="form-box">
             <div class="form-value">
-                <form action="{{url_for('login')}}" method="post">
+                <form action="{{url_for('login')}}" method="post" enctype="multipart/form-data">
                     <div id="login">
                         <h2>Login</h2>
                         <div class="inputbox">
                             <ion-icon name="person-circle-outline"></ion-icon>
                             <input id="input1" type="text" name="username" pattern="[A-Za-z1-0 ]*">
-                            <label for="">Username or Email</label>
+                            <label for="">Username or Email <span style="color: red">*</span></label>
                         </div>
                         <div class="inputbox">
                             <ion-icon name="lock-open-outline"></ion-icon>
                             <input id="input2" type="password" name="password">
-                            <label for="">Password</label>
+                            <label for="">Password <span style="color: red">*</span></label>
                         </div>
                         <button type="submit">Log in</button>
                         <div class="register">
                             <p>Don't have a account. <a style="cursor: pointer" onclick="document.getElementById('register').style.display='block'; document.getElementById('login').style.display='none'; document.getElementById('input1').value=''; document.getElementById('input2').value=''; document.getElementById('form-box').style.height='550px';">Register</a></p>
                         </div>
                     </div>
-                    <div style="display: none" id="register">
+                </form>
+                <form action="{{ url_for('register') }}" method="post" enctype="multipart/form-data">
+                    <div style="display: none;" id="register">
                         <h2>Register</h2>
                         <div class="inputbox">
                             <ion-icon name="person-circle-outline"></ion-icon>
@@ -38,7 +40,7 @@
                         <div class="inputbox">
                             <ion-icon name="mail-outline"></ion-icon>
                             <input id="input4" type="email" name="reg_email" pattern="[A-Za-z1-0 ]*">
-                            <label for="">Email</label>
+                            <label for="">Email <span style="color: red">*</span></label>
                         </div>
                         <div class="inputbox">
                             <ion-icon name="lock-closed-outline"></ion-icon>
@@ -50,10 +52,21 @@
                             <input id="input6" type="password" name="reg_password2">
                             <label for="">Confirm Password <span style="color: red">*</span></label>
                         </div>
-                        <button type="submit">Create account</button>
+                        <button type="button" onclick="document.getElementById('register').style.display='none'; document.getElementById('final_register').style.display='flex'; document.getElementById('form-box').style.height='450px';">Create account</button>
                         <div class="register">
                             <p><a style="cursor: pointer" onclick="document.getElementById('register').style.display='none'; document.getElementById('login').style.display='block'; document.getElementById('input3').value=''; document.getElementById('input4').value=''; document.getElementById('input5').value=''; document.getElementById('input6').value=''; document.getElementById('form-box').style.height='450px';">I have an account</a></p>
                         </div>
+                    </div>
+                    <div style="display: none; flex-direction: column; justify-content: center; align-items: center;" id="final_register">
+                        <h2 style="font-size: 22px;">What nick do you want to use?</h2>
+                        <img style="border-radius: 50%;" src="{{ url_for('userava', username='static') }}" width="170px" height="170px">
+                        <input type="file" name="file">
+                        <div class="inputbox">
+                            <ion-icon name="person-circle-outline"></ion-icon>
+                            <input id="input3" type="text" name="reg_nick" pattern="[A-Za-z1-0 ]*">
+                            <label for="">Nick <span style="color: red">*</span></label>
+                        </div>
+                        <button style="width: 310px;" type="submit">Log in</button>
                     </div>
                 </form>
             </div>

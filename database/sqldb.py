@@ -35,9 +35,9 @@ class FDataBase:
         self.__db = db
         self.__cur = db.cursor()
 
-    def addData(self, username, password, email):
+    def addData(self, username, password, email, status):
         try:
-            self.__cur.execute("INSERT INTO user VALUES (NULL, ?, ?, ?)", (username, password, email))
+            self.__cur.execute("INSERT INTO user VALUES (NULL, ?, ?, ?, ?)", (username, password, email, status,))
             self.__db.commit()
         except sq.Error as e:
             print(str(e))
@@ -61,6 +61,15 @@ class FDataBase:
             self.__cur.execute("SELECT username, password, email FROM user WHERE ? = email AND ? = password OR ? = username AND ? = password", (username, password, username, password))
             res = self.__cur.fetchall()
             return res
+        except sq.Error as e:
+            print(str(e))
+            return False
+
+    def getStatus(self, username):
+        try:
+            self.__cur.execute("SELECT status FROM user WHERE ? = username", (username,))
+            res = self.__cur.fetchone()
+            if res: return res
         except sq.Error as e:
             print(str(e))
             return False
@@ -269,9 +278,9 @@ class FDataBase:
             print(str(e))
             return False
 
-    def UpdateProfile(self, nick, name, age, about):
+    def UpdateProfile(self, nick, name, age, about, login):
         try:
-            self.__cur.execute(f"UPDATE profile SET nick == ?, name == ?, age == ?, about == ?", (nick, name, age, about,))
+            self.__cur.execute(f"UPDATE profile SET nick == ?, name == ?, age == ?, about == ? WHERE ? = login", (nick, name, age, about, login,))
             self.__db.commit()
             return True
         except sq.Error as e:
@@ -308,4 +317,6 @@ if __name__ == "__main__":
     #print(db.addData('admin', '111', 'admin@gmail.com'))
     #print(db.delMenu(0))
     #print(db.addMenu('Главная', 'start_page'))
-    #print(connect_db().execute('ALTER TABLE profile ADD COLUMN "login" "text not null unique"'))
+    print(connect_db().execute('ALTER TABLE profile ADD COLUMN "login" "text not null unique"'))
+    print(connect_db().execute('ALTER TABLE user DROP COLUMN status'))
+    print(connect_db().execute('ALTER TABLE user ADD COLUMN status text'))

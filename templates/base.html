@@ -72,7 +72,7 @@
                         <li><a href="{{url_for(m.url)}}"> {{m.title}}</a></li>
                     {% endfor -%}
                     {% if 'userlogged' in session %}
-                        {% if session['userlogged'] == 'admin' %}
+                        {% if status == 'admin' %}
                             <li><a href="{{ url_for('post') }}">Добавить пост</a></li>
                             <li><a href="{{ url_for('admin_page') }}">Админ</a></li>
                         {% endif %}
@@ -84,7 +84,13 @@
                                 {% if ava %}
                                     <img style="border-radius: 50%;" src="{{ url_for('userava', username=session['userlogged']) }}" height="30" width="30">
                                 {% endif %}
-                                <div style="margin-top: -40px; margin-left: 48px;">{{ session['userlogged'] }}</div>
+                                <div style="margin-top: -40px; margin-left: 48px;">
+                                    {% if nick != '' %}
+                                        {{ nick }}
+                                    {% else %}
+                                        {{ session['userlogged'] }}
+                                    {% endif %}
+                                </div>
                             </a>
                         </li>
                         <li><a href="{{ url_for('quit_login') }}">Выход</a></li>

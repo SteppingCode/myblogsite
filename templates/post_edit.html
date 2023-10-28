@@ -1,11 +1,19 @@
 {% extends 'base.html' %}
 {% block content %}
-{{super()}}
-    <form method="post" class='form-contact'>
-        <p><label>Название статьи: </label>{{post.title}} - <input type="text" name="title" value="" required></p>
-        <p><label>Текст статьи: </label> {{post.text}} <br>
-            <textarea name="text" rows="7" cols="40"></textarea> </p>
-        <p><label>Фото статьи:</label>{{post.photo}} <input type="text" name="photo" value=""></p>
-        <p><input type="submit" value="Добавить"></p>
-    </form>
+    {{super()}}
+    <style>
+    </style>
+    <div class="content-block">
+        <div>
+            <form method="post" class='form-contact'>
+                Название статьи: {{post.title}} - <input type="text" name="title" value="" required><br>
+                Текст статьи: {{post.text}} <br>
+                    <textarea name="text" rows="7" cols="40"></textarea> <br>
+                Фото статьи: <br>
+                    {{post.photo}}
+                    <input type="text" name="photo" value=""> <br>
+                <input type="submit" value="Добавить">
+            </form>
+        </div>
+    </div>
 {% endblock %}
