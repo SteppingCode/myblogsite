@@ -93,8 +93,8 @@
                             <input id="input2" name="name" type="text" disabled placeholder="Name" value="{{n.name}}" title="name">
                             <input id="input3" name="age" type="number" disabled placeholder="Age" value="{{n.age}}" title="age">
                             <input id="input4" name="about" type="text" disabled placeholder="About" value="{{n.about}}" title="about">
-                            <input type="button" value="Change" onclick="document.getElementById('input1').disabled=false; document.getElementById('input2').disabled=false; document.getElementById('input3').disabled=false; document.getElementById('input4').disabled=false;">
-                            <input value="Submit" type="submit">
+                            <input type="button" value="Change" onclick="document.getElementById('submit').disabled=false; this.disabled=true; document.getElementById('input1').disabled=false; document.getElementById('input2').disabled=false; document.getElementById('input3').disabled=false; document.getElementById('input4').disabled=false;">
+                            <input id="submit" value="Submit" disabled type="submit">
                         {% endfor %}
                     {% else %}
                         <input id="login" type="text" disabled value="{{ session['userlogged'] }}" title="login">
