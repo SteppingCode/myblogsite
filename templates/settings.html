@@ -56,6 +56,9 @@
         }
         .avatar img {
             border-radius: 50%;
+            text-align: center;
+            margin-left: 25px;
+            margin-bottom: 10px;
         }
         .upload, .upload a {
             display: flex;
@@ -75,6 +78,11 @@
         .profile input {
             margin-bottom: 4px;
         }
+        .titles {
+            font-family: "Arial Black";
+            text-align: center;
+            font-size: 20px;
+        }
     </style>
     <div class="content-block">
         <div class="messages">
@@ -84,7 +92,7 @@
         </div>
         <div class="all-in">
             <form action="{{ url_for('profile') }}" method="post" enctype="multipart/form-data">
-                <h2>Profile</h2>
+                <h2 class="titles">Profile</h2>
                 <div class="profile">
                     {% if prof %}
                         {% for n in prof %}
@@ -107,7 +115,7 @@
                 </div>
             </form>
             <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
-                <h2>Profile avatar</h2>
+                <h2 class="titles">Profile avatar</h2>
                 <div class="avatar">
                     {% if ava %}
                         <div class="avatar"><img src="{{ url_for('userava', username=session['userlogged']) }}" height="200" width="200"></div>
@@ -123,7 +131,7 @@
             </form>
             <form action="{{ url_for('password') }}" method="post" enctype="multipart/form-data">
                 <div class="password_change">
-                    <h2>Password change</h2>
+                    <h2 class="titles">Password change</h2>
                     <input id="password" placeholder="Current password" type="password" name="cur_psw">
                     <input id="password" placeholder="New password" type="password" name="psw">
                     <input id="password" placeholder="Confirm password" type="password" name="psw2">
@@ -132,7 +140,7 @@
             </form>
             <form action="{{ url_for('email') }}" method="post" enctype="multipart/form-data">
                 <div class="email_reg">
-                    <h2>Account email</h2>
+                    <h2 class="titles">Account email</h2>
                     <div class="email">
                         <input name="email" id="email" value="{{ email }}" type="email" placeholder="Email" disabled>
                         <input id="btn_email" type="button" value="Change" onclick="document.getElementById('email').disabled=false; this.disabled=true; document.getElementById('btn_apply').style.display='block'; document.getElementById('btn_apply').disabled=false">
