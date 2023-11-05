@@ -1,5 +1,6 @@
 # taskkill /f /im python.exe
 import random
+from datetime import timedelta
 
 from flask import render_template, Flask, request, redirect, url_for, session, g, abort, flash, Markup
 from config import Config
@@ -18,6 +19,7 @@ app = Flask(__name__)
 app.config.from_object(Config)
 app.config.update(dict(DATABASE=os.path.join(app.root_path, 'posts.db'))) #Создается база данных
 app.config.update(dict(PHOTOBASE=os.path.join(app.root_path, 'photo.db'))) #Создается база данных
+app.permanent_session_lifetime = timedelta(days=730)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
 
@@ -114,6 +116,7 @@ def login():
     if request.method == 'POST':
         if len(request.form['username']) > 0 and len(request.form['password']) > 0:
             if database.getData(request.form['username'], request.form['password']):
+                session.permanent = True
                 session['userlogged'] = database.getData(request.form['username'], request.form['password'])[0][0]
                 return redirect(url_for('start_page'))
     return render_template('login.html', title="Вход", menu=database.getMenu())
@@ -129,6 +132,7 @@ def register():
             if request.form['reg_password'] == request.form['reg_password2']:
                 if len(request.form['reg_nick']) > 0:
                     if database.addData(request.form["reg_username"], request.form["reg_password"], request.form['reg_email'],'', 'unconfirmed'):
+                        session.permanent = True
                         session['userlogged'] = request.form['reg_username']
                         if 'file' not in request.files:
                             flash('Can not read the file', category='error')

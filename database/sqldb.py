@@ -327,15 +327,15 @@ class FDataBase:
             return False
 
 if __name__ == "__main__":
-    #from app import connect_db
+    # from app import connect_db
     db = connect_db()
     db = FDataBase(db)
-    #create_db()
-    #print(db.delData(0))
-    #print(db.addData('admin', '111', 'admin@gmail.com'))
-    #print(db.delMenu(0))
-    #print(db.addMenu('Главная', 'start_page'))
-    print(connect_db().execute('ALTER TABLE profile ADD COLUMN login text not null unique'))
-    print(connect_db().execute('ALTER TABLE user DROP COLUMN status'))
-    print(connect_db().execute('ALTER TABLE user ADD COLUMN status text'))
-    print(connect_db().execute("ALTER TABLE user ADD COLUMN confirmed text not null default 'unconfirmed'"))
+    # create_db()
+    # print(db.delData(0))
+    # print(db.addData('admin', '111', 'admin@gmail.com'))
+    # print(db.delMenu(0))
+    # print(db.addMenu('Главная', 'start_page'))
+    # print(connect_db().execute('ALTER TABLE profile ADD COLUMN login text not null unique'))
+    # print(connect_db().execute('ALTER TABLE user DROP COLUMN status'))
+    # print(connect_db().execute('ALTER TABLE user ADD COLUMN status text'))
+    # print(connect_db().execute("ALTER TABLE user ADD COLUMN confirmed text not null default 'unconfirmed'"))
