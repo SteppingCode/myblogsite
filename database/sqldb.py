@@ -35,9 +35,9 @@ class FDataBase:
         self.__db = db
         self.__cur = db.cursor()
 
-    def addData(self, username, password, email, status):
+    def addData(self, username, password, email, status, email_status):
         try:
-            self.__cur.execute("INSERT INTO user VALUES (NULL, ?, ?, ?, ?)", (username, password, email, status,))
+            self.__cur.execute("INSERT INTO user VALUES (NULL, ?, ?, ?, ?, ?)", (username, password, email, status, email_status,))
             self.__db.commit()
         except sq.Error as e:
             print(str(e))
@@ -308,6 +308,24 @@ class FDataBase:
             print(str(e))
             return False
 
+    def UpdateEmailStatus(self, login, status):
+        try:
+            self.__cur.execute("UPDATE user SET confirmed == ? WHERE ? = username", (status, login,))
+            self.__db.commit()
+            return True
+        except sq.Error as e:
+            print(str(e))
+            return False
+
+    def getEmailStatus(self, login):
+        try:
+            self.__cur.execute("SELECT confirmed FROM user WHERE ? = username", (login,))
+            res = self.__cur.fetchone()
+            return res
+        except sq.Error as e:
+            print(str(e))
+            return False
+
 if __name__ == "__main__":
     #from app import connect_db
     db = connect_db()
@@ -317,6 +335,7 @@ if __name__ == "__main__":
     #print(db.addData('admin', '111', 'admin@gmail.com'))
     #print(db.delMenu(0))
     #print(db.addMenu('Главная', 'start_page'))
-    print(connect_db().execute('ALTER TABLE profile ADD COLUMN "login" "text not null unique"'))
+    print(connect_db().execute('ALTER TABLE profile ADD COLUMN login text not null unique'))
     print(connect_db().execute('ALTER TABLE user DROP COLUMN status'))
     print(connect_db().execute('ALTER TABLE user ADD COLUMN status text'))
+    print(connect_db().execute("ALTER TABLE user ADD COLUMN confirmed text not null default 'unconfirmed'"))

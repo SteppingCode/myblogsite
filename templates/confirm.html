@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+{{ super() }}
+    <style>
+        h2 {
+            margin: 0;
+        }
+        .content-block {
+            padding: 25px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            width: 300px;
+        }
+        form input, button {
+            margin-top: 10px;
+        }
+        footer {
+            display: none;
+        }
+        .button {
+            text-align: center;
+            padding: 2px;
+            border-radius: 2px;
+            text-decoration: none;
+            color: black;
+            background: white;
+            width: 100px;
+            margin-top: 10px;
+        }
+    </style>
+    <div class="content-block">
+        <form action="{{ url_for('confirm_email', login=session['userlogged']) }}" method="post">
+            <h2>Confirm your email</h2>
+            <a class="button" href="{{ url_for('send_email', login=session['userlogged']) }}">Send</a>
+            <p>Please enter code here</p>
+            <input placeholder="Confirm code" type="text" name="code" pattern="[1-0]">
+            <button type="submit">Confirm</button>
+        </form>
+    </div>
+{% endblock %}

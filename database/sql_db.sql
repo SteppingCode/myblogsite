@@ -16,7 +16,8 @@ id integer primary key,
 username text not null unique,
 password text not null,
 email text not null unique,
-status text
+status text,
+confirmed text not null default 'unconfirmed'
 );
 
 create table if not exists profile (

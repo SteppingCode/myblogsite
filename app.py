@@ -1,8 +1,10 @@
 # taskkill /f /im python.exe
+import random
+
 from flask import render_template, Flask, request, redirect, url_for, session, g, abort, flash, Markup
 from config import Config
 from database.sqldb import FDataBase
-import git, os, sqlite3, math
+import git, os, sqlite3, math, smtplib
 from database.photos_db import Photo
 from werkzeug.utils import secure_filename
 
@@ -39,6 +41,15 @@ def get_db():
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+code = None
+
+def generate_code():
+    digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+    random.shuffle(digits)
+    digit = random.randint(1, 9)
+    code = int(''.join(digits)) * digit
+    return code
 
 #Server updating
 @app.route('/update_server', methods=['POST', 'GET'])
@@ -117,7 +128,7 @@ def register():
         if len(request.form['reg_username']) > 0 and len(request.form['reg_password']) > 0 and len(request.form['reg_email']) > 0:
             if request.form['reg_password'] == request.form['reg_password2']:
                 if len(request.form['reg_nick']) > 0:
-                    if database.addData(request.form["reg_username"], request.form["reg_password"], request.form['reg_email'],''):
+                    if database.addData(request.form["reg_username"], request.form["reg_password"], request.form['reg_email'],'', 'unconfirmed'):
                         session['userlogged'] = request.form['reg_username']
                         if 'file' not in request.files:
                             flash('Can not read the file', category='error')
@@ -126,8 +137,75 @@ def register():
                             filename = str(session['userlogged']) + '.png'
                             file.save(os.path.join(f'{app.root_path + "/static/avatars/" + filename}'))
                         if database.addProfile(request.form['reg_nick'], '', '', '', session['userlogged']):
-                            return redirect(url_for('start_page'))
+                            return redirect(url_for('confirm_email', login=session['userlogged']))
     return redirect(url_for('login'))
+
+@app.route('/send_email/<login>', methods=['POST', 'GET'])
+def send_email(login: str):
+    db = connect_db()
+    database = FDataBase(db)
+    if 'userlogged' not in session or login != session['userlogged']:
+        return redirect(url_for('start_page'))
+    smtpObj = smtplib.SMTP('smtp.gmail.com', 587)
+    smtpObj.starttls()
+    smtpObj.login('dodik337.github@gmail.com', 'nrgz ctgo ignr upwv')
+    email = database.getEmail(login)
+    global code
+    code = generate_code()
+    msg = f"""
+
+        From: Evgeniu Stepin
+        To: {login}
+        
+        Please confirm your register on website https://myblogweb.pythonanywhere.com/
+        
+        To confirm registration enter this code in special field
+
+
+        {code}
+
+
+        Best wishes,
+        Evgeniu Stepin
+        https://myblogweb.pythonanywhere.com/
+
+    """
+    smtpObj.sendmail("dodik337.github@gmail.com", email, msg)
+    return redirect(url_for('confirm_email', login=login))
+
+@app.route('/confirm_email/<login>', methods=['POST', 'GET'])
+def confirm_email(login: str):
+    db = connect_db()
+    database = FDataBase(db)
+    if 'userlogged' not in session:
+        return redirect(url_for('login'))
+    if request.method == 'POST':
+        if len(request.form['code']) == 0 or int(request.form['code']) != int(code):
+            return redirect(url_for('confirm_email', login=login))
+        smtpObj = smtplib.SMTP('smtp.gmail.com', 587)
+        smtpObj.starttls()
+        smtpObj.login('dodik337.github@gmail.com', 'nrgz ctgo ignr upwv')
+        database.UpdateEmailStatus(login, 'confirm')
+        email = database.getEmail(login)
+        msg = f"""
+            
+            From: Evgeniu Stepin
+            To: {login}
+            
+            
+            Thank you for registration on my website!
+            
+            I hope you have a great time!
+            
+            
+            Best wishes,
+            Evgeniu Stepin
+            https://myblogweb.pythonanywhere.com/
+            
+        """
+        smtpObj.sendmail("dodik337.github@gmail.com", email, msg)
+        return redirect(url_for('settings'))
+    return render_template('confirm.html', menu=database.getMenu(), title='Подтверждение почты')
 
 #Admin Page
 @app.route('/admin', methods=['POST', 'GET'])
@@ -188,7 +266,7 @@ def post():
     return redirect(url_for('start_page'))
 
 @app.route('/post/page/<int:page>/<int:last_id>')
-def post_page(page, last_id):
+def post_page(page: int, last_id: int):
     db = connect_db()
     database = FDataBase(db)
     MAX_PAGES = (database.getAllPostsId()[-1][0] - 1) // 3
@@ -225,42 +303,41 @@ def post_page(page, last_id):
 
 #Edit post
 @app.route('/editpost/<int:id_post>', methods=['POST', 'GET'])
-def post_edit(id_post):
+def post_edit(id_post: int):
     db = get_db()
     database = FDataBase(db)
-    if 'userlogged' in session:
-        filename = str(session['userlogged']) + '.png'
-        status = database.getStatus(session['userlogged'])[0]
-        nick = database.getProfile(session['userlogged'])[0]['nick']
-        if status == 'admin':
-            if request.method == 'POST':
-                if len(request.form['title']) > 3 and len(request.form['text']) > 10:
-                    res = database.PostUpdate(request.form['title'], request.form['text'], request.form['photo'], id_post)
-                    if not res:
-                        return redirect(url_for('post_edit', id_post=id_post))
-                    else:
-                        return redirect(url_for('start_page'))
-                else:
+    if 'userlogged' not in session:
+        return redirect(url_for('start_page'))
+    filename = str(session['userlogged']) + '.png'
+    status = database.getStatus(session['userlogged'])[0]
+    nick = database.getProfile(session['userlogged'])[0]['nick']
+    if status == 'admin':
+        if request.method == 'POST':
+            if len(request.form['title']) > 3 and len(request.form['text']) > 10:
+                res = database.PostUpdate(request.form['title'], request.form['text'], request.form['photo'], id_post)
+                if not res:
                     return redirect(url_for('post_edit', id_post=id_post))
-            for i in os.listdir(f'{app.root_path + "/static/avatars/"}'):
-                if filename in i:
-                    return render_template('post_edit.html', title='Редактировать статью', menu=database.getMenu(), post=database.getPost(id_post), ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'), status=status, nick=nick)
+                else:
+                    return redirect(url_for('start_page'))
             else:
-                return render_template('post_edit.html', title='Редактировать статью', menu=database.getMenu(), post=database.getPost(id_post), ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'), status=status, nick=nick)
-    return redirect(url_for('start_page'))
+                return redirect(url_for('post_edit', id_post=id_post))
+        for i in os.listdir(f'{app.root_path + "/static/avatars/"}'):
+            if filename in i:
+                return render_template('post_edit.html', title='Редактировать статью', menu=database.getMenu(), post=database.getPost(id_post), ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'), status=status, nick=nick)
+        else:
+            return render_template('post_edit.html', title='Редактировать статью', menu=database.getMenu(), post=database.getPost(id_post), ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'), status=status, nick=nick)
 
 #Quit
 @app.route('/quit', methods=['GET', 'POST'])
 def quit_login():
-    if 'userlogged' in session:
-        return redirect(url_for('start_page')), session.clear()
-    else:
+    if 'userlogged' not in session:
         return redirect(url_for('start_page'))
+    return redirect(url_for('start_page')), session.clear()
 
 
 #Deleting post
 @app.route('/delpost/<int:id_post>')
-def delpost_page(id_post):
+def delpost_page(id_post: int):
     db = get_db()
     database = FDataBase(db)
     ph = connect_photo()
@@ -268,23 +345,22 @@ def delpost_page(id_post):
     title = database.getPostAnnoce()
     aticle = database.getPostAnnoce()
     post_name = database.getPost(id_post)[0]
-    if 'userlogged' in session:
-        status = database.getStatus(session['userlogged'])[0]
-        nick = database.getProfile(session['userlogged'])[0]['nick']
-        if status == 'admin':
-            delpost = database.delPost(id_post)
-            delphoto = photobase.PhotoDelete(post_name)
-            if not title:
-                abort(404)
-            if delpost and delphoto:
-                return redirect(url_for('admin_page'))
-            return render_template('admin.html', title='title', menu=database.getMenu(), post=aticle, post_title=title, status=status)
-    else:
+    if 'userlogged' not in session:
         return redirect(url_for('start_page'))
+    status = database.getStatus(session['userlogged'])[0]
+    nick = database.getProfile(session['userlogged'])[0]['nick']
+    if status == 'admin':
+        delpost = database.delPost(id_post)
+        delphoto = photobase.PhotoDelete(post_name)
+        if not title:
+            abort(404)
+        if delpost and delphoto:
+            return redirect(url_for('admin_page'))
+        return render_template('admin.html', title='title', menu=database.getMenu(), post=aticle, post_title=title, status=status)
 
 #Post page
 @app.route('/posts/<int:id_post>', methods=['POST', 'GET'])
-def showPost(id_post):
+def showPost(id_post: int):
     db = get_db()
     database = FDataBase(db)
     ph = connect_photo()
@@ -292,39 +368,39 @@ def showPost(id_post):
     title, aticle = database.getPost(id_post)
     photo = photobase.getPhoto(title)
     comments = database.getComments(id_post)
-    if 'userlogged' in session:
-        filename = str(session['userlogged']) + '.png'
-        status = database.getStatus(session['userlogged'])[0]
-        nick = database.getProfile(session['userlogged'])[0]['nick']
+    if 'userlogged' not in session:
         if photo:
-            for i in os.listdir(f'{app.root_path + "/static/avatars/"}'):
-                if filename in i:
-                    return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), post_title=title, post_image=photo[2], comments=comments, posts=database.getPostAnnoce(), id_post=id_post, ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'), status=status, nick=nick)
-            else:
-                return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), post_title=title, post_image=photo[2], comments=comments, posts=database.getPostAnnoce(), id_post=id_post, ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'), status=status, nick=nick)
-        if comments:
-            if request.method == 'POST':
-                if len(request.form['text']) > 3:
-                    addcom = database.addComment(session['userlogged'], request.form['text'], id_post)
-                    if addcom:
-                        return redirect(url_for('showPost', id_post=id_post))
-                    for i in os.listdir('static/avatars/'):
-                        if filename in i:
-                            return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), post_title=title, comments=comments, posts=database.getPostAnnoce(), id_post=id_post, ava=open(f'static/avatars/{filename}', 'rb'), status=status, nick=nick)
-                    else:
-                        return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), post_title=title, comments=comments, posts=database.getPostAnnoce(), id_post=id_post, ava_empty=open(f'static/avatars/static.png', 'rb'), status=status, nick=nick)
-                return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), post_title=title, comments=comments, posts=database.getPostAnnoce(), id_post=id_post, status=status)
+            return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), post_title=title, post_image=photo[2], comments=comments, posts=database.getPostAnnoce(), id_post=id_post)
+        return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), post_title=title, posts=database.getPostAnnoce(), comments=comments, id_post=id_post)
+    filename = str(session['userlogged']) + '.png'
+    status = database.getStatus(session['userlogged'])[0]
+    nick = database.getProfile(session['userlogged'])[0]['nick']
+    if photo:
         for i in os.listdir(f'{app.root_path + "/static/avatars/"}'):
             if filename in i:
-                return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), post_title=title, comments=comments, posts=database.getPostAnnoce(), id_post=id_post, ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'), status=status, nick=nick)
+                return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), post_title=title, post_image=photo[2], comments=comments, posts=database.getPostAnnoce(), id_post=id_post, ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'), status=status, nick=nick)
         else:
-            return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), post_title=title, comments=comments, posts=database.getPostAnnoce(), id_post=id_post, ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'), status=status, nick=nick)
-    if photo:
-        return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), post_title=title, post_image=photo[2], comments=comments, posts=database.getPostAnnoce(), id_post=id_post)
-    return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), post_title=title, posts=database.getPostAnnoce(), comments=comments, id_post=id_post)
+            return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), post_title=title, post_image=photo[2], comments=comments, posts=database.getPostAnnoce(), id_post=id_post, ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'), status=status, nick=nick)
+    if comments:
+        if request.method == 'POST':
+            if len(request.form['text']) > 3:
+                addcom = database.addComment(session['userlogged'], request.form['text'], id_post)
+                if addcom:
+                    return redirect(url_for('showPost', id_post=id_post))
+                for i in os.listdir('static/avatars/'):
+                    if filename in i:
+                        return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), post_title=title, comments=comments, posts=database.getPostAnnoce(), id_post=id_post, ava=open(f'static/avatars/{filename}', 'rb'), status=status, nick=nick)
+                else:
+                    return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), post_title=title, comments=comments, posts=database.getPostAnnoce(), id_post=id_post, ava_empty=open(f'static/avatars/static.png', 'rb'), status=status, nick=nick)
+            return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), post_title=title, comments=comments, posts=database.getPostAnnoce(), id_post=id_post, status=status)
+    for i in os.listdir(f'{app.root_path + "/static/avatars/"}'):
+        if filename in i:
+            return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), post_title=title, comments=comments, posts=database.getPostAnnoce(), id_post=id_post, ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'), status=status, nick=nick)
+    else:
+        return render_template('aticle.html', title=title, menu=database.getMenu(), post=Markup(aticle), post_title=title, comments=comments, posts=database.getPostAnnoce(), id_post=id_post, ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'), status=status, nick=nick)
 
 @app.route('/display_image_by_name/<post_name>', methods=['POST', 'GET'])
-def display_image_by_name(post_name):
+def display_image_by_name(post_name: str):
     ph = connect_photo()
     photobase = Photo(ph)
     filename = photobase.getPhoto(post_name)[3]
@@ -332,7 +408,7 @@ def display_image_by_name(post_name):
 
 #Deleting comment
 @app.route('/delcom/<int:id_post>/<int:id_com>')
-def delcom_page(id_post, id_com):
+def delcom_page(id_post: int, id_com: int):
     db = get_db()
     database = FDataBase(db)
     if 'userlogged' in session:
@@ -348,7 +424,7 @@ def delcom_page(id_post, id_com):
 
 #Deleting to-do-list
 @app.route('/deltodo/<int:id_todo>/')
-def deltodo(id_todo):
+def deltodo(id_todo: int):
     db = get_db()
     database = FDataBase(db)
     if 'userlogged' in session:
@@ -367,28 +443,31 @@ def deltodo(id_todo):
 def settings():
     db = connect_db()
     database = FDataBase(db)
-    if 'userlogged' in session:
-        filename = str(session['userlogged']) + '.png'
-        status = database.getStatus(session['userlogged'])[0]
-        nick = database.getProfile(session['userlogged'])[0]['nick']
-        for i in os.listdir(f'{app.root_path + "/static/avatars/"}'):
-            if filename in i:
-                if database.getProfile(session['userlogged']):
-                    return render_template('settings.html', menu=database.getMenu(), title='Настройки', email=database.getEmail(session['userlogged'])[0], ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'), prof=database.getProfile(session['userlogged']), status=status, nick=nick)
-                return render_template('settings.html', menu=database.getMenu(), title='Настройки', email=database.getEmail(session['userlogged'])[0], ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'), status=status)
-        else:
+    if 'userlogged' not in session:
+        return redirect(url_for('start_page'))
+    filename = str(session['userlogged']) + '.png'
+    status = database.getStatus(session['userlogged'])[0]
+    nick = database.getProfile(session['userlogged'])[0]['nick']
+    email_status = database.getEmailStatus(session['userlogged'])[0]
+    for i in os.listdir(f'{app.root_path + "/static/avatars/"}'):
+        if filename in i:
             if database.getProfile(session['userlogged']):
-                return render_template('settings.html', menu=database.getMenu(), title='Настройки', email=database.getEmail(session['userlogged'])[0], ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'), prof=database.getProfile(session['userlogged']), status=status, nick=nick)
-            return render_template('settings.html', menu=database.getMenu(), title='Настройки', email=database.getEmail(session['userlogged'])[0], ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'), status=status)
-    return redirect(url_for('start_page'))
+                return render_template('settings.html', menu=database.getMenu(), title='Настройки', email=database.getEmail(session['userlogged'])[0], ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'), prof=database.getProfile(session['userlogged']), status=status, nick=nick, email_status=email_status)
+            return render_template('settings.html', menu=database.getMenu(), title='Настройки', email=database.getEmail(session['userlogged'])[0], ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'), status=status, email_status=email_status)
+    else:
+        if database.getProfile(session['userlogged']):
+            return render_template('settings.html', menu=database.getMenu(), title='Настройки', email=database.getEmail(session['userlogged'])[0], ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'), prof=database.getProfile(session['userlogged']), status=status, nick=nick, email_status=email_status)
+        return render_template('settings.html', menu=database.getMenu(), title='Настройки', email=database.getEmail(session['userlogged'])[0], ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'), status=status, email_status=email_status)
 
 @app.route('/prfoile', methods=['POST', 'GET'])
 def profile():
     db = connect_db()
     database = FDataBase(db)
-    if 'userlogged' in session:
-        if request.method == 'POST':
-            if database.getProfile(session['userlogged']):
+    if 'userlogged' not in session:
+        return redirect(url_for('start_page'))
+    if request.method == 'POST':
+        if database.getProfile(session['userlogged']):
+            if 0 < len(request.form['nick']) < 15:
                 if database.UpdateProfile(request.form['nick'], request.form['name'],  request.form['age'], request.form['about'], session['userlogged']):
                     flash('Profile has been updated', category='success')
                     return redirect(url_for('settings'))
@@ -396,80 +475,86 @@ def profile():
                     flash('This nickname is already exist', category='error')
                     return redirect(url_for('settings'))
             else:
+                flash('This nickname is incorrect', category='error')
+                return redirect(url_for('settings'))
+        else:
+            if 0 < len(request.form['nick_reg']) < 15:
                 if database.addProfile(request.form['nick_reg'], request.form['name_reg'],  request.form['age_reg'], request.form['about_reg'], session['userlogged']):
                     flash('Profile has been updated', category='success')
                     return redirect(url_for('settings'))
                 else:
                     flash('Error', category='error')
                     return redirect(url_for('settings'))
-        return redirect(url_for('settings'))
-    return redirect(url_for('start_page'))
+            else:
+                flash('This nickname is incorrect', category='error')
+                return redirect(url_for('settings'))
 
 @app.route('/password', methods=['POST', 'GET'])
 def password():
     db = connect_db()
     database = FDataBase(db)
-    if 'userlogged' in session:
-        if request.method == 'POST':
-            if len(request.form['cur_psw']) > 0 and len(request.form['psw']) > 0 and len(request.form['psw2']) > 0:
-                if database.getData(session['userlogged'], request.form['cur_psw']):
-                    if request.form['psw'] == request.form['psw2']:
-                        if database.UpdateUserPass(session['userlogged'], request.form['psw']):
-                            print('dsf')
-                            flash('Password was successfully changed', category='success')
-                            return redirect(url_for('settings'))
-                        else:
-                            flash('Error updating password in data base', category='error')
-                            return redirect(url_for('settings'))
+    if 'userlogged' not in session:
+        return redirect(url_for('start_page'))
+    if request.method == 'POST':
+        if len(request.form['cur_psw']) > 0 and len(request.form['psw']) > 0 and len(request.form['psw2']) > 0:
+            if database.getData(session['userlogged'], request.form['cur_psw']):
+                if request.form['psw'] == request.form['psw2']:
+                    if database.UpdateUserPass(session['userlogged'], request.form['psw']):
+                        print('dsf')
+                        flash('Password was successfully changed', category='success')
+                        return redirect(url_for('settings'))
                     else:
-                        flash('Passwords are not match', category='error')
+                        flash('Error updating password in data base', category='error')
                         return redirect(url_for('settings'))
                 else:
-                    flash('Incorrect password', category='error')
+                    flash('Passwords are not match', category='error')
                     return redirect(url_for('settings'))
             else:
-                flash('You did not write password', category='error')
+                flash('Incorrect password', category='error')
                 return redirect(url_for('settings'))
-    return redirect(url_for('start_page'))
+        else:
+            flash('You did not write password', category='error')
+            return redirect(url_for('settings'))
 
 @app.route('/email', methods=['POST', 'GET'])
 def email():
     db = connect_db()
     database = FDataBase(db)
-    if 'userlogged' in session:
-        if request.method == 'POST':
-            if len(request.form['email']) > 0:
-                if database.UpdateEmail(request.form['email'], session['userlogged']):
-                    flash('Email was successfully changed', category='success')
-                    return redirect(url_for('settings'))
-                else:
-                    flash('Error', category='error')
-                    return redirect(url_for('settings'))
-            return redirect(url_for('settings'))
-    return redirect(url_for('start_page'))
+    if 'userlogged' not in session:
+        return redirect(url_for('start_page'))
+    if request.method == 'POST':
+        if len(request.form['email']) > 0:
+            if database.UpdateEmail(request.form['email'], session['userlogged']):
+                database.UpdateEmailStatus(session['userlogged'], 'unconfirmed')
+                flash('Email was successfully changed', category='success')
+                return redirect(url_for('settings'))
+            else:
+                flash('Error', category='error')
+                return redirect(url_for('settings'))
+        return redirect(url_for('settings'))
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
-    if 'userlogged' in session:
-        if request.method == 'POST':
-            if 'file' not in request.files:
-                flash('Can not read the file', category='error')
-            file = request.files['file']
-            if file.filename == '':
-                flash('No choosen file', category='error')
-            if file and allowed_file(file.filename):
-                filename = str(session['userlogged']) + '.png'
-                file.save(os.path.join(f'{app.root_path + "/static/avatars/" + filename}'))
-        return redirect(url_for('settings'))
-    return redirect(url_for('start_page'))
+    if 'userlogged' not in session:
+        return redirect(url_for('start_page'))
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            flash('Can not read the file', category='error')
+        file = request.files['file']
+        if file.filename == '':
+            flash('No choosen file', category='error')
+        if file and allowed_file(file.filename):
+            filename = str(session['userlogged']) + '.png'
+            file.save(os.path.join(f'{app.root_path + "/static/avatars/" + filename}'))
+    return redirect(url_for('settings'))
 
 @app.route('/userava/<username>', methods=['POST', 'GET'])
-def userava(username):
+def userava(username: str):
     filename = str(username) + ".png"
     return redirect(url_for('static', filename='avatars/' + filename), code=301)
 
 @app.route('/userava/delete/<filename>')
-def userava_delete(filename):
+def userava_delete(filename: str):
     filename = str(session['userlogged']) + '.png'
     for i in os.listdir(f'{app.root_path + "/static/avatars/"}'):
         if filename in i:

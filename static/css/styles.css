@@ -185,8 +185,6 @@ footer a:hover {
     transition: .4s;
 }
 
-@media (max-width: 992px) {
-    ul.menu li {
-        font-size: 6px;
-    }
+.author {
+    align-self: center;
 }

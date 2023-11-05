@@ -68,9 +68,6 @@
         #login {
             cursor: not-allowed;
         }
-        #email:disabled {
-            cursor: not-allowed;
-        }
         .profile {
             display: flex;
             flex-direction: column;
@@ -82,6 +79,18 @@
             font-family: "Arial Black";
             text-align: center;
             font-size: 20px;
+        }
+        .button {
+            text-align: center;
+            padding: 2px;
+            border-radius: 2px;
+            text-decoration: none;
+            color: black;
+            background: white;
+            margin-bottom: 4px;
+        }
+        #btn_apply:disabled, #submit:disabled, #email:disabled {
+            cursor: not-allowed;
         }
     </style>
     <div class="content-block">
@@ -142,6 +151,11 @@
                 <div class="email_reg">
                     <h2 class="titles">Account email</h2>
                     <div class="email">
+                        {% if email_status == 'unconfirmed' %}
+                            <input disabled type="text" value="{{ email_status }}" style="text-transform: uppercase;">
+                            <a class="button" href="{{ url_for('confirm_email', login=session['userlogged']) }}">Confirm Email</a>
+                        {% else %}
+                        {% endif %}
                         <input name="email" id="email" value="{{ email }}" type="email" placeholder="Email" disabled>
                         <input id="btn_email" type="button" value="Change" onclick="document.getElementById('email').disabled=false; this.disabled=true; document.getElementById('btn_apply').style.display='block'; document.getElementById('btn_apply').disabled=false">
                         <input id="btn_apply" type="submit" value="Submit" disabled onclick="document.getElementById('email').disabled=false;">
