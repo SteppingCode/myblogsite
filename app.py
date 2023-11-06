@@ -319,35 +319,36 @@ def admin_page():
     db = get_db()
     database = FDataBase(db)
     if 'userlogged' not in session:
-        filename = str(session['userlogged']) + '.png'
-        status = database.getStatus(session['userlogged'])[0]
-        nick = database.getProfile(session['userlogged'])[0]['nick']
-        if status == 'admin':
-            if request.method == 'POST':
-                addtodo = database.addTODO(request.form['text'])
-                if addtodo:
-                    return redirect(url_for('admin_page'))
-                return redirect(url_for('admin_page'))
-            for i in os.listdir(f'{app.root_path + "/static/avatars/"}'):
-                if filename in i:
-                    return render_template('admin.html',
-                                           title='Admin Page',
-                                           menu=database.getMenu(),
-                                           posts=database.getAllposts(),
-                                           todo=database.getTODO(),
-                                           ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'),
-                                           status=status,
-                                           nick=nick)
-            else:
-                return render_template('admin.html',
-                                           title='Admin Page',
-                                           menu=database.getMenu(),
-                                           posts=database.getAllposts(),
-                                           todo=database.getTODO(),
-                                           ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'),
-                                           status=status,
-                                           nick=nick)
-    return redirect(url_for('start_page'))
+        return redirect(url_for('start_page'))
+    filename = str(session['userlogged']) + '.png'
+    status = database.getStatus(session['userlogged'])[0]
+    nick = database.getProfile(session['userlogged'])[0]['nick']
+    if status != 'admin':
+        return redirect(url_for('start_page'))
+    if request.method == 'POST':
+        addtodo = database.addTODO(request.form['text'])
+        if addtodo:
+            return redirect(url_for('admin_page'))
+        return redirect(url_for('admin_page'))
+    for i in os.listdir(f'{app.root_path + "/static/avatars/"}'):
+        if filename in i:
+            return render_template('admin.html',
+                                   title='Admin Page',
+                                   menu=database.getMenu(),
+                                   posts=database.getAllposts(),
+                                   todo=database.getTODO(),
+                                   ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'),
+                                   status=status,
+                                   nick=nick)
+    else:
+        return render_template('admin.html',
+                               title='Admin Page',
+                               menu=database.getMenu(),
+                               posts=database.getAllposts(),
+                               todo=database.getTODO(),
+                               ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'),
+                               status=status,
+                               nick=nick)
 
 # Creating post PAGE
 @app.route('/post', methods=['POST', 'GET'])
