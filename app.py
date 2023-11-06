@@ -218,6 +218,8 @@ def register():
         if len(request.form['reg_username']) > 0 and len(request.form['reg_password']) > 0 and len(request.form['reg_email']) > 0:
             if request.form['reg_password'] == request.form['reg_password2']:
                 if len(request.form['reg_nick']) > 0:
+                    if request.form['reg_username'] == 'static':
+                        return redirect(url_for('login'))
                     if database.addData(request.form["reg_username"], request.form["reg_password"], request.form['reg_email'],'', 'unconfirmed'):
                         session.permanent = True
                         session['userlogged'] = request.form['reg_username']
@@ -854,9 +856,14 @@ def email():
 def delete_account(login: str):
     db = connect_db()
     database = FDataBase(db)
+    filename = login + '.png'
     if 'userlogged' not in session or session['userlogged'] != login or not database.deleteAccount(login):
         return redirect(url_for('settings'))
-    return redirect(url_for('start_page')), session.clear()
+    for i in os.listdir(f'{app.root_path + "/static/avatars/"}'):
+        if filename in i:
+            os.remove(f'{app.root_path + "/static/avatars/" + filename}')
+    else:
+        return redirect(url_for('start_page')), session.clear()
 
 # Upload some file
 @app.route('/upload', methods=['GET', 'POST'])
@@ -891,7 +898,7 @@ def userava_delete(filename: str):
         flash("No avatar", category='error')
         return redirect(url_for('settings'))
 
-# Forget psw
+# Forget psw PAGE
 @app.route('/forget_psw/', methods=['POST', 'GET'])
 def forget_psw():
     db = connect_db()
@@ -934,7 +941,7 @@ def reset_code_send(login: str):
     send_email(email, 'Reset password', msg)
     return redirect(url_for('reset_password', login=login))
 
-# Reset password
+# Reset password PAGE
 @app.route('/reset_password/<login>', methods=['POST', 'GET'])
 def reset_password(login: str):
     db = connect_db()
