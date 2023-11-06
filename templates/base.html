@@ -8,6 +8,10 @@
         <title>{{title}}</title>
     {% endif %}
     <style>
+        body {
+            opacity: 0;
+            transition: .2s;
+        }
         ul.menu li {
             float: left;
             margin: 10px 40px 0px 50px;
@@ -35,10 +39,10 @@
 		     1px  1px 1px #000000;
         }
         ul.menu li .last{
-        float: right;
+            float: right;
         }
         ul.menu a:hover {
-        color:lightblue;
+            color:lightblue;
         }
         ul.menu a::after {
             content: "";
@@ -57,7 +61,7 @@
         }
     </style>
 </head>
-<body>
+<body id="body" onload="document.getElementById('body').style.opacity='1';">
 {% block content %}
     {%- block menu -%}
         <div class="burger" id="burger" onclick="document.getElementById('menu').style.left='0'; document.getElementById('burger').style.display='none';">
@@ -73,8 +77,8 @@
                     {% endfor -%}
                     {% if 'userlogged' in session %}
                         {% if status == 'admin' %}
-                            <li><a href="{{ url_for('post') }}">Добавить пост</a></li>
-                            <li><a href="{{ url_for('admin_page') }}">Админ</a></li>
+                            <li><a href="{{ url_for('post') }}">Add post</a></li>
+                            <li><a href="{{ url_for('admin_page') }}">Admin</a></li>
                         {% endif %}
                         <li>
                             <a href="{{ url_for('settings') }}">
@@ -93,9 +97,9 @@
                                 </div>
                             </a>
                         </li>
-                        <li><a href="{{ url_for('quit_login') }}">Выход</a></li>
+                        <li><a href="{{ url_for('quit_login') }}">Log out</a></li>
                     {% else %}
-                        <li><a href="{{ url_for('login') }}">Вход</a></li>
+                        <li><a href="{{ url_for('login') }}">Log in</a></li>
                     {% endif %}
                 </ul>
             </div>
@@ -103,7 +107,7 @@
     {% endblock menu -%}
 {% endblock %}
 <footer id="footer">
-    <div class="author">&copy; 2023 - 2024 <a href="https://github.com/dodik337">Степин Е.А.</a></div>
+    <div class="author">&copy; 2023 - 2024 <a href="https://github.com/dodik337">Stepin E.A.</a></div>
 </footer>
 </body>
 </html>

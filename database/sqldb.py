@@ -326,6 +326,16 @@ class FDataBase:
             print(str(e))
             return False
 
+    def deleteAccount(self, login):
+        try:
+            self.__cur.execute("DELETE FROM user WHERE ? = username", (login,))
+            self.__cur.execute("DELETE FROM profile WHERE ? = login", (login,))
+            self.__db.commit()
+            return True
+        except sq.Error as e:
+            print(str(e))
+            return False
+
 if __name__ == "__main__":
     # from app import connect_db
     db = connect_db()
@@ -334,7 +344,7 @@ if __name__ == "__main__":
     # print(db.delData(0))
     # print(db.addData('admin', '111', 'admin@gmail.com'))
     # print(db.delMenu(0))
-    # print(db.addMenu('Главная', 'start_page'))
+    # print(db.addMenu('Main', 'start_page'))
     # print(connect_db().execute('ALTER TABLE profile ADD COLUMN login text not null unique'))
     # print(connect_db().execute('ALTER TABLE user DROP COLUMN status'))
     # print(connect_db().execute('ALTER TABLE user ADD COLUMN status text'))

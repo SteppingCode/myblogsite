@@ -86,28 +86,18 @@
         footer{
             display: none;
         }
-
-        .send_email{
-            text-decoration: none;
-            color: #fff;
-        }
-        .send_email:hover{
-            text-decoration: underline;
-            color: royalblue;
-        }
     </style>
     <section>
         <div class="form-box">
             <div class="form-value">
-                <form action="{{ url_for('confirm_email', login=session['userlogged']) }}" method="post">
-                    <h2>Confirm your email</h2>
-                    <a class="send_email" href="{{ url_for('confirm_email_sending', login=session['userlogged']) }}">Send code</a>
+                <form action="{{ url_for('forget_psw') }}" method="post">
+                    <h2>Reset password</h2>
                     <div class="inputbox">
                         <ion-icon name="person-circle-outline"></ion-icon>
-                        <input id="input" placeholder="Please enter code here" type="text" name="code" pattern="[1-0]">
-                        <label for="input">Confirming code</label>
+                        <input placeholder="Login of account" type="text" name="login">
+                        <label></label>
                     </div>
-                    <button type="submit">Confirm</button>
+                    <button type="submit">Send message</button>
                 </form>
             </div>
         </div>

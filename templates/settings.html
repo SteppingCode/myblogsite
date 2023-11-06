@@ -92,6 +92,25 @@
         #btn_apply:disabled, #submit:disabled, #email:disabled {
             cursor: not-allowed;
         }
+        .delete {
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .delete:hover {
+            color: royalblue;
+        }
+        .delete_btns {
+            cursor: pointer;
+            text-decoration: none;
+            color: black;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .delete_btns:hover {
+            color: royalblue;
+            text-decoration: underline;
+        }
     </style>
     <div class="content-block">
         <div class="messages">
@@ -160,6 +179,13 @@
                         <input id="btn_email" type="button" value="Change" onclick="document.getElementById('email').disabled=false; this.disabled=true; document.getElementById('btn_apply').style.display='block'; document.getElementById('btn_apply').disabled=false">
                         <input id="btn_apply" type="submit" value="Submit" disabled onclick="document.getElementById('email').disabled=false;">
                     </div>
+                </div>
+                <div style="border: 1px black solid; border-radius: 20px; padding: 12px; position: absolute;">
+                    <div id="confirm_deleting" style="display: none;">
+                        <p>Are you sure about that?</p>
+                        <a class="delete_btns" href="{{ url_for('delete_account', login=session['userlogged']) }}">Yes</a> <a class="delete_btns" onclick="document.getElementById('confirm_deleting').style.display='none'; document.getElementById('delete').style.display='block';">No</a>
+                    </div>
+                    <a class="delete" id="delete" onclick="document.getElementById('confirm_deleting').style.display='inline-block'; document.getElementById('delete').style.display='none';">Delete account</a>
                 </div>
             </form>
         </div>
