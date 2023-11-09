@@ -372,7 +372,7 @@ def post():
                         flash('Нет выбранного файла')
                     if file and allowed_file(file.filename):
                         filename = secure_filename(file.filename)
-                        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                        file.save(os.path.join(app.root_path, UPLOAD_FOLDER, filename))
                         photobase.PhotoAdd(filename, request.form['name'], str(filename))
                     if not res:
                         return redirect(url_for('post'))
@@ -539,25 +539,16 @@ def delpost_page(id_post: int):
     database = FDataBase(db)
     ph = connect_photo()
     photobase = Photo(ph)
-    title = database.getPostAnnoce()
-    aticle = database.getPostAnnoce()
     post_name = database.getPost(id_post)[0]
     if 'userlogged' not in session:
         return redirect(url_for('start_page'))
     status = database.getStatus(session['userlogged'])[0]
-    nick = database.getProfile(session['userlogged'])[0]['nick']
     if status == 'admin':
         delpost = database.delPost(id_post)
         delphoto = photobase.PhotoDelete(post_name)
-        if not title:
-            abort(404)
         if delpost and delphoto:
             return redirect(url_for('admin_page'))
-        return render_template('admin.html',
-                                           menu=database.getMenu(),
-                                           post=aticle,
-                                           post_title=title,
-                                           status=status)
+        return redirect(url_for('admin_page'))
 
 # Post PAGE
 @app.route('/posts/<int:id_post>', methods=['POST', 'GET'])
@@ -721,7 +712,6 @@ def deltodo(id_todo: int):
             if deltodo:
                 return redirect(url_for('admin_page'))
             else:
-                flash('Error', category='error')
                 return redirect(url_for('admin_page'))
     else:
         return redirect(url_for('start_page'))
