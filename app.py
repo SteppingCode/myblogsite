@@ -27,6 +27,9 @@ app.permanent_session_lifetime = timedelta(days=365)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
 
+#APP PATH
+APP_PATH = app.root_path
+
 # Connecting main DataBase
 def connect_db():
     conn = sqlite3.connect(app.config['DATABASE'])

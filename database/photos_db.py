@@ -1,9 +1,7 @@
 import os.path
 import sqlite3 as sq
 from flask import Flask, g
-
-class Config():
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'privet _will day its okey'
+from config import Config
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -34,9 +32,9 @@ class Photo:
         self.__db = db
         self.__cur = db.cursor()
 
-    def PhotoAdd(self, photo_name, post_name, filename):
+    def PhotoAdd(self, photo_name: str, post_name: str, filename: str):
         try:
-            with open(f"static/photos/{photo_name}", 'rb') as photo:
+            with open(os.path.join(app.root_path,'../static/photos/',photo_name), 'rb') as photo:
                 self.__cur.execute('INSERT INTO photo VALUES(NULL, ?, ?, ?)', (photo.read(), post_name, filename))
                 self.__db.commit()
         except sq.Error as e:
