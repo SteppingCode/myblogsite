@@ -1,7 +1,11 @@
 import os.path
 import sqlite3 as sq
 from flask import Flask, g
-from config import Config
+
+import os
+
+class Config():
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'privet _will day its okey'
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -63,7 +67,7 @@ if __name__ == "__main__":
     #from app import connect_db
     db = connect_photo()
     db = Photo(db)
-    #create_db()
+    create_db()
     #print(db.PhotoAdd('favicon.png', 'ghfghfghfghfghfghf', 'favicon.png'))
 
 """def getLastPhotoName():
