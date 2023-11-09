@@ -7,7 +7,7 @@ from datetime import timedelta
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from flask import render_template, Flask, request, redirect, url_for, session, g, abort, flash, Markup
-from config import Config
+from config import Config, Data
 from database.sqldb import FDataBase
 from database.photos_db import Photo
 from werkzeug.utils import secure_filename
@@ -74,7 +74,7 @@ def webhook():
 def send_email(receiver_email: str, subject: str, body: str):
     # Creating object MIMEMultipart
     message = MIMEMultipart()
-    message["From"] = 'dodik337.github@gmail.com'
+    message["From"] = Data.SECRET_EMAIL
     message["To"] = receiver_email
     message["Subject"] = subject
 
@@ -84,8 +84,8 @@ def send_email(receiver_email: str, subject: str, body: str):
     # Message send
     smtpObj = smtplib.SMTP('smtp.gmail.com', 587)
     smtpObj.starttls()
-    smtpObj.login('dodik337.github@gmail.com', 'nrgz ctgo ignr upwv')
-    smtpObj.sendmail('dodik337.github@gmail.com', receiver_email, message.as_string())
+    smtpObj.login(Data.SECRET_EMAIL, Data.SECRET_PASSWORD)
+    smtpObj.sendmail(Data.SECRET_EMAIL, receiver_email, message.as_string())
 
 # Main PAGE
 @app.route('/', methods=['GET', 'POST'])
@@ -333,22 +333,22 @@ def admin_page():
     for i in os.listdir(f'{app.root_path + "/static/avatars/"}'):
         if filename in i:
             return render_template('admin.html',
-                                   title='Admin Page',
-                                   menu=database.getMenu(),
-                                   posts=database.getAllposts(),
-                                   todo=database.getTODO(),
-                                   ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'),
-                                   status=status,
-                                   nick=nick)
+                                           title='Admin Page',
+                                           menu=database.getMenu(),
+                                           posts=database.getAllposts(),
+                                           todo=database.getTODO(),
+                                           ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'),
+                                           status=status,
+                                           nick=nick)
     else:
         return render_template('admin.html',
-                               title='Admin Page',
-                               menu=database.getMenu(),
-                               posts=database.getAllposts(),
-                               todo=database.getTODO(),
-                               ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'),
-                               status=status,
-                               nick=nick)
+                                           title='Admin Page',
+                                           menu=database.getMenu(),
+                                           posts=database.getAllposts(),
+                                           todo=database.getTODO(),
+                                           ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'),
+                                           status=status,
+                                           nick=nick)
 
 # Creating post PAGE
 @app.route('/post', methods=['POST', 'GET'])
@@ -972,14 +972,14 @@ def reset_password(login: str):
             send_email(email, 'Password was changed', msg)
             return redirect(url_for('settings'))
         return render_template('reset_password.html',
-                               menu=database.getMenu(),
-                               title='Reset password',
-                               login=login)
+                                           menu=database.getMenu(),
+                                           title='Reset password',
+                                           login=login)
     return render_template('reset_password.html',
-                           menu=database.getMenu(),
-                           title='Reset password',
-                           login=login,
-                           email=email_fst)
+                                           menu=database.getMenu(),
+                                           title='Reset password',
+                                           login=login,
+                                           email=email_fst)
 
 # Website start
 if __name__ == "__main__":

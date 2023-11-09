@@ -2,3 +2,4 @@
 /.idea/
 /posts.db
 /photo.db
+/config.py
