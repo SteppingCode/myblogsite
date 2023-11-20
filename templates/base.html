@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-US">
 <head>
     <meta charset="UTF-8">
     <link type="text/css" href="{{url_for('static', filename='css/styles.css')}}" rel="stylesheet"/>
@@ -8,106 +8,329 @@
         <title>{{title}}</title>
     {% endif %}
     <style>
-        body {
-            opacity: 0;
-            transition: .2s;
+        * {
+            box-sizing: border-box;
         }
-        ul.menu li {
-            float: left;
-            margin: 10px 40px 0px 50px;
+        .search form {
             position: relative;
-            cursor: pointer;
-            font-family: Arial;
-	        font-size: 22px;
-	        font-weight: bold;
-	        text-shadow:
-		    -0   -1px 1px #000000,
-		     0   -1px 1px #000000,
-		    -0    1px 1px #000000,
-		     0    1px 1px #000000,
-		    -1px -0   1px #000000,
-		     1px -0   1px #000000,
-		    -1px  0   1px #000000,
-		     1px  0   1px #000000,
-		    -1px -1px 1px #000000,
-		     1px -1px 1px #000000,
-		    -1px  1px 1px #000000,
-		     1px  1px 1px #000000,
-		    -1px -1px 1px #000000,
-		     1px -1px 1px #000000,
-		    -1px  1px 1px #000000,
-		     1px  1px 1px #000000;
+            width: 100px;
+            margin: 0 auto;
+            height: 42px;
         }
-        ul.menu li .last{
-            float: right;
-        }
-        ul.menu a:hover {
-            color:lightblue;
-        }
-        ul.menu a::after {
-            content: "";
+
+        .search input {
+            height: 42px;
+            width: 0;
+            padding: 0 42px 0 15px;
+            border: none;
+            border-bottom: 2px solid transparent;
+            outline: none;
+            background: transparent;
+            transition: .6s cubic-bezier(0, 0.8, 0, 1);
             position: absolute;
-            bottom: -5px;
-            height: 2px;
-            width: 100%;
+            top: 0;
             left: 0;
-            background-color: skyblue;
-            transition: 0.3s;
-            transition-timing-function: ease-in-out;
-            transform: scaleX(0);
+            z-index: 2;
         }
-        ul.menu a:hover::after {
-            transform: scaleX(-1);
+        .search input:focus {
+            width: 175px;
+            z-index: 1;
+            background: #ccc;
+            border-bottom: 2px solid grey;
+        }
+        .search button {
+            background: #ccc;
+            border: none;
+            height: 42px;
+            width: 42px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: pointer;
+        }
+        .search button:before {
+            content: '⌕';
+            font-family: FontAwesome;
+            font-size: 30px;
+            color: grey;
+        }
+
+        @media (max-width: 999px) {
+            body {
+                max-width: 100%;
+            }
+
+            .menu {
+                height: auto;
+                right: 0;
+                left: 0;
+                margin-left: -40px;
+            }
+
+            .menu ul {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .menu .search form {
+                margin-left: 0;
+
+            }
+
+            .menu .search input {
+                width: auto;
+                z-index: 2;
+                opacity: 0;
+            }
+
+            .menu .search input:focus {
+                opacity: 1;
+            }
+
+            .menu .search button {
+                margin-left: 20px;
+                z-index: 1;
+            }
+
+            .menu ul li {
+                padding: 20px;
+                border: 1px black solid;
+                text-align: center;
+            }
+
+            .menu ul a img {
+                display: none;
+            }
+
+            .menu .dropdown-content {
+                width: 100%;
+                border: 1px black solid;
+                border-bottom-right-radius: 20px;
+                border-bottom-left-radius: 20px;
+            }
+
+            .menu .dropdown-content li {
+                border: none;
+            }
+
+            footer {
+                color: lightgrey;
+                font-size: 24px;
+                background: white;
+                border-top: 1px black solid;
+            }
+
+            .inner-footer .author {
+                display: flex;
+                justify-content: center;
+                padding-bottom: 60px;
+                color: rgba(0, 0, 0, .8);
+            }
+
+            .inner-footer .img {
+                height: 200px;
+            }
+
+            .inner-footer .img img {
+                width: 200px;
+                height: 200px;
+                position: absolute;
+                left: 50%;
+                transform: translate(-50%, 0);
+            }
+
+            .inner-footer a {
+                color: grey;
+                text-decoration: none;
+                transition: .4s ease;
+            }
+
+            .inner-footer a:hover {
+                color: royalblue;
+                text-decoration: underline;
+            }
+
+            .inner-footer .other_inner {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .inner-footer .other_inner .some_text a {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                border: 1px black solid;
+                text-align: center;
+                padding: 20px;
+            }
+
+            .inner-footer .other_inner .some_text a:hover {
+                background: royalblue;
+                color: white;
+            }
+
+            .inner-footer .other_stuff {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .inner-footer .other_stuff img {
+                width: 200px;
+                height: 200px;
+            }
+        }
+        @media (min-width: 1000px) {
+            footer {
+                padding-top: 50px;
+                color: lightgrey;
+                font-size: 24px;
+                background: white;
+                border-top: 1px black solid;
+            }
+
+            .inner-footer .other_inner {
+                margin-left: 120px;
+            }
+
+            .inner-footer a {
+                color: grey;
+                text-decoration: none;
+                transition: .4s ease;
+            }
+
+            .inner-footer .some_text {
+                display: flex;
+                margin-top: -100px;
+                margin-inline: 200px;
+                justify-content: space-around;
+                border-right: .5px black solid;
+            }
+
+            .inner-footer .other_stuff {
+                position: absolute;
+                right: 60px;
+                margin-top: -45px;
+            }
+
+            .inner-footer a:hover {
+                color: royalblue;
+                text-decoration: underline;
+            }
+
+            .inner-footer hr {
+                margin-top: 60px;
+            }
+
+            .inner-footer .author {
+                display: flex;
+                justify-content: center;
+                padding-bottom: 60px;
+                color: rgba(0, 0, 0, .8);
+            }
         }
     </style>
 </head>
-<body id="body" onload="document.getElementById('body').style.opacity='1';">
+<body>
 {% block content %}
     {%- block menu -%}
-        <div class="burger" id="burger" onclick="document.getElementById('menu').style.left='0'; document.getElementById('burger').style.display='none';">
-            <span id="span_1"></span>
-            <span id="span_2"></span>
-            <span id="span_3"></span>
-        </div>
-        <div class="menu" id="menu" onmouseleave="document.getElementById('menu').style.left='-500px'; document.getElementById('burger').style.display='block';">
-            <div class="list_menu">
-                <ul>
-                    {% for m in menu -%}
-                        <li><a href="{{url_for(m.url)}}"> {{m.title}}</a></li>
-                    {% endfor -%}
-                    {% if 'userlogged' in session %}
-                        {% if status == 'admin' %}
-                            <li><a href="{{ url_for('post') }}">Add post</a></li>
-                            <li><a href="{{ url_for('admin_page') }}">Admin</a></li>
-                        {% endif %}
-                        <li>
-                            <a href="{{ url_for('settings') }}">
-                                {% if ava_empty %}
-                                    <img style="border-radius: 50%;" src="{{ url_for('userava', username='static') }}" height="30" width="30">
-                                {% endif %}
-                                {% if ava %}
-                                    <img style="border-radius: 50%;" src="{{ url_for('userava', username=session['userlogged']) }}" height="30" width="30">
-                                {% endif %}
-                                <div style="margin-top: -40px; margin-left: 48px;">
-                                    {% if nick != '' %}
-                                        {{ nick }}
-                                    {% else %}
-                                        {{ session['userlogged'] }}
-                                    {% endif %}
-                                </div>
-                            </a>
-                        </li>
-                        <li><a href="{{ url_for('quit_login') }}">Log out</a></li>
-                    {% else %}
-                        <li><a href="{{ url_for('login') }}">Log in</a></li>
-                    {% endif %}
-                </ul>
-            </div>
+        <div class="menu">
+            <ul>
+                {% if 'userlogged' not in session %}
+                    <li class="search">
+                        <form action="{{ url_for('search') }}" method="post">
+                            <input name="search" type="text" placeholder="Search...">
+                            <button type="submit"></button>
+                        </form>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('post_page_fst') }}">Posts</a>
+                    </li>
+                    <a href="{{ url_for('start_page') }}"><img title="Main page" src="/static/img/favicon.ico" width="60" height="60"></a>
+                    <div class="dropdown">
+                        <li class="dropbtn" onmouseenter="document.getElementById('dropbtn').innerText='Drop Menu ▲';" onmouseleave="document.getElementById('dropbtn').innerText='Drop Menu ▼';"><a id="dropbtn">Drop Menu ▼</a></li>
+                        <div class="dropdown-content">
+                            {% for m in menu -%}
+                                <li>
+                                    <a href="{{url_for(m.url)}}"> {{m.title}}</a>
+                                </li>
+                                <li>
+                                    <a href="{{ url_for('settings') }}">Settings</a>
+                                </li>
+                            {% endfor -%}
+                        </div>
+                    </div>
+                    <li>
+                        <a href="{{ url_for('login') }}">Log in</a>
+                    </li>
+                {% else %}
+                    <li class="search">
+                        <form action="{{ url_for('search') }}" method="post">
+                            <input name="search" type="text" placeholder="Search...">
+                            <button type="submit"></button>
+                        </form>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('post_page_fst') }}">Posts</a>
+                    </li>
+                    <a href="{{ url_for('start_page') }}"><img title="Main page"  src="/static/img/favicon.ico" width="60" height="60"></a>
+                    <div class="dropdown">
+                        <li class="dropbtn" onmouseenter="document.getElementById('dropbtn').innerText='Drop Menu ▲';" onmouseleave="document.getElementById('dropbtn').innerText='Drop Menu ▼';"><a id="dropbtn">Drop Menu ▼</a></li>
+                        <div class="dropdown-content">
+                            {% for m in menu -%}
+                                <li>
+                                    <a href="{{url_for(m.url)}}"> {{m.title}}</a>
+                                </li>
+                            {% endfor -%}
+                            <li>
+                                <a href="{{ url_for('settings') }}">Settings</a>
+                            </li>
+                            {% if status == 'admin' %}
+                                <li>
+                                    <a href="{{ url_for('post') }}">Add post</a>
+                                </li>
+                                <li>
+                                    <a href="{{ url_for('admin_page') }}">Admin</a>
+                                </li>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <li>
+                        <a href="{{ url_for('quit_login') }}">Log out</a>
+                    </li>
+                {% endif %}
+            </ul>
         </div>
     {% endblock menu -%}
+    <div class="messages">
+        {% for cat, msg in get_flashed_messages(True) %}
+            <div class="flash {{cat}}"> {{msg}}</div>
+        {% endfor %}
+    </div>
 {% endblock %}
-<footer id="footer">
-    <div class="author">&copy; 2023 - 2024 <a href="https://github.com/dodik337">Stepin E.A.</a></div>
+<footer>
+    <div class="inner-footer">
+        <div class="other_inner">
+            <a class="img" href="{{ url_for('start_page') }}"><img title="Main page" src="/static/img/favicon.ico" width="150" height="150"></a>
+            <div class="some_text"><a href="{{ url_for('about') }}">About</a> <a href="https://vk.com/z.stepin">Partnerships</a> <a href="https://vk.com/z.stepin">Contact</a></div>
+            <div class="other_stuff">
+                <a href="https://vk.com/z.stepin"><img title="VK" src="/static/img/vk.png" width="60" height="60"></a>
+            </div>
+        </div>
+        <hr width="330px">
+        <div class="author">
+            <div>&copy; 2023 - 2024 <a href="https://vk.com/z.stepin">Stepin E.A.</a></div>
+        </div>
+    </div>
 </footer>
+
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+}
+</script>
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 </body>
 </html>

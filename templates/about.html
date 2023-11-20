@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+    {{ super() }}
+    <style>
+        .content-block .text p, .content-block .imgage .other_text p {
+            margin: 0;
+            line-height: 2em;
+            margin-inline: auto;
+            padding: 50px;
+            color: #ccc;
+        }
+
+        .content-block .text {
+            background: #161616;
+        }
+
+        .content-block .other_text {
+            margin-right: 0;
+        }
+
+        .content-block .imgage {
+            background-image: url("/static/img/author.png");
+        }
+
+        .author_span {
+            color: white;
+        }
+    </style>
+    <div class="content-block">
+        <!--<div class="imgage">
+            <div class="other_text">
+                <br><br>
+                <p>
+                    <span class="author_span">Евгений Степин</span>
+                </p>
+                <br><br>
+            </div>
+        </div>-->
+        <div class="text">
+            <br><br>
+            <p>
+                Добро пожаловать на мой сайт.
+                <br><br>
+                Здесь я делюсь своими мыслями, впечатлениями и тем, что происходит в моей жизни.
+                Вы можете прочитать о моих приключениях, увлечениях, интересных событиях и многом другом.
+                Я буду рад видеть ваши комментарии и оценки, так что не стесняйтесь делиться своим мнением.
+                Давайте создадим здесь уютное сообщество, где каждый найдет что-то интересное для себя.
+                <br><br>
+                Спасибо, что заглянули на мой сайт, вам здесь обязательно понравится!
+            </p>
+            <br><br>
+        </div>
+    </div>
+{% endblock %}

@@ -2,117 +2,130 @@
 {% block content %}
 {{ super() }}
     <style>
-        .post-title {
-            margin: 25px;
-            margin-left: 50px;
-            margin-right: 50px;
-            color: mediumpurple;
-            text-shadow: 2px 2px 20px rebeccapurple;
-            font-family: "Arial Black";
-            max-width: 100%;
-            overflow: auto;
+        * {
+            box-sizing: border-box;
         }
-        .post-title::-webkit-scrollbar {
-            width: 10px;
-            height: 8px;
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: #606060;
+            font-size: 14px;
         }
-        .post-title::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, .1);
+        .container {
+            max-width: 960px;
+            margin: 50px auto;
+            padding: 0 15px;
+            background: white;
         }
-        .post-title::-webkit-scrollbar-thumb {
-            box-shadow: inset 0 0 2px rgba(255, 255, 255, 0.6);
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 20px;
+        .post-image img {
+            width: 100%;
+            margin: 0 0 20px 0;
         }
-        .post-text {
-            max-width: 100%;
-            overflow: auto;
-            margin: 50px;
-            font-size: 16px;
-            font-family: "Arial Black";
-            color: #6161c9;
-            max-height: 100px;
-            margin-bottom: 10px;
-            margin-top: 10px;
+        .post h1 {
+            color: #222;
+            font-weight: 600;
+            margin-bottom: 30px;
         }
-        .post-text::-webkit-scrollbar {
-            width: 10px;
-            height: 8px;
-        }
-        .post-text::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, .1);
-        }
-        .post-text::-webkit-scrollbar-thumb {
-            box-shadow: inset 0 0 2px rgba(255, 255, 255, 0.6);
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 20px;
-        }
-        .post-text-noimg {
-            max-width: 100%;
-            overflow: auto;
-            margin: 50px;
-            font-size: 16px;
-            font-family: "Arial Black";
-            color: #6161c9;
-            max-height: 280px;
-        }
-        .post-image {
-            margin-left: 50px;
-            max-width: 350px;
-            max-height: 240px;
-        }
-        .comment-add {
-            margin-left: 50px;
-        }
-        .comments {
-            list-style-type: none;
-            margin-left: 50px;
-        }
-        .comment {
-            list-style-type: none;
-            width: 40%;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        .content-block {
+        .post-meta {
+            margin-bottom: 30px;
             display: flex;
-            min-height: 455.33333px;
+            flex-wrap: wrap;
         }
-        .post-info {
-            max-width: 100%;
+        time {
+            padding-right: 26px;
+            position: relative;
         }
-        .post-text a {
-            color: grey;
+        p {
+            line-height: 1.5;
+            margin-bottom: 1em;
+        }
+        @media (min-width: 768px) {
+            body {
+                font-size: 16px;
+            }
+            .container {
+                padding: 0 45px;
+            }
+            .post-image img {
+                float: right;
+                width: 300px;
+                margin: 0 0 20px 20px;
+            }
+            .post-header {
+                padding-left: 26px;
+                border-left: 4px solid #D8D8D8;
+                margin-left: -30px;
+            }
+        }
+        .post_text a {
             text-decoration: none;
+            color: grey;
         }
-        .post-text a:hover {
+        .post_text a:hover {
             text-decoration: underline;
             color: royalblue;
         }
-        .post-text-noimg a {
-            color: grey;
-            text-decoration: none;
+        .author-post {
+            animation: colorRotate 6s linear 0s infinite;
         }
-        .post-text-noimg a:hover {
-            text-decoration: underline;
-            color: royalblue;
-        }
-        .other {
-            max-width: 350px;
-            max-height: 240px;
+        @keyframes colorRotate {
+            from {
+                color: rgb(255, 0, 0);
+            }
+            16.6% {
+                color: rgb(255, 0, 255);
+            }
+            33.3% {
+                color: rgb(0, 0, 255);
+            }
+            50% {
+                color: rgb(0, 255, 255);
+            }
+            66.6% {
+                color: rgb(0, 255, 0);
+            }
+            83.3% {
+                color: rgb(255, 255, 0);
+            }
+            to {
+                color: rgb(255, 0, 0);
+            }
         }
     </style>
-    <div class="content-block">
-        <div class="post-info">
-            {% if post_image %}
-                <h1 class="post-title">{{ post_title }}</h1>
-                <p class="post-text">{{ post }}</p>
+    <div class="container">
+        <div class="post">
+            {% if photo %}
                 <div class="post-image">
-                    <img src="{{ url_for('display_image_by_name', post_name=post_title) }}" class="other">
+                    <img src="{{ url_for('display_image_by_name', post_name=post.title) }}">
+                </div>
+            {% endif %}
+            <div class="post-content">
+                <div class="post-header">
+                    <h1>{{ post.title }}</h1>
+                    <div class="post-meta">
+                        <time>{{ post.time }}</time>
+                        Author:<span class="author-post">admin</span>
+                    </div>
+                </div>
+                <p>{{ text }}</p>
+            </div>
+            {% if 'userlogged' in session %}
+                <form action="{{ url_for('comment_add', id_post=post.id) }}" method="post" enctype="multipart/form-data">
+                    <input name="comment_text" type="text" placeholder="Comment">
+                    <input type="submit" value="Sumbit">
+                </form>
+            {% endif %}
+            {% if comments %}
+                <div class="comments">
+                    {% for c in comments %}
+                        <p>{{ c.username }}</p>
+                        <p>{{ c.text }}</p>
+                        {% if status == 'admin' or session['userlogged'] == c.login %}
+                            <a href="{{ url_for('delcom', id_post=post.id, id_com=c.id) }}">Delete</a>
+                        {% endif %}
+                    {% endfor %}
                 </div>
             {% else %}
-                <h1 class="post-title">{{ post_title }}</h1>
-                <p class="post-text-noimg">{{ post }}</p>
+                <p>Тут пока ничего нет</p>
             {% endif %}
         </div>
     </div>

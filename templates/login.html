@@ -5,6 +5,87 @@
         footer {
             display: none;
         }
+        input[type="file"] {
+            display: none;
+        }
+        .custom-file-upload {
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            display: inline-block;
+            padding: 6px 12px;
+            background: #dcdcdc;
+            cursor: pointer;
+        }
+        .button-1 {
+            color: #232323;
+            background: transparent;
+            border: 1px solid #232323;
+            position: relative;
+            font-size: 14px;
+            letter-spacing: .3em;
+            font-family: 'Montserrat', sans-serif;
+            padding: 17px 34px 17px 39px;
+            transition: .2s ease-in-out;
+            cursor: pointer;
+            border-radius: 20px;
+        }
+        .button-1:before {
+            content: "";
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 20px;
+            z-index: -1;
+            transition: .25s ease;
+            transform: translate(0, 0);
+        }
+        .button-1:hover:before {
+            transform: translate(4px, 4px);
+        }
+        .inputbox {
+           position: relative;
+           margin-bottom: 40px;
+        }
+        .inputbox input {
+           display: block;
+           width: 100%;
+           padding: 0 10px;
+           line-height: 40px;
+           font-family: 'Roboto', sans-serif;
+           background: none;
+           border-width: 0;
+           border-bottom: 2px solid #4a90e2;
+           transition: all 0.2s ease;
+            color: #a8a8a8;
+            font-size: 16px;
+        }
+        .inputbox label {
+           position: absolute;
+           left: 13px;
+           color: #9d959d;
+           font-size: 20px;
+           font-weight: 300;
+           transform: translateY(-35px);
+           transition: all 0.2s ease;
+        }
+        .inputbox input:focus {
+            outline: 0;
+            border-color: #F77A52;
+            color: white;
+            font-size: 16px;
+        }
+        .inputbox input:focus+label, .inputbox input:valid+label {
+           transform: translateY(-60px);
+           margin-left: -14px;
+           font-size: 14px;
+           font-weight: 400;
+           outline: 0;
+           border-color: #F77A52;
+           color: whitesmoke;
+        }
     </style>
     <link type="text/css" rel="stylesheet" href="{{url_for('static', filename='css/login.css')}}">
     <section>
@@ -15,18 +96,18 @@
                         <h2>Login</h2>
                         <div class="inputbox">
                             <ion-icon name="person-circle-outline"></ion-icon>
-                            <input id="input1" type="text" name="username" pattern="[A-Za-z1-0 ]*">
-                            <label for="">Username or Email <span style="color: red">*</span></label>
+                            <input required autocomplete="off" id="input1" type="text" name="username" pattern="[A-Za-z1-0 ]*">
+                            <label for="input1">Login or Email <span style="color: red">*</span></label>
                         </div>
                         <div class="inputbox">
-                            <ion-icon name="lock-open-outline"></ion-icon>
-                            <input id="input2" type="password" name="password">
-                            <label for="">Password <span style="color: red">*</span></label>
+                            <ion-icon name="lock-closed-outline"></ion-icon>
+                            <input required autocomplete="off" id="input2" type="password" name="password">
+                            <label for="input2">Password <span style="color: red">*</span></label>
                         </div>
-                        <button type="submit">Log in</button>
+                        <button class="button-1" type="submit">Log in</button>
                         <div class="register">
                             <p><a href="{{ url_for('forget_psw') }}">Forget password</a></p>
-                            <p>Don't have a account. <a style="cursor: pointer" onclick="document.getElementById('register').style.display='block'; document.getElementById('login').style.display='none'; document.getElementById('input1').value=''; document.getElementById('input2').value=''; document.getElementById('form-box').style.height='550px';">Register</a></p>
+                            <p>Don't have an account. <a style="cursor: pointer" onclick="document.getElementById('register').style.display='block'; document.getElementById('login').style.display='none'; document.getElementById('input1').value=''; document.getElementById('input2').value=''; document.getElementById('form-box').style.height='550px';">Register</a></p>
                         </div>
                     </div>
                 </form>
@@ -35,39 +116,42 @@
                         <h2>Register</h2>
                         <div class="inputbox">
                             <ion-icon name="person-circle-outline"></ion-icon>
-                            <input id="input3" type="text" name="reg_username" pattern="[A-Za-z1-0 ]*">
-                            <label for="">Username <span style="color: red">*</span></label>
+                            <input required autocomplete="off" id="input3" type="text" name="reg_username" pattern="[A-Za-z1-0 ]*">
+                            <label for="input3">Login <span style="color: red">*</span></label>
                         </div>
                         <div class="inputbox">
                             <ion-icon name="mail-outline"></ion-icon>
-                            <input id="input4" type="email" name="reg_email" pattern="[A-Za-z1-0 ]*">
-                            <label for="">Email <span style="color: red">*</span></label>
+                            <input required autocomplete="off" id="input4" type="email" name="reg_email" pattern="[A-Za-z1-0 ]*">
+                            <label for="input4">Email <span style="color: red">*</span></label>
                         </div>
                         <div class="inputbox">
                             <ion-icon name="lock-closed-outline"></ion-icon>
-                            <input id="input5" type="password" name="reg_password">
-                            <label for="">Password <span style="color: red">*</span></label>
+                            <input required autocomplete="off" id="input5" type="password" name="reg_password">
+                            <label for="input5">Password <span style="color: red">*</span></label>
                         </div>
                         <div class="inputbox">
                             <ion-icon name="lock-closed"></ion-icon>
-                            <input id="input6" type="password" name="reg_password2">
-                            <label for="">Confirm Password <span style="color: red">*</span></label>
+                            <input required autocomplete="off" id="input6" type="password" name="reg_password2">
+                            <label for="input6">Confirm Password <span style="color: red">*</span></label>
                         </div>
-                        <button type="button" onclick="document.getElementById('register').style.display='none'; document.getElementById('final_register').style.display='flex'; document.getElementById('form-box').style.height='450px';">Create account</button>
+                        <button class="button-1" type="button" onclick="document.getElementById('register').style.display='none'; document.getElementById('final_register').style.display='flex'; document.getElementById('form-box').style.height='450px';">Create account</button>
                         <div class="register">
                             <p><a style="cursor: pointer" onclick="document.getElementById('register').style.display='none'; document.getElementById('login').style.display='block'; document.getElementById('input3').value=''; document.getElementById('input4').value=''; document.getElementById('input5').value=''; document.getElementById('input6').value=''; document.getElementById('form-box').style.height='450px';">I have an account</a></p>
                         </div>
                     </div>
                     <div style="display: none; flex-direction: column; justify-content: center; align-items: center;" id="final_register">
-                        <h2 style="font-size: 22px;">What nick do you want to use?</h2>
-                        <img style="border-radius: 50%;" src="{{ url_for('userava', username='static') }}" width="170px" height="170px">
-                        <input type="file" name="file">
-                        <div class="inputbox">
+                        <h2 style="font-size: 20px;">What nickname do you want to use?</h2>
+                        <img style="border-radius: 50%;" src="{{ url_for('userava', username='static') }}" width="150px" height="150px">
+                        <label class="custom-file-upload">
+                            <input type="file" name="file">
+                            <ion-icon name="cloud-upload"></ion-icon> Upload
+                        </label>
+                        <div style="margin-top: 25px;" class="inputbox">
                             <ion-icon name="person-circle-outline"></ion-icon>
-                            <input id="input3" type="text" name="reg_nick" pattern="[A-Za-z1-0 ]*">
-                            <label for="">Nick <span style="color: red">*</span></label>
+                            <input required autocomplete="off" id="input7" type="text" name="reg_nick" pattern="[A-Za-z1-0 ]*">
+                            <label for="input7">Nickname <span style="color: red">*</span></label>
                         </div>
-                        <button style="width: 310px;">Log in</button>
+                        <button class="button-1" style="width: 310px;">Log in</button>
                     </div>
                 </form>
             </div>

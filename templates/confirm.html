@@ -3,7 +3,7 @@
 {{ super() }}
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap');
-        section{
+        section {
             display: flex;
             justify-content: center;
             align-items: center;
@@ -16,62 +16,100 @@
         }
 
         .form-box{
-            position: relative;
+            display: flex;
+            /**border: 2px solid rgba(255,255,255,0.5);**/
+            border-radius: 20px;
+            justify-content: center;
+            align-items: center;
             width: 400px;
             height: 450px;
-            background: transparent;
-            border: 2px solid rgba(255,255,255,0.5);
-            border-radius: 20px;
-            backdrop-filter: blur(15px);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .form-box::before {
+            content: '';
+            position: absolute;
+            width: 700px;
+            height: 700px;
+            background-image: conic-gradient(transparent, transparent, white, white);
+            animation: rotate 2s linear infinite;
+        }
+
+        .form-box::after {
+            content: '';
+            position: absolute;
+            width: 700px;
+            height: 700px;
+            background-image: conic-gradient(transparent, transparent, mediumpurple, mediumpurple);
+            animation: rotate 2s linear infinite;
+            animation-delay: -1s;
+        }
+
+        .form-value {
             display: flex;
             justify-content: center;
             align-items: center;
+            position: absolute;
+            inset: 5px;
+            background: #161620;
+            z-index: 1;
+            border-radius: 20px;
         }
 
-        h2{
+        h2 {
             font-size: 2em;
             color: #fff;
             text-align: center;
         }
 
-        .inputbox{
-            position: relative;
-            margin: 30px 0;
-            width: 310px;
-            border-bottom: 2px solid #fff;
+        .inputbox {
+           position: relative;
+           margin-bottom: 40px;
         }
-
-        .inputbox label{
-            position: absolute;
-            left: 5px;
-            transform: translateY(-50%);
-            color: #fff;
-            font-size: 1em;
-            pointer-events: none;
-            transition: .5s;
-            top: -5px;
-        }
-
         .inputbox input {
-            width: 100%;
-            height: 50px;
-            background: transparent;
-            border: none;
-            outline: none;
-            font-size: 1em;
-            padding:0 35px 0 5px;
-            color: #fff;
+           display: block;
+           width: 100%;
+           padding: 0 10px;
+           line-height: 40px;
+           font-family: 'Roboto', sans-serif;
+           background: none;
+           border-width: 0;
+           border-bottom: 2px solid #4a90e2;
+           transition: all 0.2s ease;
+        }
+        .inputbox label {
+           position: absolute;
+           left: 13px;
+           color: #9d959d;
+           font-size: 20px;
+           font-weight: 300;
+           transform: translateY(-35px);
+           transition: all 0.2s ease;
+        }
+        .inputbox input:focus {
+           outline: 0;
+           border-color: #F77A52;
+        }
+        .inputbox input:focus+label, .inputbox input:valid+label {
+           transform: translateY(-60px);
+           margin-left: -14px;
+           font-size: 14px;
+           font-weight: 400;
+           outline: 0;
+           border-color: #F77A52;
+           color: #F77A52;
         }
 
         .inputbox ion-icon{
             position: absolute;
-            right: 8px;
+            right: -10px;
             color: #fff;
-            font-size: 1.2em;
-            top: 20px;
+            font-size: 1.4em;
+            top: 12px;
         }
 
-        button{
+        button {
             width: 100%;
             height: 40px;
             border-radius: 40px;
@@ -87,13 +125,43 @@
             display: none;
         }
 
-        .send_email{
-            text-decoration: none;
-            color: #fff;
+        @keyframes rotate {
+            from {
+                transform: rotate(0);
+            }
+            to {
+                transform: rotate(360deg);
+            }
         }
-        .send_email:hover{
-            text-decoration: underline;
-            color: royalblue;
+
+        .button-1 {
+            color: #232323;
+            background: transparent;
+            border: 1px solid #232323;
+            position: relative;
+            font-size: 14px;
+            letter-spacing: .3em;
+            font-family: 'Montserrat', sans-serif;
+            padding: 17px 34px 17px 39px;
+            transition: .2s ease-in-out;
+            cursor: pointer;
+            border-radius: 20px;
+        }
+        .button-1:before {
+            content: "";
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 20px;
+            z-index: -1;
+            transition: .25s ease;
+            transform: translate(0, 0);
+        }
+        .button-1:hover:before {
+            transform: translate(4px, 4px);
         }
     </style>
     <section>
@@ -101,14 +169,13 @@
             <div class="form-value">
                 <form action="{{ url_for('confirm_email', login=session['userlogged']) }}" method="post">
                     <h2>Confirm your email</h2>
-                    <a class="send_email" href="{{ url_for('confirm_email_sending', login=session['userlogged']) }}">Send code</a>
-                    <p style="width: 300px;">Notice: If you don't find the message, check folder 'Spam'</p>
+                    <p style="width: 300px; color: white">Notice: If you don't find the message, check folder 'Spam'</p>
                     <div class="inputbox">
                         <ion-icon name="person-circle-outline"></ion-icon>
-                        <input id="input" placeholder="Please enter code here" type="text" name="code" pattern="[1-0]">
+                        <input required autocomplete="off" id="input" type="text" name="code" pattern="[1-0]">
                         <label for="input">Confirming code</label>
                     </div>
-                    <button type="submit">Confirm</button>
+                    <button class="button-1" type="submit">Confirm</button>
                 </form>
             </div>
         </div>

@@ -1,11 +1,7 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% block content %}
-{{ super() }}
+    {{ super() }}
     <style>
-        body {
-            opacity: 0;
-            transition: .8s;
-        }
         *, *:after, *:before {
            box-sizing: border-box;
            padding: 0;
@@ -93,34 +89,20 @@
            border-left-color: #3C3D41;
            transform: translateX(100%);
         }
-        /**
-            <br><br>
-            <h2>Добро пожаловать на мой сайт.</h2>
-            <br><br>
-            <p>Здесь я делюсь своими мыслями, впечатлениями и тем, что происходит в моей жизни.</p>
-            <p>Вы можете прочитать о моих приключениях, увлечениях, интересных событиях и многом другом.</p>
-            <p>Я буду рад видеть ваши комментарии и оценки, так что не стесняйтесь делиться своим мнением.</p>
-            <p>Давайте создадим здесь уютное сообщество, где каждый найдет что-то интересное для себя.</p>
-            <br><br>
-            <p>Спасибо, что заглянули на мой сайт, вам здесь обязательно понравится!</p>
-            <br><br>
-        **/
     </style>
-    <body id="body" onload="document.getElementById('body').style.opacity='1';">
-        {% for p in posts %}
-            <div class="container">
-                <div class="posts-list">
-                    <article id="post-1" class="post">
-                        <div class="post-image"><img src="{{ url_for('display_image_by_name', post_name=p.title) }}"></div>
-                        <div class="post-content">
-                            <h2 class="post-title">{{ p.title }}</h2>
-                            <div class="post-footer">
-                                <a class="more-link" href="{{ url_for('showPost', id_post=p.id) }}">Продолжить чтение</a>
-                            </div>
+    {% for p in posts %}
+        <div class="container">
+            <div class="posts-list">
+                <article id="post-1" class="post">
+                    <div class="post-image"><img src="{{ url_for('display_image_by_name', post_name=p.title) }}"></div>
+                    <div class="post-content">
+                        <h2 class="post-title">{{ p.title }}</h2>
+                        <div class="post-footer">
+                            <a class="more-link" href="{{ url_for('showPost', id_post=p.id) }}">Продолжить чтение</a>
                         </div>
-                    </article>
-                </div>
+                    </div>
+                </article>
             </div>
-        {% endfor %}
-    </body>
+        </div>
+    {% endfor %}
 {% endblock %}

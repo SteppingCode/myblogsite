@@ -154,6 +154,27 @@ class FDataBase:
             return False
         return True
 
+    def getPost(self, post_id: int):
+        try:
+            self.__cur.execute("SELECT * FROM post WHERE ? == id", (post_id,))
+            res = self.__cur.fetchall()
+            if res: return res
+        except sq.Error as e:
+            print(str(e))
+            return False
+
+    def getPostList(self, posts_ids: list):
+        try:
+            posts = []
+            for i in range(len(posts_ids)):
+                self.__cur.execute("SELECT * FROM post WHERE ? == id", (posts_ids[i],))
+                res = self.__cur.fetchall()
+                posts.append(res)
+            return posts
+        except sq.Error as e:
+            print(str(e))
+            return False
+
     def getAllPostsId(self):
         try:
             self.__cur.execute(f"SELECT id time FROM post ORDER BY time")
@@ -161,47 +182,41 @@ class FDataBase:
             if res: return res
         except sq.Error as e:
             print("Ошибка получения статей из БД" + str(e))
+            return False
         return []
 
-    def getPostAnnoce(self):
+    def getAllPosts(self):
         try:
-            self.__cur.execute(f"SELECT id, title, text, time FROM post ORDER BY time LIMIT 1")
+            self.__cur.execute(f"SELECT id, title, text, time FROM post")
             res = self.__cur.fetchall()
             if res: return res
         except sq.Error as e:
             print("Ошибка получения статей из БД" + str(e))
+            return False
         return []
 
-    def getAllposts(self):
+    def getLastPosts(self):
         try:
-            self.__cur.execute(f"SELECT id, title, text, time FROM post ORDER BY time")
+            self.__cur.execute("SELECT id, title, text, time FROM post ORDER BY time LIMIT 3")
+            res = self.__cur.fetchall()
+            if res: return res
+        except sq.Error as e:
+            print(str(e))
+            return False
+        return []
+
+    def getPostAnnocePages(self, last_id: int):
+        try:
+            self.__cur.execute("SELECT id, title, text, time FROM post WHERE id > ? ORDER BY id ASC LIMIT 5", (last_id,))
             res = self.__cur.fetchall()
             if res: return res
         except sq.Error as e:
             print("Ошибка получения статей из БД" + str(e))
-        return []
+            return False
 
-    def getPostAnnocePages(self, last_id):
+    def addComment(self, username, text, id_post, login):
         try:
-            self.__cur.execute(f"SELECT id, title, text, time FROM post WHERE id > ? ORDER BY id ASC LIMIT 3", (last_id,))
-            res = self.__cur.fetchall()
-            if res: return res
-        except sq.Error as e:
-            print("Ошибка получения статей из БД" + str(e))
-        return []
-
-    def getPost(self, postid):
-        try:
-            self.__cur.execute(f"SELECT title, text FROM post WHERE id = {postid} LIMIT 1")
-            res = self.__cur.fetchone()
-            if res: return res
-        except sq.Error as e:
-            print("Ошибка получения статьи из БД" + str(e))
-        return (False, False)
-
-    def addComment(self, username, text, postid):
-        try:
-            self.__cur.execute("INSERT INTO comments VALUES (NULL, ?, ?, ?)", (username, text, postid))
+            self.__cur.execute("INSERT INTO comments VALUES (NULL, ?, ?, ?, ?)", (username, text, id_post, login,))
             self.__db.commit()
         except sq.Error as e:
             print(str(e))
@@ -220,9 +235,18 @@ class FDataBase:
             return False
         return True
 
-    def getComments(self, postid):
+    def getComment(self, id_com: int):
         try:
-            self.__cur.execute(f"SELECT * FROM comments WHERE postid == {postid}")
+            self.__cur.execute("SELECT * FROM comments WHERE ? == id", (id_com,))
+            res = self.__cur.fetchone()
+            if res: return res
+        except sq.Error as e:
+            print(str(e))
+            return False
+
+    def getComments(self, id_post: int):
+        try:
+            self.__cur.execute("SELECT * FROM comments WHERE ? == postid", (id_post,))
             res = self.__cur.fetchall()
             return res
         except sq.Error as e:
@@ -336,6 +360,32 @@ class FDataBase:
             print(str(e))
             return False
 
+    def SearchInPosts(self, text: str):
+        try:
+            searched = []
+            text = text.lower()
+            for i in range(0, len(self.getAllPosts())):
+                post = self.getAllPosts()[i]
+                ss = []
+                for i in text:
+                    if i not in ss:
+                        ss.append(i)
+                title: str = post['title']
+                title: str = title.lower()
+                for y in range(len(ss)):
+                    titles_count = title.count(''.join(ss[y]))
+                    if titles_count >= 1:
+                        searched.append(post['id'])
+            new_searched = []
+            for i in searched:
+                if i not in new_searched:
+                    new_searched.append(i)
+            posts = self.getPostList(new_searched)
+            return posts
+        except sq.Error as e:
+            print(str(e))
+            return False
+
 if __name__ == "__main__":
     # from app import connect_db
     db = connect_db()
@@ -345,7 +395,9 @@ if __name__ == "__main__":
     # print(db.addData('admin', '111', 'admin@gmail.com'))
     # print(db.delMenu(0))
     # print(db.addMenu('Main', 'start_page'))
+    print(db.addMenu('About', 'about'))
     # print(connect_db().execute('ALTER TABLE profile ADD COLUMN login text not null unique'))
     # print(connect_db().execute('ALTER TABLE user DROP COLUMN status'))
     # print(connect_db().execute('ALTER TABLE user ADD COLUMN status text'))
     # print(connect_db().execute("ALTER TABLE user ADD COLUMN confirmed text not null default 'unconfirmed'"))
+    print(connect_db().execute("ALTER TABLE comments ADD COLUMN login text not null default ''"))

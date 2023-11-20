@@ -1,8 +1,7 @@
-import os.path
+# Imports
+import os.path, os
 import sqlite3 as sq
-from flask import Flask, g
-
-import os
+from flask import Flask
 
 class Config():
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'privet _will day its okey'
@@ -11,17 +10,13 @@ app = Flask(__name__)
 app.config.from_object(Config)
 app.config.update(dict(PHOTOBASE=os.path.join(app.root_path,'../photo.db')))
 
+# Connecting DataBase
 def connect_photo():
     photo = sq.connect(app.config['PHOTOBASE'], check_same_thread=False)
     photo.row_factory = sq.Row
     return photo
 
-def get_db():
-    if not hasattr(g, 'link_db'):
-        g.link_db = connect_photo()
-        return g.link_db
-
-#Подключение базы данных
+# Creating DataBase
 def create_db():
     '''Вспомогательная функция для создания таблиц БД '''
     db = connect_photo()
@@ -64,15 +59,7 @@ class Photo:
             return False
 
 if __name__ == "__main__":
-    #from app import connect_db
     db = connect_photo()
     db = Photo(db)
     create_db()
-    #print(db.PhotoAdd('favicon.png', 'ghfghfghfghfghfghf', 'favicon.png'))
-
-"""def getLastPhotoName():
-    path = 'static/photos'
-    ss = []
-    for i in os.listdir(path):
-        ss.append(int(os.path.splitext(i)[0]))
-    return max(ss)"""
+    # print(db.PhotoAdd('favicon.png', 'ghfghfghfghfghfghf', 'favicon.png'))
