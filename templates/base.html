@@ -6,11 +6,18 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
     {% if title %}
         <title>{{title}}</title>
+    {% else %}
+        <title>My blog</title>
     {% endif %}
     <style>
         * {
             box-sizing: border-box;
         }
+
+        body {
+            background: white;
+        }
+
         .search form {
             position: relative;
             width: 100px;
