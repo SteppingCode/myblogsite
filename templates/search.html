@@ -87,6 +87,9 @@
            transform: translateX(100%);
         }
     </style>
+    <div style="margin: 0 auto; width: 100%; max-width: 960px; font-size: 20px; padding: 16px;">
+        <p>Search request "{{ text }}"</p>
+    </div>
     {% for p in posts %}
         <div class="container">
             <div class="posts-list">
@@ -95,7 +98,7 @@
                     <div class="post-content">
                         <h2 class="post-title">{{ p.title }}</h2>
                         <div class="post-footer">
-                            <a class="more-link" href="{{ url_for('showPost', id_post=p.id) }}">Продолжить чтение</a>
+                            <a class="more-link" href="{{ url_for('showPost', id_post=p.id) }}">Read</a>
                         </div>
                     </div>
                 </article>
