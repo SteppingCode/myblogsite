@@ -70,6 +70,7 @@
             .menu ul {
                 display: flex;
                 flex-direction: column;
+                padding-top: 0;
             }
 
             .menu .search form {
@@ -254,10 +255,10 @@
                                 <li>
                                     <a href="{{url_for(m.url)}}"> {{m.title}}</a>
                                 </li>
-                                <li>
-                                    <a href="{{ url_for('settings') }}">Settings</a>
-                                </li>
                             {% endfor -%}
+                            <li>
+                                <a href="{{ url_for('settings') }}">Settings</a>
+                            </li>
                         </div>
                     </div>
                     <li>
