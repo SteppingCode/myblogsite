@@ -1,16 +1,26 @@
 # taskkill /f /im python.exe
 
-# Imports
-import git, os, sqlite3, math, smtplib, random, secrets
-
 from datetime import timedelta
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from flask import render_template, Flask, request, redirect, url_for, session, g, abort, flash, Markup
-from config import Config, Data, generate_psw
-from database.sqldb import FDataBase
-from database.photos_db import Photo
+
+# Imports
+import os
+
+import database.sqldb
+
+os.environ["GIT_PYTHON_REFRESH"] = "quiet"
+import git
+import random
+import smtplib
+import sqlite3
+from flask import render_template, Flask, request, redirect, url_for, session, g, flash, Markup
 from werkzeug.utils import secure_filename
+
+from config import Config, Data, generate_psw
+from database.photos_db import Photo
+from database.sqldb import FDataBase
+from database import sqldb, photos_db
 
 # Upload folder
 UPLOAD_FOLDER = 'static/photos/'
@@ -27,7 +37,7 @@ app.permanent_session_lifetime = timedelta(days=365)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
 
-#APP PATH
+# APP PATH
 APP_PATH = app.root_path
 
 # Connecting main DataBase
@@ -36,11 +46,13 @@ def connect_db():
     conn.row_factory = sqlite3.Row
     return conn
 
+
 # Connecting DataBase for photos
 def connect_photo():
     photo = sqlite3.connect(app.config['PHOTOBASE'])
     photo.row_factory = sqlite3.Row
     return photo
+
 
 # Get data from DataBase
 def get_db():
@@ -48,11 +60,14 @@ def get_db():
         g.link_db = connect_db()
         return g.link_db
 
+
 def allowed_file(filename):
     return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-code = None
+
+code: None = None
+
 
 # Confirm code generator
 def generate_code():
@@ -61,6 +76,7 @@ def generate_code():
     digit = random.randint(1, 9)
     code = int(''.join(digits)) * digit
     return code
+
 
 # Server updating
 @app.route('/update_server', methods=['POST', 'GET'])
@@ -72,6 +88,7 @@ def webhook():
         return 'Сайт обновился', 200
     else:
         return 'Возникла ошибка', 400
+
 
 # Email send function
 def send_email(receiver_email: str, subject: str, body: str):
@@ -90,6 +107,7 @@ def send_email(receiver_email: str, subject: str, body: str):
     smtpObj.login(Data.SECRET_EMAIL, Data.SECRET_PASSWORD)
     smtpObj.sendmail(Data.SECRET_EMAIL, receiver_email, message.as_string())
 
+
 # Main PAGE
 @app.route('/', methods=['GET', 'POST'])
 def start_page():
@@ -99,29 +117,29 @@ def start_page():
     if posts != []:
         if 'userlogged' not in session:
             return render_template('index.html',
-                                           title="Main",
-                                           menu=database.getMenu(),
-                                           posts=posts)
+                                   title="Main",
+                                   menu=database.getMenu(),
+                                   posts=posts)
         filename = str(session['userlogged']) + '.png'
         status = database.getStatus(session['userlogged'])[0]
         nick = database.getProfile(session['userlogged'])[0]['nick']
         for i in os.listdir(f'{app.root_path + "/static/avatars/"}'):
             if filename in i:
                 return render_template('index.html',
-                                           title="Main",
-                                           menu=database.getMenu(),
-                                           ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'),
-                                           status=status,
-                                           nick=nick,
-                                           posts=posts)
+                                       title="Main",
+                                       menu=database.getMenu(),
+                                       ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'),
+                                       status=status,
+                                       nick=nick,
+                                       posts=posts)
         else:
             return render_template('index.html',
-                                           title="Main",
-                                           menu=database.getMenu(),
-                                           ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'),
-                                           status=status,
-                                           nick=nick,
-                                           posts=posts)
+                                   title="Main",
+                                   menu=database.getMenu(),
+                                   ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'),
+                                   status=status,
+                                   nick=nick,
+                                   posts=posts)
     if 'userlogged' not in session:
         return render_template('index.html',
                                title="Main",
@@ -145,6 +163,7 @@ def start_page():
                                status=status,
                                nick=nick)
 
+
 @app.route('/search', methods=['POST', 'GET'])
 def search():
     db = connect_db()
@@ -161,10 +180,10 @@ def search():
                 if 'userlogged' not in session:
                     flash(f'Searched about {len(posts)} posts', category='success')
                     return render_template('search.html',
-                                       menu=database.getMenu(),
-                                       title='Search',
-                                       posts=posts,
-                                       text=text)
+                                           menu=database.getMenu(),
+                                           title='Search',
+                                           posts=posts,
+                                           text=text)
                 status = database.getStatus(session['userlogged'])[0]
                 nick = database.getProfile(session['userlogged'])[0]['nick']
                 flash(f'Searched about {len(posts)} posts', category='success')
@@ -182,21 +201,23 @@ def search():
             return redirect(url_for('start_page'))
         return redirect(url_for('start_page'))
 
+
 @app.route('/about', methods=['POST', 'GET'])
 def about():
     db = connect_db()
     database = FDataBase(db)
     if 'userlogged' not in session:
         return render_template('about.html',
-                                           title='About',
-                                           menu=database.getMenu())
+                               title='About',
+                               menu=database.getMenu())
     status = database.getStatus(session['userlogged'])[0]
     nick = database.getProfile(session['userlogged'])[0]['nick']
     return render_template('about.html',
-                                           title='About',
-                                           menu=database.getMenu(),
-                                           nick=nick,
-                                           status=status)
+                           title='About',
+                           menu=database.getMenu(),
+                           nick=nick,
+                           status=status)
+
 
 # Login PAGE
 @app.route('/login', methods=['POST', 'GET'])
@@ -216,8 +237,9 @@ def login():
         else:
             flash('Fill the gaps', category='error')
     return render_template('login.html',
-                                           title="Log in",
-                                           menu=database.getMenu())
+                           title="Log in",
+                           menu=database.getMenu())
+
 
 # Register
 @app.route('/register', methods=['POST', 'GET'])
@@ -227,14 +249,16 @@ def register():
     if 'userlogged' in session:
         return redirect(url_for('start_page'))
     if request.method == 'POST':
-        if len(request.form['reg_username']) > 0 and len(request.form['reg_password']) > 0 and len(request.form['reg_email']) > 0:
+        if len(request.form['reg_username']) > 0 and len(request.form['reg_password']) > 0 and len(
+                request.form['reg_email']) > 0:
             if request.form['reg_password'] == request.form['reg_password2']:
                 if 0 < len(request.form['reg_nick']) < 15:
                     if request.form['reg_username'] == 'static':
                         flash('Please, choose another login', category='error')
                         return redirect(url_for('login'))
                     if database.addProfile(request.form['reg_nick'], '', '', '', request.form['reg_username']):
-                        if database.addData(request.form["reg_username"], request.form["reg_password"], request.form['reg_email'],'', 'unconfirmed'):
+                        if database.addData(request.form["reg_username"], request.form["reg_password"],
+                                            request.form['reg_email'], '', 'unconfirmed'):
                             session.permanent = True
                             session['userlogged'] = request.form['reg_username']
                             if 'file' not in request.files:
@@ -256,6 +280,7 @@ def register():
         else:
             flash('Fill the gaps', category='error')
     return redirect(url_for('login'))
+
 
 # Sending message to user
 @app.route('/send_email/<login>', methods=['POST', 'GET'])
@@ -288,6 +313,7 @@ def confirm_email_sending(login: str):
     send_email(email, 'Confirm Email', msg)
     flash(f'Message was sent to this email {email}', category='success')
     return redirect(url_for('confirm_email', login=login))
+
 
 # Confirm email PAGE
 @app.route('/confirm_email/<login>', methods=['POST', 'GET'])
@@ -326,18 +352,19 @@ def confirm_email(login: str):
     for i in os.listdir(f'{app.root_path + "/static/avatars/"}'):
         if filename in i:
             return render_template('confirm.html',
-                                           title='Confirm Email',
-                                           menu=database.getMenu(),
-                                           ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'),
-                                           status=status,
-                                           nick=nick)
+                                   title='Confirm Email',
+                                   menu=database.getMenu(),
+                                   ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'),
+                                   status=status,
+                                   nick=nick)
     else:
         return render_template('confirm.html',
-                                           title='Confirm Email',
-                                           menu=database.getMenu(),
-                                           ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'),
-                                           status=status,
-                                           nick=nick)
+                               title='Confirm Email',
+                               menu=database.getMenu(),
+                               ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'),
+                               status=status,
+                               nick=nick)
+
 
 # Admin PAGE
 @app.route('/admin', methods=['POST', 'GET'])
@@ -359,22 +386,23 @@ def admin_page():
     for i in os.listdir(f'{app.root_path + "/static/avatars/"}'):
         if filename in i:
             return render_template('admin.html',
-                                           title='Admin Page',
-                                           menu=database.getMenu(),
-                                           posts=database.getAllPosts(),
-                                           todo=database.getTODO(),
-                                           ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'),
-                                           status=status,
-                                           nick=nick)
+                                   title='Admin Page',
+                                   menu=database.getMenu(),
+                                   posts=database.getAllPosts(),
+                                   todo=database.getTODO(),
+                                   ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'),
+                                   status=status,
+                                   nick=nick)
     else:
         return render_template('admin.html',
-                                           title='Admin Page',
-                                           menu=database.getMenu(),
-                                           posts=database.getAllPosts(),
-                                           todo=database.getTODO(),
-                                           ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'),
-                                           status=status,
-                                           nick=nick)
+                               title='Admin Page',
+                               menu=database.getMenu(),
+                               posts=database.getAllPosts(),
+                               todo=database.getTODO(),
+                               ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'),
+                               status=status,
+                               nick=nick)
+
 
 # Creating post PAGE
 @app.route('/post', methods=['POST', 'GET'])
@@ -420,12 +448,13 @@ def post():
                                            nick=nick)
             else:
                 return render_template('post.html',
-                                           title='Add post',
-                                           menu=database.getMenu(),
-                                           ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'),
-                                           status=status,
-                                           nick=nick)
+                                       title='Add post',
+                                       menu=database.getMenu(),
+                                       ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'),
+                                       status=status,
+                                       nick=nick)
     return redirect(url_for('start_page'))
+
 
 # Posts PAGES
 @app.route('/post/page', methods=['POST', 'GET'])
@@ -440,73 +469,74 @@ def post_page_fst():
         if MAX_PAGES != []:
             if MAX_PAGES[-1][0] <= 5:
                 return render_template('posts.html',
-                                               menu=database.getMenu(),
-                                               title='Page 0',
-                                               last_id=last_id,
-                                               posts=posts,
-                                               MAX_PAGES=0,
-                                               page=page)
+                                       menu=database.getMenu(),
+                                       title='Page 0',
+                                       last_id=last_id,
+                                       posts=posts,
+                                       MAX_PAGES=0,
+                                       page=page)
             if ((database.getAllPostsId()[-1][0] / 5) - database.getAllPostsId()[-1][0] // 5) != 0:
                 MAX_PAGES = (database.getAllPostsId()[-1][0] // 5) + 1
                 return render_template('posts.html',
-                                               menu=database.getMenu(),
-                                               title='Page 0',
-                                               last_id=last_id,
-                                               posts=posts,
-                                               MAX_PAGES=MAX_PAGES,
-                                               page=page)
+                                       menu=database.getMenu(),
+                                       title='Page 0',
+                                       last_id=last_id,
+                                       posts=posts,
+                                       MAX_PAGES=MAX_PAGES,
+                                       page=page)
             else:
                 return render_template('posts.html',
-                                               menu=database.getMenu(),
-                                               title='Page 0',
-                                               last_id=last_id,
-                                               posts=posts,
-                                               MAX_PAGES=MAX_PAGES,
-                                               page=page)
+                                       menu=database.getMenu(),
+                                       title='Page 0',
+                                       last_id=last_id,
+                                       posts=posts,
+                                       MAX_PAGES=MAX_PAGES,
+                                       page=page)
         return render_template('posts.html',
-                                               menu=database.getMenu(),
-                                               title='Page 0',
-                                               last_id=last_id,
-                                               posts=posts,
-                                               MAX_PAGES=0,
-                                               page=page)
+                               menu=database.getMenu(),
+                               title='Page 0',
+                               last_id=last_id,
+                               posts=posts,
+                               MAX_PAGES=0,
+                               page=page)
     status = database.getStatus(session['userlogged'])[0]
     if MAX_PAGES != []:
         if MAX_PAGES[-1][0] <= 5:
             return render_template('posts.html',
-                                               menu=database.getMenu(),
-                                               title='Page 0',
-                                               last_id=last_id,
-                                               posts=posts,
-                                               MAX_PAGES=0,
-                                               page=page,
-                                               status=status)
+                                   menu=database.getMenu(),
+                                   title='Page 0',
+                                   last_id=last_id,
+                                   posts=posts,
+                                   MAX_PAGES=0,
+                                   page=page,
+                                   status=status)
         if ((database.getAllPostsId()[-1][0] / 5) - database.getAllPostsId()[-1][0] // 5) != 0:
             MAX_PAGES = (database.getAllPostsId()[-1][0] // 5) + 1
             return render_template('posts.html',
-                                               menu=database.getMenu(),
-                                               title='Page 0',
-                                               last_id=last_id,
-                                               posts=posts,
-                                               MAX_PAGES=MAX_PAGES,
-                                               page=page,
-                                               status=status)
+                                   menu=database.getMenu(),
+                                   title='Page 0',
+                                   last_id=last_id,
+                                   posts=posts,
+                                   MAX_PAGES=MAX_PAGES,
+                                   page=page,
+                                   status=status)
         else:
             return render_template('posts.html',
-                                               menu=database.getMenu(),
-                                               title='Page 0',
-                                               last_id=last_id,
-                                               posts=posts,
-                                               MAX_PAGES=MAX_PAGES,
-                                               page=page,
-                                               status=status)
+                                   menu=database.getMenu(),
+                                   title='Page 0',
+                                   last_id=last_id,
+                                   posts=posts,
+                                   MAX_PAGES=MAX_PAGES,
+                                   page=page,
+                                   status=status)
     return render_template('posts.html',
-                                               menu=database.getMenu(),
-                                               title='Page 0',
-                                               last_id=last_id,
-                                               MAX_PAGES=0,
-                                               page=page,
-                                               status=status)
+                           menu=database.getMenu(),
+                           title='Page 0',
+                           last_id=last_id,
+                           MAX_PAGES=0,
+                           page=page,
+                           status=status)
+
 
 # Posts PAGES
 @app.route('/post/page/<int:page>/<int:last_id>', methods=['POST', 'GET'])
@@ -541,22 +571,22 @@ def post_page(page: int, last_id: int):
                                                nick=nick)
                 else:
                     return render_template('post_page.html',
-                                               title=f'Page {page}',
-                                               menu=database.getMenu(),
-                                               posts=database.getPostAnnocePages(last_id),
-                                               page=page,
-                                               last_id=last_id,
-                                               MAX_PAGES=MAX_PAGES,
-                                               ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'),
-                                               status=status,
-                                               nick=nick)
+                                           title=f'Page {page}',
+                                           menu=database.getMenu(),
+                                           posts=database.getPostAnnocePages(last_id),
+                                           page=page,
+                                           last_id=last_id,
+                                           MAX_PAGES=MAX_PAGES,
+                                           ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'),
+                                           status=status,
+                                           nick=nick)
             return render_template('post_page.html',
-                                               title=f'Page {page}',
-                                               menu=database.getMenu(),
-                                               posts=database.getPostAnnocePages(last_id),
-                                               page=page,
-                                               last_id=last_id,
-                                               MAX_PAGES=MAX_PAGES)
+                                   title=f'Page {page}',
+                                   menu=database.getMenu(),
+                                   posts=database.getPostAnnocePages(last_id),
+                                   page=page,
+                                   last_id=last_id,
+                                   MAX_PAGES=MAX_PAGES)
         else:
             MAX_PAGES = (database.getAllPostsId()[-1][0] - 5) // 5
             if page > MAX_PAGES or last_id > database.getAllPostsId()[-1][0]:
@@ -579,23 +609,24 @@ def post_page(page: int, last_id: int):
                                                nick=nick)
                 else:
                     return render_template('post_page.html',
-                                               title=f'Page {page}',
-                                               menu=database.getMenu(),
-                                               posts=database.getPostAnnocePages(last_id),
-                                               page=page,
-                                               last_id=last_id,
-                                               MAX_PAGES=MAX_PAGES,
-                                               ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'),
-                                               status=status,
-                                               nick=nick)
+                                           title=f'Page {page}',
+                                           menu=database.getMenu(),
+                                           posts=database.getPostAnnocePages(last_id),
+                                           page=page,
+                                           last_id=last_id,
+                                           MAX_PAGES=MAX_PAGES,
+                                           ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'),
+                                           status=status,
+                                           nick=nick)
             return render_template('post_page.html',
-                                               title=f'Page {page}',
-                                               menu=database.getMenu(),
-                                               posts=database.getPostAnnocePages(last_id),
-                                               page=page,
-                                               last_id=last_id,
-                                               MAX_PAGES=MAX_PAGES)
+                                   title=f'Page {page}',
+                                   menu=database.getMenu(),
+                                   posts=database.getPostAnnocePages(last_id),
+                                   page=page,
+                                   last_id=last_id,
+                                   MAX_PAGES=MAX_PAGES)
     return redirect(url_for('post_page_fst'))
+
 
 # Edit post PAGE
 @app.route('/editpost/<int:id_post>', methods=['POST', 'GET'])
@@ -620,20 +651,21 @@ def post_edit(id_post: int):
         for i in os.listdir(f'{app.root_path + "/static/avatars/"}'):
             if filename in i:
                 return render_template('post_edit.html',
-                                           title='Edit post',
-                                           menu=database.getMenu(),
-                                           post=database.getPost(id_post),
-                                           ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'),
-                                           status=status,
-                                           nick=nick)
+                                       title='Edit post',
+                                       menu=database.getMenu(),
+                                       post=database.getPost(id_post),
+                                       ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'),
+                                       status=status,
+                                       nick=nick)
         else:
             return render_template('post_edit.html',
-                                           title='Edit post',
-                                           menu=database.getMenu(),
-                                           post=database.getPost(id_post),
-                                           ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'),
-                                           status=status,
-                                           nick=nick)
+                                   title='Edit post',
+                                   menu=database.getMenu(),
+                                   post=database.getPost(id_post),
+                                   ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'),
+                                   status=status,
+                                   nick=nick)
+
 
 # Quit
 @app.route('/quit', methods=['GET', 'POST'])
@@ -661,6 +693,7 @@ def delpost_page(id_post: int):
             return redirect(url_for('admin_page'))
         return redirect(url_for('admin_page'))
 
+
 # Post PAGE
 @app.route('/posts/<int:id_post>', methods=['POST', 'GET'])
 def showPost(id_post: int):
@@ -675,49 +708,50 @@ def showPost(id_post: int):
     if 'userlogged' not in session:
         if photo:
             return render_template('aticle.html',
-                                           menu=database.getMenu(),
-                                           title=post['title'],
-                                           post=post,
-                                           text=text,
-                                           photo=photo)
+                                   menu=database.getMenu(),
+                                   title=post['title'],
+                                   post=post,
+                                   text=text,
+                                   photo=photo)
         if comments:
             return render_template('aticle.html',
-                                           menu=database.getMenu(),
-                                           title=post['title'],
-                                           post=post,
-                                           text=text,
-                                           comments=comments)
+                                   menu=database.getMenu(),
+                                   title=post['title'],
+                                   post=post,
+                                   text=text,
+                                   comments=comments)
         return render_template('aticle.html',
-                                           menu=database.getMenu(),
-                                           title=post['title'],
-                                           post=post,
-                                           text=text)
+                               menu=database.getMenu(),
+                               title=post['title'],
+                               post=post,
+                               text=text)
     filename = str(session['userlogged']) + '.png'
     status = database.getStatus(session['userlogged'])[0]
     nick = database.getProfile(session['userlogged'])[0]['nick']
     for i in os.listdir(f'{app.root_path + "/static/avatars/"}'):
         if filename in i:
             return render_template('aticle.html',
-                                           menu=database.getMenu(),
-                                           title=post['title'],
-                                           post=post,
-                                           text=text,
-                                           photo=photo,
-                                           comments=comments,
-                                           ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'),
-                                           status=status,
-                                           nick=nick)
+                                   menu=database.getMenu(),
+                                   title=post['title'],
+                                   post=post,
+                                   text=text,
+                                   photo=photo,
+                                   comments=comments,
+                                   ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'),
+                                   status=status,
+                                   nick=nick)
     else:
         return render_template('aticle.html',
-                                           menu=database.getMenu(),
-                                           title=post['title'],
-                                           post=post,
-                                           text=text,
-                                           photo=photo,
-                                           comments=comments,
-                                           ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'),
-                                           status=status,
-                                           nick=nick)
+                               menu=database.getMenu(),
+                               title=post['title'],
+                               post=post,
+                               text=text,
+                               photo=photo,
+                               comments=comments,
+                               ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'),
+                               status=status,
+                               nick=nick)
+
 
 # Comment add
 @app.route('/comment_add/<int:id_post>', methods=['POST', 'GET'])
@@ -737,6 +771,7 @@ def comment_add(id_post: int):
         else:
             return redirect(url_for('showPost', id_post=id_post))
 
+
 # Display image
 @app.route('/display_image_by_name/<post_name>', methods=['POST', 'GET'])
 def display_image_by_name(post_name: str):
@@ -744,6 +779,7 @@ def display_image_by_name(post_name: str):
     photobase = Photo(ph)
     filename = photobase.getPhoto(post_name)[3]
     return redirect(url_for('static', filename='photos/' + filename), code=301)
+
 
 # Deleting comment
 @app.route('/delcom/<int:id_post>/<int:id_com>')
@@ -763,6 +799,7 @@ def delcom(id_post: int, id_com: int):
     else:
         return redirect(url_for('showPost', id_post=id_post))
 
+
 # Deleting to-do-list
 @app.route('/deltodo/<int:id_todo>/')
 def deltodo(id_todo: int):
@@ -779,6 +816,7 @@ def deltodo(id_todo: int):
     else:
         return redirect(url_for('start_page'))
 
+
 # Settings PAGE
 @app.route('/settings/', methods=['POST', 'GET'])
 def settings():
@@ -794,39 +832,40 @@ def settings():
         if filename in i:
             if database.getProfile(session['userlogged']):
                 return render_template('settings.html',
-                                           menu=database.getMenu(),
-                                           title='Settings',
-                                           email=database.getEmail(session['userlogged'])[0],
-                                           ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'),
-                                           prof=database.getProfile(session['userlogged']),
-                                           status=status,
-                                           nick=nick,
-                                           email_status=email_status)
+                                       menu=database.getMenu(),
+                                       title='Settings',
+                                       email=database.getEmail(session['userlogged'])[0],
+                                       ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'),
+                                       prof=database.getProfile(session['userlogged']),
+                                       status=status,
+                                       nick=nick,
+                                       email_status=email_status)
             return render_template('settings.html',
-                                           menu=database.getMenu(),
-                                           title='Settings',
-                                           email=database.getEmail(session['userlogged'])[0],
-                                           ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'),
-                                           status=status,
-                                           email_status=email_status)
+                                   menu=database.getMenu(),
+                                   title='Settings',
+                                   email=database.getEmail(session['userlogged'])[0],
+                                   ava=open(f'{app.root_path + "/static/avatars/" + filename}', 'rb'),
+                                   status=status,
+                                   email_status=email_status)
     else:
         if database.getProfile(session['userlogged']):
             return render_template('settings.html',
-                                           menu=database.getMenu(),
-                                           title='Settings',
-                                           email=database.getEmail(session['userlogged'])[0],
-                                           ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'),
-                                           prof=database.getProfile(session['userlogged']),
-                                           status=status,
-                                           nick=nick,
-                                           email_status=email_status)
+                                   menu=database.getMenu(),
+                                   title='Settings',
+                                   email=database.getEmail(session['userlogged'])[0],
+                                   ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'),
+                                   prof=database.getProfile(session['userlogged']),
+                                   status=status,
+                                   nick=nick,
+                                   email_status=email_status)
         return render_template('settings.html',
-                                           menu=database.getMenu(),
-                                           title='Settings',
-                                           email=database.getEmail(session['userlogged'])[0],
-                                           ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'),
-                                           status=status,
-                                           email_status=email_status)
+                               menu=database.getMenu(),
+                               title='Settings',
+                               email=database.getEmail(session['userlogged'])[0],
+                               ava_empty=open(f'{app.root_path + "/static/avatars/static.png"}', 'rb'),
+                               status=status,
+                               email_status=email_status)
+
 
 # Profile editing
 @app.route('/prfoile', methods=['POST', 'GET'])
@@ -837,7 +876,8 @@ def profile():
         return redirect(url_for('start_page'))
     if request.method == 'POST':
         if 0 < len(request.form['nick']) < 15:
-            if database.UpdateProfile(request.form['nick'], request.form['name'],  request.form['age'], request.form['about'], session['userlogged']):
+            if database.UpdateProfile(request.form['nick'], request.form['name'], request.form['age'],
+                                      request.form['about'], session['userlogged']):
                 flash('Profile has been updated', category='success')
                 return redirect(url_for('settings'))
             else:
@@ -846,6 +886,7 @@ def profile():
         else:
             flash('This nickname is incorrect', category='error')
             return redirect(url_for('settings'))
+
 
 # Password editing
 @app.route('/password', methods=['POST', 'GET'])
@@ -874,6 +915,7 @@ def password():
             flash('You did not write password', category='error')
             return redirect(url_for('settings'))
 
+
 #Email editing
 @app.route('/email', methods=['POST', 'GET'])
 def email():
@@ -892,6 +934,7 @@ def email():
                 return redirect(url_for('settings'))
         return redirect(url_for('settings'))
 
+
 # Account deleting
 @app.route('/delete_account/<login>', methods=['POST', 'GET'])
 def delete_account(login: str):
@@ -905,6 +948,7 @@ def delete_account(login: str):
             os.remove(f'{app.root_path + "/static/avatars/" + filename}')
     else:
         return redirect(url_for('start_page')), session.clear()
+
 
 # Upload some file
 @app.route('/upload', methods=['GET', 'POST'])
@@ -922,11 +966,13 @@ def upload_file():
             file.save(os.path.join(f'{app.root_path + "/static/avatars/" + filename}'))
     return redirect(url_for('settings'))
 
+
 # Loading user avatar
 @app.route('/userava/<username>', methods=['POST', 'GET'])
 def userava(username: str):
     filename = str(username) + ".png"
     return redirect(url_for('static', filename='avatars/' + filename), code=301)
+
 
 # Deleting user avatar
 @app.route('/userava/delete/<filename>')
@@ -938,6 +984,7 @@ def userava_delete(filename: str):
     else:
         flash("No avatar", category='error')
         return redirect(url_for('settings'))
+
 
 # Forget psw PAGE
 @app.route('/forget_psw/', methods=['POST', 'GET'])
@@ -953,8 +1000,9 @@ def forget_psw():
             login = request.form['login']
             return redirect(url_for('reset_code_send', login=login))
     return render_template('forget_psw.html',
-                                            menu=database.getMenu(),
-                                            title='Forget password')
+                           menu=database.getMenu(),
+                           title='Forget password')
+
 
 # Send reset code
 @app.route('/reset_code_send/<login>', methods=['POST', 'GET'])
@@ -982,6 +1030,7 @@ def reset_code_send(login: str):
     send_email(email, 'Reset password', msg)
     return redirect(url_for('reset_password', login=login))
 
+
 # Reset password PAGE
 @app.route('/reset_password/<login>', methods=['POST', 'GET'])
 def reset_password(login: str):
@@ -992,7 +1041,7 @@ def reset_password(login: str):
         if int(request.form['code']) == int(code):
             session['userlogged'] = login
             email = database.getEmail(login)[0]
-            new_psw = generate_psw(16)
+            new_psw = generate_psw(32)
             msg = f"""
                 
                 From: Evgeniu Stepin
@@ -1012,14 +1061,15 @@ def reset_password(login: str):
             send_email(email, 'Password was changed', msg)
             return redirect(url_for('settings'))
         return render_template('reset_password.html',
-                                           menu=database.getMenu(),
-                                           title='Reset password',
-                                           login=login)
+                               menu=database.getMenu(),
+                               title='Reset password',
+                               login=login)
     return render_template('reset_password.html',
-                                           menu=database.getMenu(),
-                                           title='Reset password',
-                                           login=login,
-                                           email=email_fst)
+                           menu=database.getMenu(),
+                           title='Reset password',
+                           login=login,
+                           email=email_fst)
+
 
 # Website start
 if __name__ == "__main__":

@@ -38,6 +38,7 @@ postid integer not null
 
 create table if not exists todo (
 id integer primary key,
+login text not null default '',
 text text not null,
 time integer not null
 );
