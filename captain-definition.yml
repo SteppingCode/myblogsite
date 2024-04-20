@@ -1,6 +1,0 @@
-schemaVersion: 2
-name: git
-version: 1.0.0
-dockerfileLines: 5
-buildCommand: "pip install -r requirements.txt"
-runCommand: "python app.py"
