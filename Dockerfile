@@ -1,7 +1,7 @@
 # Используем официальный образ Python
 FROM python:3.9-slim
 
-COPY /path/to/requirements.txt /app/requirements.txt
+COPY requirements.txt /app/requirements.txt
 
 # Установка зависимостей
 RUN pip install --no-cache-dir -r requirements.txt
@@ -10,7 +10,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 WORKDIR /app
 
 # Копируем файлы проекта в контейнер
-COPY .github/workflows /app
+COPY / /app
 
 # Открытие порта 5000
 EXPOSE 3000
