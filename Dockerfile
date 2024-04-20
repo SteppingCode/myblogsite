@@ -14,7 +14,7 @@ WORKDIR /app
 COPY . /app
 
 # Открытие порта 3000
-EXPOSE 3000
+EXPOSE 5000
 
 # Запуск приложения
 CMD ["python", "app.py"]
