@@ -8,7 +8,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 WORKDIR /app
 
 # Копируем файлы проекта в контейнер
-COPY . /app
+COPY .github/workflows /app
 
 # Открытие порта 5000
 EXPOSE 3000
