@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 2,
+  "templateId": "python/3.11",
+  "dockerfileLines": [
+      "FROM python:3.11-slim",
+      "WORKDIR /usr/src/app",
+      "COPY ./src /usr/src/app",
+      "RUN pip install --no-cache-dir -r requirements.txt",
+      "EXPOSE 80",
+      "CMD [\"gunicorn\", \"-b\", \"0.0.0.0:80\", \"app:app\"]"
+  ]
+}

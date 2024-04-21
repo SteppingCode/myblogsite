@@ -1,20 +1,10 @@
-# Используем официальный образ Python
-FROM python:3.9-slim
+FROM python:3.11-slim
 
-# Копируем файл requirements.txt в контейнер
-COPY requirements.txt /app/requirements.txt
-
-# Установка зависимостей
-RUN pip install --no-cache-dir -r /app/requirements.txt
-
-# Установка рабочей директории внутри контейнера
 WORKDIR /app
 
-# Копируем все файлы проекта в контейнер
-COPY . /app
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Открытие порта 443
-EXPOSE 443
+COPY . .
 
-# Запуск приложения
-CMD ["python", "app.py"]
+CMD ["gunicorn", "-b", "0.0.0.0:80", "app:app"]
