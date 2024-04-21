@@ -3,7 +3,7 @@
   "dockerfilePath": "./Dockerfile",
   "appName": "git",
   "env": {
-    "PORT": 3000,
+    "PORT": 443,
     "PYTHONUNBUFFERED": "1"
   }
 }
