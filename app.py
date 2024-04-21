@@ -1,26 +1,24 @@
 # taskkill /f /im python.exe
 
-from datetime import timedelta
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-
 # Imports
 import os
-
-import database.sqldb
-
-os.environ["GIT_PYTHON_REFRESH"] = "quiet"
 import git
 import random
 import smtplib
 import sqlite3
+
+from datetime import timedelta
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 from flask import render_template, Flask, request, redirect, url_for, session, g, flash, Markup
 from werkzeug.utils import secure_filename
 
 from config import Config, Data, generate_psw
 from database.photos_db import Photo
 from database.sqldb import FDataBase
-from database import sqldb, photos_db
+
+os.environ["GIT_PYTHON_REFRESH"] = "quiet"
 
 # Upload folder
 UPLOAD_FOLDER = 'static/photos/'
@@ -39,6 +37,7 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
 
 # APP PATH
 APP_PATH = app.root_path
+
 
 # Connecting main DataBase
 def connect_db():
@@ -1038,7 +1037,7 @@ def reset_password(login: str):
     database = FDataBase(db)
     email_fst = database.getEmail(login)[0]
     if request.method == 'POST':
-        if int(request.form['code']) == int(code):
+        if int(code) == int(request.form['code']):
             session['userlogged'] = login
             email = database.getEmail(login)[0]
             new_psw = generate_psw(32)
