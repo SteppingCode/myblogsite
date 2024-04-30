@@ -6,6 +6,6 @@
       "WORKDIR /usr/src/app",
       "COPY ./src /usr/src/app",
       "RUN pip install --no-cache-dir -r requirements.txt",
-      "CMD [\"gunicorn\", \"-b\", \"blog.evgeniu-s.ru\", \"app:app\"]"
+      "CMD [\"gunicorn\", \"-b\", \"0.0.0.0:443\", \"app:app\"]"
   ]
 }

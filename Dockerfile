@@ -11,4 +11,4 @@ COPY . .
 
 ENV GIT_PYTHON_REFRESH quiet
 
-CMD ["gunicorn", "-b", "blog.evgeniu-s.ru", "app:app"]
+CMD ["gunicorn", "-b", "0.0.0.0:443", "app:app"]
