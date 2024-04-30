@@ -11,4 +11,6 @@ COPY . .
 
 ENV GIT_PYTHON_REFRESH quiet
 
+EXPOSE 443
+
 CMD ["gunicorn", "-b", "0.0.0.0:443", "app:app"]
