@@ -6,7 +6,7 @@
       "WORKDIR /usr/src/app",
       "COPY ./src /usr/src/app",
       "RUN pip install --no-cache-dir -r requirements.txt",
-      "EXPOSE 443",
-      "CMD [\"gunicorn\", \"-b\", \"0.0.0.0:443\", \"app:app\"]"
+      "EXPOSE 80",
+      "CMD [\"gunicorn\", \"-b\", \"0.0.0.0:80\", \"app:app\"]"
   ]
 }
