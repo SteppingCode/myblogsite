@@ -5,6 +5,10 @@ WORKDIR /app
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
+RUN apt-get update && apt-get install -y git
+
 COPY . .
 
-CMD ["gunicorn", "-b", "0.0.0.0:80", "app:app"]
+ENV GIT_PYTHON_REFRESH quiet
+
+CMD ["gunicorn", "-b", "blog.evgeniu-s.ru", "app:app"]

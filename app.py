@@ -3,6 +3,16 @@
 # Imports
 import os
 import git
+
+os.environ['GIT_PYTHON_GIT_EXECUTABLE'] = '/usr/bin/git'  # Указывайте актуальный путь
+os.environ['GIT_PYTHON_REFRESH'] = 'quiet'
+git.refresh('/usr/bin/git')
+
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logging.info(f"Using GIT executable at: {os.getenv('GIT_PYTHON_GIT_EXECUTABLE', 'Not set')}")
+
 import random
 import smtplib
 import sqlite3
@@ -11,6 +21,7 @@ from datetime import timedelta
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+import gunicorn
 from flask import render_template, Flask, request, redirect, url_for, session, g, flash, Markup
 from werkzeug.utils import secure_filename
 
@@ -18,7 +29,6 @@ from config import Config, Data, generate_psw
 from database.photos_db import Photo
 from database.sqldb import FDataBase
 
-os.environ["GIT_PYTHON_REFRESH"] = "quiet"
 
 # Upload folder
 UPLOAD_FOLDER = 'static/photos/'
@@ -1072,4 +1082,4 @@ def reset_password(login: str):
 
 # Website start
 if __name__ == "__main__":
-    app.run(host='0.0.0.0')
+    app.run(host='blog.evgeniu-s.ru')
